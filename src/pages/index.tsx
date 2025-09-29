@@ -375,7 +375,7 @@ export default function Maintenance() {
         Website Under Maintenance
       </h1>
       <h3 className="cooking-text">
-        Stay curious. We'll be live soon!
+        Stay curious. We will be live soon!
       </h3>
       <p className="subtitle">
         The new <span className="highlight">TEDx NIIT University</span> site is coming soon.<br />
