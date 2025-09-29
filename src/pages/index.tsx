@@ -1,361 +1,355 @@
-"use client"; // Ensures this component is treated as a client component in Next.js
+import { SignalZero } from 'lucide-react';
+import { useState, useEffect } from 'react';
 
-import Image from "next/image";
-import { useEffect, useState, useRef, ReactNode } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
-import Header from "@/components/Header/Header";
-import HeaderMob from "@/components/HeaderMob/HeaderMob";
-import Footer from "@/components/Footer/Footer";
-import CustomTimer from "@/components/Timer/Timer";
-import { BulletinBoard } from "@/components/BulletinBoard/BulletinBoard";
-import Link from "next/link";
-import confetti from "canvas-confetti";
-
-interface InnovativeSectionProps {
-  title: string;
-  description: string;
-  imageSrc: string;
-  ctaText: ReactNode;
-  isReversed: boolean;
-  className?: string;
+interface Particle {
+  id: number;
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  size: number;
+  opacity: number;
+  life: number;
 }
 
-const InnovativeSection: React.FC<InnovativeSectionProps> = ({
-  title,
-  description,
-  imageSrc,
-  ctaText,
-  isReversed,
-  className,
-}) => {
-  const sectionRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start end", "end start"],
-  });
-
-  const opacity = useTransform(scrollYProgress, [0, 0.5, 1], [0, 1, 0]);
-  const scale = useTransform(scrollYProgress, [6, 0.2, 1], [-1, 1, 0.2]);
-  const xOffset = useTransform(scrollYProgress, [0, 0.5, 0.7], [50, 0, 10]);
-  const negatedXOffset = useTransform(xOffset, (value) => -value);
-
-  return (
-    <motion.div
-      ref={sectionRef}
-      style={{ opacity, scale }}
-      className={`flex flex-col md:flex-row items-center min-h-screen ${
-        isReversed ? "md:flex-row-reverse" : ""
-      } ${className || ""}`}
-    >
-      <motion.div
-        style={{ x: isReversed ? xOffset : negatedXOffset }}
-        className="w-full md:w-1/2 p-6 md:p-12"
-      >
-        <h2 className="text-3xl md:text-4xl font-bold mb-4 md:mb-6 text-white">
-          {title}
-        </h2>
-        <p className="text-lg md:text-xl mb-6 md:mb-8 text-gray-300">
-          {description}
-        </p>
-        <button className="bg-red-600 text-white px-6 py-2 md:px-8 md:py-3 rounded-full text-base md:text-lg font-semibold hover:bg-red-700 transition-colors">
-          {ctaText}
-        </button>
-      </motion.div>
-      <div className="w-full md:w-1/2 h-[50vh] md:h-screen relative">
-        <Image
-          src={imageSrc || "/placeholder.svg"}
-          alt={title}
-          layout="fill"
-          objectFit="cover"
-          className="rounded-lg shadow-2xl"
-        />
-      </div>
-    </motion.div>
-  );
-};
-
-const HeroSection = () => {
-  const [scrollProgress, setScrollProgress] = useState(0);
-  const [, setTimeLeft] = useState(10 * 24 * 60 * 60);
-  const [isFixed, setIsFixed] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
-  const heroRef = useRef<HTMLDivElement>(null);
-  const contentRef = useRef<HTMLDivElement>(null);
-
-  const handleConfetti = () => {
-    const duration = 3 * 1000;
-    const animationEnd = Date.now() + duration;
-    const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
-
-    const randomInRange = (min: number, max: number) =>
-      Math.random() * (max - min) + min;
-
-    const interval = window.setInterval(() => {
-      const timeLeft = animationEnd - Date.now();
-
-      if (timeLeft <= 0) {
-        return clearInterval(interval);
-      }
-
-      const particleCount = 50 * (timeLeft / duration);
-      confetti({
-        ...defaults,
-        particleCount,
-        origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 },
-      });
-      confetti({
-        ...defaults,
-        particleCount,
-        origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 },
-      });
-    }, 250);
-  };
+export default function Maintenance() {
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [particles, setParticles] = useState<Particle[]>([]);
+  const [particleId, setParticleId] = useState(0);
+  const [clickRipples, setClickRipples] = useState<{id: number, x: number, y: number}[]>([]);
+  const [rippleId, setRippleId] = useState(0);
 
   useEffect(() => {
-    if (Date() >= "Mar 09 2025 08:30:00") {
-      handleConfetti();
-    }
-  }, []);
+    const MAX_PARTICLES = 150;
+    let lastTime = 0;
+    const updateMousePosition = (e: MouseEvent) => {
+      const now = Date.now();
+      // Throttle particle creation to every 20ms (faster creation)
+      if (now - lastTime < 20) return;
+      lastTime = now;
+      const newX = e.clientX;
+      const newY = e.clientY;
+      setMousePosition({ x: newX, y: newY });
 
-  useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth <= 768);
-    };
-
-    const handleScroll = () => {
-      if (heroRef.current) {
-        const scrollPosition = window.scrollY;
-        const heroHeight = heroRef.current.offsetHeight;
-        const progress = Math.min(scrollPosition / heroHeight, 1);
-        setScrollProgress(progress);
-
-        // Check if the second InnovativeSection is reached
-        const secondSection = document.getElementById("second-section");
-        if (secondSection) {
-          const secondSectionTop = secondSection.getBoundingClientRect().top;
-          if (secondSectionTop <= window.innerHeight) {
-            setIsFixed(true);
-          } else {
-            setIsFixed(false);
-          }
-        }
+      // Create more particles per move
+      const newParticles: Particle[] = [];
+      for (let i = 0; i < 2; i++) {
+        newParticles.push({
+          id: particleId + i,
+          x: newX + (Math.random() - 0.5) * 25,
+          y: newY + (Math.random() - 0.5) * 25,
+          vx: (Math.random() - 0.5) * 2.5,
+          vy: (Math.random() - 0.5) * 2.5 - 0.5,
+          size: Math.random() * 6 + 3,
+          opacity: 1,
+          life: 1
+        });
       }
+      setParticles(prev => {
+        const combined = [...prev, ...newParticles];
+        return combined.length > MAX_PARTICLES ? combined.slice(combined.length - MAX_PARTICLES) : combined;
+      });
+      setParticleId(prev => prev + 2);
     };
 
-    const timer = setInterval(() => {
-      setTimeLeft((prevTime) => (prevTime > 0 ? prevTime - 1 : 0));
-    }, 1000);
+    const handleClick = (e: MouseEvent) => {
+      const newRipple = {
+        id: rippleId,
+        x: e.clientX,
+        y: e.clientY
+      };
+      setClickRipples(prev => [...prev, newRipple]);
+      setRippleId(prev => prev + 1);
+      
+      // Remove ripple after animation
+      setTimeout(() => {
+        setClickRipples(prev => prev.filter(ripple => ripple.id !== newRipple.id));
+      }, 1000);
+    };
 
-    window.addEventListener("resize", handleResize);
-    window.addEventListener("scroll", handleScroll);
-    handleResize(); // Initial check
-
+    window.addEventListener('mousemove', updateMousePosition);
+    window.addEventListener('click', handleClick);
     return () => {
-      window.removeEventListener("resize", handleResize);
-      window.removeEventListener("scroll", handleScroll);
-      clearInterval(timer);
+      window.removeEventListener('mousemove', updateMousePosition);
+      window.removeEventListener('click', handleClick);
     };
+  }, [particleId, rippleId]);
+
+  // Animate particles
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setParticles(prev => 
+        prev.map(particle => ({
+          ...particle,
+          x: particle.x + particle.vx,
+          y: particle.y + particle.vy,
+          vy: particle.vy + 0.18, // gravity (slightly less)
+          opacity: particle.opacity * 0.96,
+          life: particle.life * 0.98,
+          size: particle.size * 0.995
+        })).filter(particle => particle.life > 0.1)
+      );
+    }, 24); // ~40fps for less CPU
+
+    return () => clearInterval(interval);
   }, []);
 
-  const logoScale = 2.3 + scrollProgress * 5.5;
-  const blurIntensity = scrollProgress * 10;
-  const contentOpacity = scrollProgress >= 1 ? 1 : 0;
-  const contentTranslateY = scrollProgress >= 1 ? 0 : 100;
-
   return (
-    <div className="relative bg-black/80">
-      {isMobile ? <HeaderMob /> : <Header />}
-      <div
-        ref={heroRef}
-        className={`sticky top-0 h-[130vh] overflow-hidden ${
-          isFixed ? "fixed" : ""
-        }`}
-      >
-        <div className="h-screen relative">
-          <div className="absolute left-0 top-0 w-1/2 h-1/2 bg-gradient-to-br from-black-600 to-transparent transform overflow-hidden z-30 blur-sm">
-            <Image
-              src="/images/test/7.jpg"
-              alt="Hourglass"
-              layout="fill"
-              objectFit="cover"
-            />
-            <div className="absolute inset-0 bg-black/50"></div>
-          </div>
-          <div className="absolute right-0 bottom-0 w-1/2 h-1/2 bg-gradient-to-tl from-red-600 to-transparent transform overflow-hidden z-30 blur-sm">
-            <Image
-              src="/images/test/8.jpg"
-              alt="Hourglass"
-              layout="fill"
-              objectFit="cover"
-            />
-          </div>
-          <div className="absolute md:right-1/2 right-1/3 bottom-0 w-1/2 h-1/2 bg-gradient-to-bl from-cyan-600 via-black to-black transform overflow-hidden z-0 blur-sm"></div>
-          <div className="absolute md:left-1/2 left-1/3 top-0 w-1/2 h-1/2 bg-gradient-to-tr from-red-600 via-black to-black transform overflow-hidden z-20 blur-sm"></div>
-          <div className="z-[999999]">
-            {" "}
-            <BulletinBoard
-              recentEvents={[
-                {
-                  title: "Echoes of Hourglass",
-                  date: "2025-01-28",
-                  images: [
-                    "/bulletin/panel (1).jpg",
-                    "/bulletin/panel (2).jpg",
-                  ],
-                },
-                {
-                  title: "Adventure Day",
-                  date: "2025-02-16",
-                  images: ["/bulletin/ad3.jpg", "/bulletin/ad1.jpg"],
-                },
-              ]}
-              nextEvent={{
-                title: "TEDxNIITUniversity",
-                date: "2025-03-09",
-                images: ["/images/theme.jpeg"],
-              }}
-            />
-          </div>
-
-          <div className="absolute top-1/4 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center z-[900]">
-            <h1 className="text-6xl md:text-6xl font-bold text-white">
-              INVE
-              <span className="inline-block transform scale-x-[-1] text-cyan-400">
-                R
-              </span>
-              SO{" "}
-              <span className="text-white whitespace-nowrap">
-                CLESSID
-                <span className="inline-block transform scale-x-[-1] text-red-600">
-                  R
-                </span>
-                A
-              </span>
-            </h1>
-            <p className="text-xl md:text-xl mt-4 mb-12 text-white">
-              As <span className="text-red-600 font-bold">time</span> folds,
-              perspectives unfold.
-            </p>
-          </div>
-          <div className="relative z-40 flex items-center justify-center w-full h-full">
-            <div className="relative">
-              <div className="w-[300px] h-[300px] md:w-[600px] md:h-[600px] border-white/10 border-2 transform rotate-45 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"></div>
-              <div className="w-[225px] h-[225px] md:w-[450px] md:h-[450px] bg-white/5 transform rotate-45 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"></div>
-              <div className="w-[150px] h-[150px] md:w-[300px] md:h-[300px] border-white/20 border-2 transform rotate-45 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"></div>
-              <div
-                className="w-[200px] h-[200px] md:w-[400px] md:h-[400px] flex items-center justify-center absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
-                style={{
-                  transform: `translate(-50%, -50%) scale(${logoScale})`,
-                }}
-              >
-                <Image
-                  src="/themes/Logo.png"
-                  alt="Hourglass"
-                  width={400}
-                  height={400}
-                  className="object-contain"
-                />
-              </div>
-            </div>
-          </div>
-          <div className="absolute top-[60%] left-1/2 transform -translate-x-1/2 text-white text-lg md:text-2xl z-[9999] md:mt-32 mt-20">
-            <p className="text-center text-3xl font-bold">
-              Main Event Concluded
-            </p>
-            <p className="text-center text-sm">
-              Stay Tuned For{" "}
-              <span className="text-[#eb0028] font-bold">TEDx</span>&apos;26!!
-            </p>
-            <CustomTimer />
-          </div>
-        </div>
-      </div>
-
-      <div
-        className="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity pointer-events-none z-20"
+    <div style={{
+      minHeight: "100vh",
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "center",
+      background: "linear-gradient(135deg, #181717ff 0%, #1b2230ff 50%, #160101ff 100%)",
+      color: "#fff",
+      padding: "20px",
+      textAlign: "center",
+      position: "relative",
+      overflow: "hidden"
+    }}>
+      {/* Watery texture background */}
+      <div 
         style={{
-          opacity: scrollProgress,
-          backdropFilter: `blur(${blurIntensity}px)`,
+          position: "absolute",
+          top: 0,
+          left: 0,
+          width: "100%",
+          height: "100%",
+          background: `
+            radial-gradient(circle 150px at ${mousePosition.x}px ${mousePosition.y}px, 
+              rgba(0, 150, 255, 0.1) 0%,
+              rgba(0, 200, 255, 0.05) 30%,
+              transparent 70%
+            ),
+            radial-gradient(circle 100px at ${mousePosition.x - 20}px ${mousePosition.y - 20}px, 
+              rgba(255, 255, 255, 0.03) 0%,
+              transparent 50%
+            ),
+            conic-gradient(from 0deg at ${mousePosition.x}px ${mousePosition.y}px, 
+              transparent 0deg,
+              rgba(0, 180, 255, 0.08) 90deg,
+              rgba(0, 150, 255, 0.05) 180deg,
+              rgba(255, 255, 255, 0.02) 270deg,
+              transparent 360deg
+            )
+          `,
+          pointerEvents: "none",
+          transition: "background 0.1s ease-out"
         }}
       />
+      
+      {/* Click Ripple effects */}
+      {clickRipples.map(ripple => (
+        <div
+          key={ripple.id}
+          style={{
+            position: "absolute",
+            top: ripple.y - 100,
+            left: ripple.x - 100,
+            width: "200px",
+            height: "200px",
+            borderRadius: "50%",
+            background: "radial-gradient(circle, rgba(0, 180, 255, 0.4) 0%, rgba(0, 150, 255, 0.2) 30%, rgba(255, 255, 255, 0.1) 50%, transparent 70%)",
+            pointerEvents: "none",
+            animation: "clickRipple 1s ease-out forwards"
+          }}
+        />
+      ))}
 
-      {/* Content Sections */}
-      <div
-        ref={contentRef}
-        className="relative z-30 transition-all duration-1000"
-        style={{
-          opacity: contentOpacity,
-          transform: `translateY(${contentTranslateY}px)`,
-        }}
-      >
-        <div className="h-[100vh]"></div>
-        {/* Innovative Sections */}
-        <InnovativeSection
-          title="Our Speakers"
-          description="Our TEDxNIITUniversity speakers are thought leaders, innovators, and visionaries from diverse fields. They share inspiring stories, groundbreaking ideas, and transformative experiences, sparking meaningful conversations and motivating our audience to embrace change and pursue their passions with purpose."
-          imageSrc="/images/rewindhero.jpeg"
-          ctaText={
-            <Link href="/speakers" className="text-white hover:underline">
-              Learn More
-            </Link>
-          }
-          isReversed={false}
-          className="z-30"
+      {/* Water particles */}
+      {particles.map(particle => (
+        <div
+          key={particle.id}
+          style={{
+            position: "absolute",
+            left: particle.x - particle.size / 2,
+            top: particle.y - particle.size / 2,
+            width: particle.size,
+            height: particle.size,
+            borderRadius: "50%",
+            background: `radial-gradient(circle, 
+              rgba(135, 206, 250, ${particle.opacity}) 0%, 
+              rgba(0, 191, 255, ${particle.opacity * 0.8}) 30%, 
+              rgba(30, 144, 255, ${particle.opacity * 0.6}) 60%,
+              transparent 100%
+            )`,
+            boxShadow: `0 0 ${particle.size}px rgba(0, 191, 255, ${particle.opacity * 0.5})`,
+            pointerEvents: "none",
+            animation: "sparkle 0.8s ease-out forwards"
+          }}
         />
-
-        <InnovativeSection
-          title="Our Sponsors"
-          description="Our sponsors play a vital role in making TEDxNIITUniversity possible. Their generous support helps fund the event, ensuring a platform for sharing ideas and empowering future innovators. We are grateful for their commitment to fostering creativity and collaboration."
-          imageSrc="/images/test/7.jpg"
-          ctaText={
-            <Link href="/sponsor" className="text-white hover:underline">
-              Learn More
-            </Link>
-          }
-          isReversed={true}
-          className="z-30"
-        />
-        <InnovativeSection
-          title="Pre-Events"
-          description="Our pre-events create a vibrant platform for idea exchange and collaboration. Engaging workshops, seminars, and networking opportunities offer participants a chance to prepare, collaborate, and connect, fueling their creative energies for the main TEDxNIITUniversity event."
-          imageSrc="/bulletin/tot1.png"
-          ctaText={
-            <Link href="/preevents" className="text-white hover:underline">
-              Learn More
-            </Link>
-          }
-          isReversed={false}
-          className="z-30"
-        />
-        <InnovativeSection
-          title="Rewind the Editions"
-          description="Rewind the editions captures the essence of previous TEDxNIITUniversity events. Through highlights, memorable talks, and key moments, we revisit the energy, innovation, and inspiration that defined each edition, showcasing the legacy of thought-provoking ideas and vibrant discussions."
-          imageSrc="/themes/saptaranga.png"
-          ctaText={
-            <Link href="/rewind" className="text-white hover:underline">
-              Learn More
-            </Link>
-          }
-          isReversed={true}
-          className="z-30"
-        />
-        <InnovativeSection
-          title="About TEDxNIITUniversity"
-          description="TEDxNIITUniversity is a dynamic stage where bold ideas collide, igniting conversations that challenge, inspire, and transform. Bringing together visionary thought leaders, innovators, and changemakers, this independently organized event pushes the boundaries of creativity and curiosity."
-          imageSrc="/images/test/8.jpg"
-          ctaText={
-            <Link href="/about" className="text-white hover:underline">
-              Learn More
-            </Link>
-          }
-          isReversed={false}
-          className="z-30"
-        />
-
-        <Footer />
+      ))}
+      
+      {/* Animated TEDx logo that follows physics */}
+      <div className="floating-logo">
+        <img src="/images/logo.png" alt="TEDx" />
       </div>
+
+      <style jsx>{`
+        @keyframes pulse {
+          0%, 100% { transform: scale(1); }
+          50% { transform: scale(1.05); }
+        }
+        
+        @keyframes glow {
+          0%, 100% { text-shadow: 0 0 5px #da9b9bff, 0 0 3px #ff2d92; }
+          50% { text-shadow: 0 0 5px #ff0000ff, 0 0 3px #ffffffff; }
+        }
+        
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        
+        @keyframes clickRipple {
+          0% {
+            transform: scale(0);
+            opacity: 0.8;
+          }
+          30% {
+            transform: scale(0.8);
+            opacity: 0.6;
+          }
+          70% {
+            transform: scale(1.5);
+            opacity: 0.3;
+          }
+          100% {
+            transform: scale(2.5);
+            opacity: 0;
+          }
+        }
+
+        @keyframes sparkle {
+          0% {
+            transform: scale(0) rotate(0deg);
+            opacity: 1;
+          }
+          50% {
+            transform: scale(1.2) rotate(180deg);
+            opacity: 0.8;
+          }
+          100% {
+            transform: scale(0.2) rotate(360deg);
+            opacity: 0;
+          }
+        }
+        
+        .main-title {
+          font-size: 4rem;
+          font-weight: 900;
+          background: linear-gradient(45deg, #8B0000, #DC143C, #B22222);
+          background-size: 400% 400%;
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+          animation: pulse 2s ease-in-out infinite, glow 3s ease-in-out infinite alternate;
+          margin-bottom: 2rem;
+          letter-spacing: 2px;
+          text-transform: uppercase;
+          font-family: 'Arial Black', Arial, sans-serif;
+          padding-top: 10rem
+        }
+        
+        .subtitle {
+          font-size: 1.5rem;
+          padding-top: 1rem;
+          font-weight: 600;
+          color: #ffffff;
+          text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+          animation: fadeInUp 1s ease-out 0.5s both;
+          line-height: 1.6;
+          max-width: 600px;
+          margin: 0 auto;
+        }
+        
+        .cooking-text {
+          font-size: 2rem;
+          font-weight: 700 !important;
+          background: linear-gradient(45deg, #8B0000, #a30a28ff, #B22222);
+          background-size: 400% 400%;
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+          animation: glow 3s ease-in-out infinite alternate;
+          padding-top: 5rem;
+          letter-spacing: 1px;
+          text-transform: uppercase;
+          font-family: 'Arial Black', 'Arial', sans-serif;
+          -webkit-font-smoothing: antialiased;
+        }
+        
+        .highlight {
+          background: linear-gradient(45deg, #ff2d92, #ff6b6b);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+          font-weight: 800;
+        }
+        
+        .floating-logo {
+          position: absolute;
+          top: 15%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          pointer-events: none;
+          animation: float 6s ease-in-out infinite;
+        }
+        
+        .floating-logo img {
+          width: 600px;
+          height: auto;
+          padding-bottom:
+        }
+        
+        @keyframes float {
+          0% {
+            transform: translate(-50%, -50%) translateY(0) rotate(0deg);
+          }
+          25% {
+            transform: translate(-50%, -50%) translateY(-10px) rotate(-5deg);
+          }
+          50% {
+            transform: translate(-50%, -50%) translateY(0) rotate(0deg);
+          }
+          75%{
+          transform: translate(-50%, -50%) translateY(10px) rotate(5deg);
+          }
+          100% {
+            transform: translate(-50%, -50%) translateY(0) rotate(0deg);
+          }
+        }
+        
+        @media (max-width: 768px) {
+          .main-title {
+            font-size: 2.5rem;
+          }
+          .cooking-text {
+            font-size: 1.5rem;
+          }
+          .subtitle {
+            font-size: 1.2rem;
+          }
+        }
+      `}</style>
+      
+      <h1 className="main-title">
+        Website Under Maintenance
+      </h1>
+      <h3 className="cooking-text">
+        Stay curious. We'll be live soon!
+      </h3>
+      <p className="subtitle">
+        The new <span className="highlight">TEDx NIIT University</span> site is coming soon.<br />
+        <strong>Stay tuned for something extraordinary!</strong>
+      </p>
     </div>
   );
-};
-
-export default HeroSection;
+}
