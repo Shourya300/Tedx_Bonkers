@@ -1,4 +1,3 @@
-import { SignalZero } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
 interface Particle {
