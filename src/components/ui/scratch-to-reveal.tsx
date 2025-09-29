@@ -121,7 +121,6 @@ export const ScratchToReveal: React.FC<ScratchToRevealProps> = ({
     const handleDocumentMouseUp = () => {
       setIsScratching(false);
       checkCompletion();
-      [isScratching, checkCompletion, scratch];
     };
 
     const handleDocumentTouchEnd = () => {
