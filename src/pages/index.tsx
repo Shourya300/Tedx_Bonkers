@@ -180,8 +180,8 @@ export default function Maintenance() {
         />
       ))}
       
-      {/* Animated TEDx logo that follows physics */}
-      <div className="floating-logo">
+      {/* TEDx Logo */}
+      <div className="logo">
         <img src="/images/logo.png" alt="TEDx" />
       </div>
 
@@ -295,36 +295,19 @@ export default function Maintenance() {
           font-weight: 800;
         }
         
-        .floating-logo {
+        .logo {
           position: absolute;
-          top: 15%;
+          top: 20%;
           left: 50%;
           transform: translate(-50%, -50%);
           pointer-events: none;
-          animation: float 6s ease-in-out infinite;
+          z-index: 1;
         }
         
-        .floating-logo img {
-          width: 600px;
+        .logo img {
+          width: 700px;
           height: auto;
-        }
-        
-        @keyframes float {
-          0% {
-            transform: translate(-50%, -50%) translateY(0) rotate(0deg);
-          }
-          25% {
-            transform: translate(-50%, -50%) translateY(-10px) rotate(-5deg);
-          }
-          50% {
-            transform: translate(-50%, -50%) translateY(0) rotate(0deg);
-          }
-          75% {
-            transform: translate(-50%, -50%) translateY(10px) rotate(5deg);
-          }
-          100% {
-            transform: translate(-50%, -50%) translateY(0) rotate(0deg);
-          }
+          opacity: 1;
         }
         
         @media (max-width: 768px) {
@@ -345,8 +328,8 @@ export default function Maintenance() {
             line-height: 1.4;
             padding: 0 10px;
           }
-          .floating-logo img {
-            width: 300px;
+          .logo img {
+            width: 250px;
           }
         }
         
@@ -365,8 +348,8 @@ export default function Maintenance() {
             font-size: 0.9rem;
             margin-top: 1rem;
           }
-          .floating-logo img {
-            width: 250px;
+          .logo img {
+            width: 200px;
           }
         }
       `}</style>
