@@ -252,22 +252,23 @@ export default function Maintenance() {
           background-clip: text;
           animation: pulse 2s ease-in-out infinite, glow 3s ease-in-out infinite alternate;
           margin-bottom: 2rem;
+          margin-top: 8rem;
           letter-spacing: 2px;
           text-transform: uppercase;
           font-family: 'Arial Black', Arial, sans-serif;
-          padding-top: 10rem
         }
         
         .subtitle {
           font-size: 1.5rem;
-          padding-top: 1rem;
+          margin-top: 2rem;
           font-weight: 600;
           color: #ffffff;
           text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
           animation: fadeInUp 1s ease-out 0.5s both;
           line-height: 1.6;
           max-width: 600px;
-          margin: 0 auto;
+          margin-left: auto;
+          margin-right: auto;
         }
         
         .cooking-text {
@@ -279,7 +280,8 @@ export default function Maintenance() {
           -webkit-text-fill-color: transparent;
           background-clip: text;
           animation: glow 3s ease-in-out infinite alternate;
-          padding-top: 5rem;
+          margin-top: 2rem;
+          margin-bottom: 2rem;
           letter-spacing: 1px;
           text-transform: uppercase;
           font-family: 'Arial Black', 'Arial', sans-serif;
@@ -306,7 +308,6 @@ export default function Maintenance() {
         .floating-logo img {
           width: 600px;
           height: auto;
-          padding-bottom:
         }
         
         @keyframes float {
@@ -319,8 +320,8 @@ export default function Maintenance() {
           50% {
             transform: translate(-50%, -50%) translateY(0) rotate(0deg);
           }
-          75%{
-          transform: translate(-50%, -50%) translateY(10px) rotate(5deg);
+          75% {
+            transform: translate(-50%, -50%) translateY(10px) rotate(5deg);
           }
           100% {
             transform: translate(-50%, -50%) translateY(0) rotate(0deg);
@@ -329,13 +330,44 @@ export default function Maintenance() {
         
         @media (max-width: 768px) {
           .main-title {
-            font-size: 2.5rem;
+            font-size: 2rem;
+            margin-top: 4rem;
+            margin-bottom: 1.5rem;
+            letter-spacing: 1px;
           }
           .cooking-text {
-            font-size: 1.5rem;
+            font-size: 1.3rem;
+            margin-top: 1.5rem;
+            margin-bottom: 1.5rem;
           }
           .subtitle {
-            font-size: 1.2rem;
+            font-size: 1rem;
+            margin-top: 1.5rem;
+            line-height: 1.4;
+            padding: 0 10px;
+          }
+          .floating-logo img {
+            width: 300px;
+          }
+        }
+        
+        @media (max-width: 480px) {
+          .main-title {
+            font-size: 1.5rem;
+            margin-top: 3rem;
+            margin-bottom: 1rem;
+          }
+          .cooking-text {
+            font-size: 1.1rem;
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+          }
+          .subtitle {
+            font-size: 0.9rem;
+            margin-top: 1rem;
+          }
+          .floating-logo img {
+            width: 250px;
           }
         }
       `}</style>
