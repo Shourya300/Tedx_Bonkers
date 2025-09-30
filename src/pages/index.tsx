@@ -88,7 +88,7 @@ export default function Maintenance() {
           size: particle.size * 0.995
         })).filter(particle => particle.life > 0.1)
       );
-    }, 24); // ~40fps for less CPU
+    }, 24); 
 
     return () => clearInterval(interval);
   }, []);
@@ -100,7 +100,7 @@ export default function Maintenance() {
       flexDirection: "column",
       alignItems: "center",
       justifyContent: "center",
-      background: "linear-gradient(135deg, #181717ff 0%, #1b2230ff 50%, #160101ff 100%)",
+      background: "linear-gradient(135deg, #181616ff 0%, #101520ff 50%, #520505ff 100%)",
       color: "#fff",
       padding: "20px",
       textAlign: "center",
@@ -117,19 +117,19 @@ export default function Maintenance() {
           height: "100%",
           background: `
             radial-gradient(circle 150px at ${mousePosition.x}px ${mousePosition.y}px, 
-              rgba(0, 150, 255, 0.1) 0%,
-              rgba(0, 200, 255, 0.05) 30%,
+              rgba(0, 150, 255, 0.2) 0%,
+              rgba(0, 200, 255, 0.12) 30%,
               transparent 70%
             ),
-            radial-gradient(circle 100px at ${mousePosition.x - 20}px ${mousePosition.y - 20}px, 
-              rgba(255, 255, 255, 0.03) 0%,
+            radial-gradient(circle 110px at ${mousePosition.x - 20}px ${mousePosition.y - 20}px, 
+              rgba(255, 255, 255, 0.08) 0%,
               transparent 50%
             ),
             conic-gradient(from 0deg at ${mousePosition.x}px ${mousePosition.y}px, 
               transparent 0deg,
-              rgba(0, 180, 255, 0.08) 90deg,
-              rgba(0, 150, 255, 0.05) 180deg,
-              rgba(255, 255, 255, 0.02) 270deg,
+              rgba(0, 180, 255, 0.15) 90deg,
+              rgba(0, 150, 255, 0.12) 180deg,
+              rgba(255, 255, 255, 0.06) 270deg,
               transparent 360deg
             )
           `,
@@ -349,7 +349,7 @@ export default function Maintenance() {
             margin-top: 1rem;
           }
           .logo img {
-            width: 200px;
+            width: 400px;
           }
         }
       `}</style>
