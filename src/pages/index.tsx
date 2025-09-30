@@ -329,7 +329,10 @@ export default function Maintenance() {
             padding: 0 10px;
           }
           .logo img {
-            width: 250px;
+            width: 70vw;
+          max-width: 350px;
+          min-width: 180px;
+          height: auto;
           }
         }
         
@@ -349,7 +352,10 @@ export default function Maintenance() {
             margin-top: 1rem;
           }
           .logo img {
-            width: 400px;
+            width: 90vw;
+            max-width: 350px;
+            min-width: 150px;
+            height: auto;
           }
         }
       `}</style>
