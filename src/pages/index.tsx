@@ -61,9 +61,9 @@ export default function Maintenance() {
             autoDemo={true}
             autoSpeed={1.0}
             autoIntensity={1.5}
-            takeoverDuration={0.1}
+            takeoverDuration={0.02}
             autoResumeDelay={0}
-            autoRampDuration={0.2}
+            autoRampDuration={0.05}
           />
         </div>
 
