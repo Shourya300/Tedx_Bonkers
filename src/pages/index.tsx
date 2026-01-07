@@ -1,214 +1,172 @@
-import { useState, useEffect } from "react";
-import LiquidEther from "../components/LiquidEther";
 
-export default function Maintenance() {
-  const [clickRipples, setClickRipples] = useState<
-    { id: number; x: number; y: number }[]
-  >([]);
-  const [rippleId, setRippleId] = useState(0);
+"use client";
+import FluidCursor from "@/components/FluidCursor";
+import TedxButton from "@/components/TedxButton";
+import dynamic from "next/dynamic";
+import { useRef, useEffect, useLayoutEffect } from "react";
+import gsap from "gsap";
 
-  useEffect(() => {
-    const handleClick = (e: MouseEvent) => {
-      const newRipple = { id: rippleId, x: e.clientX, y: e.clientY };
-      setClickRipples((prev) => [...prev, newRipple]);
-      setRippleId((prev) => prev + 1);
-      setTimeout(() => {
-        setClickRipples((prev) =>
-          prev.filter((ripple) => ripple.id !== newRipple.id)
-        );
-      }, 1000);
-    };
-    window.addEventListener("click", handleClick);
-    return () => window.removeEventListener("click", handleClick);
-  }, [rippleId]);
+const useIsomorphicLayoutEffect =
+  typeof window !== "undefined" ? useLayoutEffect : useEffect;
+
+// Dynamically import ModelViewer
+const ModelViewer = dynamic(
+  () => import("@/components/ModelViewer/ModelViewer"),
+  { ssr: false }
+);
+
+export default function Home() {
+  const textWrapRef = useRef<HTMLDivElement>(null);
+
+  useIsomorphicLayoutEffect(() => {
+    if (typeof window === "undefined") return;
+
+    let ctx: gsap.Context | undefined;
+
+    (async () => {
+      const { ScrollTrigger } = await import("gsap/ScrollTrigger");
+      gsap.registerPlugin(ScrollTrigger);
+
+      ctx = gsap.context(() => {
+        if (!textWrapRef.current) return;
+
+        const totalShift = window.innerHeight * 2;
+
+        gsap.to(textWrapRef.current, {
+          y: -totalShift,
+          ease: "none",
+          scrollTrigger: {
+            trigger: document.body,
+            start: "top top",
+            end: "+=2000",
+            scrub: true,
+          },
+        });
+      });
+    })();
+
+    return () => ctx?.revert();
+  }, []);
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        background: "#000000",
-        color: "#fff",
-        padding: "20px",
-        textAlign: "center",
-        position: "relative",
-        overflow: "hidden",
-      }}
-    >
-      <div
-        style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          width: "100%",
-          height: "100%",
-          zIndex: 0,
-        }}
-      >
-          <LiquidEther
-            // colors={["#ff0000ff", "#e00e0eff", "#e94d4dff"]}
-            mouseForce={10}
-            cursorSize={140}
-            isViscous={false}
-            viscous={35}
-            iterationsViscous={32}
-            iterationsPoisson={22}
-            resolution={0.3}
-            isBounce={true}
-            autoDemo={true}
-            autoSpeed={1.0}
-            autoIntensity={1.5}
-            takeoverDuration={0.1}
-            autoResumeDelay={0}
-            autoRampDuration={0.2}
-          />
-        </div>
-
-      {clickRipples.map((ripple) => (
-        <div
-          key={ripple.id}
-          style={{
-            position: "absolute",
-            top: ripple.y - 100,
-            left: ripple.x - 100,
-            width: "200px",
-            height: "200px",
-            borderRadius: "50%",
-            background:
-              "radial-gradient(circle, rgba(0, 180, 255, 0.4) 0%, rgba(0, 150, 255, 0.2) 30%, rgba(255, 255, 255, 0.1) 50%, transparent 70%)",
-            pointerEvents: "none",
-            animation: "clickRipple 1s ease-out forwards",
-            zIndex: 1,
-          }}
-        />
-      ))}
-
-      <div className="fg">
-        <span className="logo">
-          <img src="/images/logo-white.png" alt="TEDx" />
-        </span>
-        <span className="text-overlay">
-          <h1 className="main-title">Website Under Maintenance</h1>
-          <h3 className="cooking-text">Stay curious. We will be live soon!</h3>
-        </span>
+    <main className="relative w-full min-h-screen bg-black">
+      {/* Fixed Scene */}
+      <div className="fixed inset-0 z-0 overflow-hidden">
+        <ModelViewer url="/models/grid/Hoodie.glb" />
       </div>
 
-      <style jsx>{`
-        @keyframes clickRipple {
-          0% {
-            transform: scale(0);
-            opacity: 0.8;
-          }
-          30% {
-            transform: scale(0.8);
-            opacity: 0.6;
-          }
-          70% {
-            transform: scale(1.5);
-            opacity: 0.3;
-          }
-          100% {
-            transform: scale(2.5);
-            opacity: 0;
-          }
-        }
+      {/* Text Overlay */}
+      <div
+        ref={textWrapRef}
+        className="absolute inset-0 z-10 pointer-events-none will-change-transform md:mr-40"
+      >
+        <section className="min-h-screen flex items-center justify-center" />
 
-        .fg {
-          display: flex;
-          flex-direction: column;
-          gap: 0.3rem;
-          align-items: center;
-          z-index: 2;
-          position: relative;
-          pointer-events: none;
-        }
+        <section className="min-h-screen flex items-center justify-center pointer-events-auto px-6 md:px-12">
+          <div className="max-w-xl mx-auto md:ml-auto md:mr-0 text-center">
+            <div className="flex flex-col items-center">
+              <h2 className="text-4xl md:text-7xl font-bold text-white text-glow">
+                Speakers
+              </h2>
+              <div className="w-36 h-[1px] bg-[#D3D3D3] shadow-[0_0_10px_rgba(230,230,230,230)] mt-4" />
+              <p className="text-center text-[16px] md:text-[24px] leading-[1.7] max-w-[460px] mx-auto font-medium font-sans tracking-[0.02em] text-[#EAEAEA] mt-8 px-4 md:px-0">
+                Ideas shape the future—and our speakers are the voices leading
+                that change. Meet innovators, thinkers, creators, and
+                storytellers from diverse fields who will take the stage to
+                share powerful ideas worth spreading. Each talk is crafted to
+                spark curiosity, challenge perspectives, and inspire action.
+              </p>
+              <div className="mt-6">
+                <TedxButton />
+              </div>
+            </div>
+          </div>
+        </section>
 
-        .logo img {
-          width: 700px;
-          height: auto;
-          opacity: 1;
-          pointer-events: none;
-        }
+        <section className="min-h-screen flex items-center pointer-events-auto px-6 md:px-12">
+          <div className="max-w-xl mx-auto md:ml-auto md:mr-0 text-center">
+            <div className="flex flex-col items-center">
+              <h2 className="text-4xl md:text-7xl font-bold text-white text-glow">
+                Pre-Events
+              </h2>
+              <div className="w-48 h-[1px] bg-[#D3D3D3] shadow-[0_0_10px_rgba(230,230,230,230)] mt-4" />
+              <p className="text-center text-[16px] md:text-[24px] leading-[1.7] max-w-[460px] mx-auto font-medium font-sans tracking-[0.02em] text-[#EAEAEA] mt-8 px-4 md:px-0">
+                Before the main TEDx experience, we bring the community together
+                through engaging pre-events. From workshops and panel
+                discussions to interactive meetups, these sessions are designed
+                to ignite conversations, foster collaboration, and build
+                momentum leading up to the main event.
+              </p>
+              <div className="mt-6">
+                <TedxButton />
+              </div>
+            </div>
+          </div>
+        </section>
+        <section className="min-h-screen flex items-center pointer-events-auto px-6 md:px-12">
+          <div className="max-w-xl mx-auto md:ml-auto md:mr-0 text-center">
+            <div className="flex flex-col items-center">
+              <h2 className="text-4xl md:text-7xl font-bold text-white text-glow">
+                Rewind
+              </h2>
+              <div className="w-24 h-[1px] bg-[#D3D3D3] shadow-[0_0_10px_rgba(230,230,230,230)] mt-4" />
+              <p className="text-center text-[16px] md:text-[24px] leading-[1.7] max-w-[460px] mx-auto font-medium font-sans tracking-[0.02em] text-[#EAEAEA] mt-8 px-4 md:px-0">
+                Rewind is a podcast that explores the intersection of technology
+                and society. From discussions on the latest trends to in-depth
+                analysis of emerging technologies, Rewind offers a unique
+                perspective on the future of our world.
+              </p>
+              <div className="mt-6">
+                <TedxButton />
+              </div>
+            </div>
+          </div>
+        </section>
 
-        .text-overlay {
-          background: rgba(0, 0, 0, 0.55);
-          padding: 3rem 3rem;
-          border-radius: 20px;
-          backdrop-filter: blur(6px);
-          z-index: 2;
-          position: relative;
-          max-width: 800px;
-          margin-top: 2.5rem;
-          text-align: center;
-          pointer-events: none;
-          box-shadow:
-            inset 1px 1px 4px rgba(255, 255, 255, 0.15),
-            inset -1px -1px 4px rgba(0, 0, 0, 0.5),
-            2px 2px 8px rgba(0, 0, 0, 0.6),
-            -2px -2px 8px rgba(255, 255, 255, 0.05);
-        }
+        <section className="min-h-screen flex items-center pointer-events-auto px-6 md:px-12">
+          <div className="max-w-xl mx-auto md:ml-auto md:mr-0 text-center">
+            <div className="flex flex-col items-center">
+              <h2 className="text-4xl md:text-7xl font-bold text-white text-glow">
+                About
+              </h2>
+              <div className="w-24 h-[1px] bg-[#D3D3D3] shadow-[0_0_10px_rgba(230,230,230,230)] mt-4" />
+              <p className="text-center text-[16px] md:text-[24px] leading-[1.7] max-w-[480px] mx-auto font-sans font-medium tracking-[0.02em] text-[#EAEAEA] mt-8 px-4 md:px-0">
+                TEDx is a global movement dedicated to sharing ideas that
+                matter. <br />
+                TEDxNIIT University is an independently organized event driven
+                by a passionate team committed to creating a platform where
+                ideas, innovation, and dialogue thrive within our community.
+              </p>
+              <div className="mt-6">
+                <TedxButton />
+              </div>
+            </div>
+          </div>
+        </section>
+        <section className="min-h-screen flex items-center pointer-events-auto px-6 md:px-12">
+          <div className="max-w-xl mx-auto md:ml-auto md:mr-0 text-center">
+            <div className="flex flex-col items-center">
+              <h2 className="text-4xl md:text-7xl font-bold text-white text-glow">
+                Sponsors
+              </h2>
+              <div className="w-36 h-[1px] bg-[#D3D3D3] shadow-[0_0_10px_rgba(230,230,230,230)] mt-4" />
+              <p className="text-center text-[16px] md:text-[24px] leading-[1.7] max-w-[480px] mx-auto font-medium font-sans tracking-[0.02em] text-[#EAEAEA] mt-8 px-4 md:px-0">
+                Our sponsors make ideas possible. We are grateful to the
+                organizations and partners who support our vision and help bring
+                TEDxNIITUniversity to life. Their collaboration enables us to
+                create an experience that inspires, educates, and connects.
+              </p>
+              <div className="mt-6">
+                <TedxButton />
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
 
-        .main-title,
-        .cooking-text {
-          font-family: "Helvetica", "Poppins", "Arial Black", Arial, sans-serif;
-          text-transform: uppercase;
-          pointer-events: none;
-        }
-
-        .main-title {
-          font-size: 3.8rem;
-          font-weight: 800;
-          color: #eb0028;
-          letter-spacing: 2px;
-          margin-bottom: 0.5rem;
-        }
-
-        .cooking-text {
-          color: #e8e8e8;
-          font-size: 1.3rem;
-          font-weight: 400;
-          letter-spacing: 1px;
-        }
-
-        @media (max-width: 768px) {
-          .main-title {
-            font-size: 2.2rem;
-          }
-          .cooking-text {
-            font-size: 1.1rem;
-          }
-          .text-overlay {
-            margin-top: 2rem;
-            padding: 2rem 1.5rem;
-          }
-          .logo img {
-            width: 70vw;
-            max-width: 350px;
-          }
-        }
-
-        @media (max-width: 480px) {
-          .main-title {
-            font-size: 1.7rem;
-          }
-          .cooking-text {
-            font-size: 1rem;
-          }
-          .text-overlay {
-            margin-top: 1.5rem;
-            padding: 1.5rem 1rem;
-          }
-          .logo img {
-            width: 90vw;
-            max-width: 350px;
-          }
-        }
-      `}</style>
-
-      
-    </div>
+      {/* Fake Scroll Space */}
+      <div style={{ height: "200vh" }} />
+    </main>
   );
 }
+

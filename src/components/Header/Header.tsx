@@ -3,31 +3,11 @@ import Link from "next/link";
 import Image from "next/image";
 
 export default function Header() {
-  const [isSticky, setIsSticky] = useState(false); // Tracks sticky state based on scroll
-  const [isForceNotSticky, setIsForceNotSticky] = useState(false); // Tracks forced non-sticky state
-  const [isMenuOpen, setIsMenuOpen] = useState(false); // Tracks menu toggle state
-
-  useEffect(() => {
-    const handleScroll = () => {
-      // Reset forced non-sticky state on scroll
-      if (isForceNotSticky) {
-        setIsForceNotSticky(false);
-      }
-
-      // Apply sticky state based on scroll position
-      setIsSticky(window.scrollY >= 100);
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, [isForceNotSticky]);
+  const isSticky = false;
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const handleHeaderClick = () => {
-    // Toggle the forced non-sticky state
-    setIsForceNotSticky(true);
-    setIsSticky(false); // Ensure navbar is not sticky when forced
+   
   };
 
   const handleMenuToggle = () => {
@@ -64,52 +44,7 @@ export default function Header() {
             </Link>
           </div>
 
-          {/* Conditionally hide/show elements with animations */}
-          <div
-            className={`flex-1 flex justify-center space-x-8 hidden md:flex transition-opacity duration-10 ${
-              isSticky
-                ? "opacity-0 pointer-events-none"
-                : "opacity-100 pointer-events-auto"
-            }`}
-          >
-            <Link
-              href="/speakers"
-              className="text-white hover:text-[#eb0028] transition duration-300"
-            >
-              Speakers
-            </Link>
-            <Link
-              href="/sponsor"
-              className="text-white hover:text-[#eb0028] transition duration-300"
-            >
-              Sponsors
-            </Link>
-            <Link
-              href="/rewind"
-              className="text-white hover:text-[#eb0028] transition duration-300"
-            >
-              Rewind
-            </Link>
-            <Link
-              href="/preevents"
-              className="text-white hover:text-[#eb0028] transition duration-100 whitespace-nowrap"
-            >
-              Pre-Events
-            </Link>
-            <Link
-              href="/timeline"
-              className="text-white hover:text-[#eb0028] transition duration-100 whitespace-nowrap"
-            >
-              Timeline
-            </Link>
-            <Link
-              href="/about"
-              className="text-white hover:text-[#eb0028] transition duration-300"
-            >
-              About
-            </Link>
-          </div>
-
+          
           <div
             className={`flex items-center space-x-4 md:flex transition-opacity duration-500 ${
               isSticky
@@ -117,12 +52,7 @@ export default function Header() {
                 : "opacity-100 pointer-events-auto"
             }`}
           >
-            {/* <Link
-              href="/merchandise"
-              className="text-white border-2 border-[#eb0028] px-4 py-2 rounded-full bg-[#eb0028] hover:bg-[#fc4f4f] hover:text-white transition duration-300"
-            >
-              Merchandise
-            </Link> */}
+            
 
             <Link
               href="/register"
@@ -132,7 +62,6 @@ export default function Header() {
             </Link>
           </div>
 
-          {/* Menu Button */}
           <button
             id="openmenu"
             className={`absolute left-0 right-0 mx-auto w-[60px] h-[60px] rounded-full backdrop-blur-md border border-white/10 bg-black/30 flex flex-col justify-center items-center cursor-pointer transition-transform duration-500 ${

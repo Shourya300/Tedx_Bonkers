@@ -1,11 +1,18 @@
 import { ThemeProvider } from "next-themes";
 import "@/styles/globals.css";
-import Maintenance from "./index";
-import "@/components/LiquidEther.css"
-function MyApp() {
+
+import Navbar from "@/components/Navbar/Navbar";
+
+function MyApp({ Component, pageProps, router }: AppProps) {
+  const showHeaderFooter =
+    // router.pathname !== "/" && // Enable on index
+    router.pathname !== "/page" && router.pathname !== "/wordle";
+
   return (
     <ThemeProvider defaultTheme="dark" attribute="class">
-      <Maintenance />
+      {showHeaderFooter && <Navbar />}
+      <Component {...pageProps} />
+
     </ThemeProvider>
   );
 }
