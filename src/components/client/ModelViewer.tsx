@@ -1,86 +1,15 @@
 "use client";
 
 import { useRef, useLayoutEffect } from "react";
-import { Canvas } from "@react-three/fiber";
-import { OrbitControls, useGLTF, Environment, Center } from "@react-three/drei";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { useFrame, useThree } from "@react-three/fiber";
 gsap.registerPlugin(ScrollTrigger);
-import { useEffect, useState } from "react";
-
-import FluidCursor from "@/components/FluidCursor";
-
-function Model({ url }: { url: string }) {
-  const { scene } = useGLTF(url);
-  const { viewport } = useThree();
-
-  const isMobile = viewport.width < 5.5;
-  useLayoutEffect(() => {
-    scene.traverse((child: any) => {
-      if (child.isMesh && child.material) {
-        child.material.transparent = true;
-        child.material.depthWrite = false;
-        child.material.depthTest = true;
-      }
-    });
-  }, [scene]);
-
-  return <primitive object={scene} scale={isMobile ? 0.8 : 1} />;
-}
-
-function ClearFrame() {
-  const { gl } = useThree();
-
-  useFrame(() => {
-    gl.clear(true, true);
-  });
-
-  return null;
-}
 
 export default function ModelViewer({ url }: { url: string }) {
-  const canvasRef = useRef<HTMLDivElement>(null);
   const bg2Ref = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
-    if (!canvasRef.current || !bg2Ref.current) return;
-
-    const mm = gsap.matchMedia();
-
-    // Desktop: shift left
-    mm.add("(min-width: 769px)", () => {
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: "body",
-          start: "top top",
-          end: "90%",
-          scrub: 1,
-        },
-      });
-
-      tl.to(canvasRef.current, {
-        xPercent: -25,
-        ease: "none",
-      });
-    });
-
-    mm.add("(max-width: 768px)", () => {
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: "body",
-          start: "top top",
-          end: "90%",
-          scrub: 1,
-        },
-      });
-
-      tl.to(canvasRef.current, {
-        xPercent: 0,
-        scale: 0.8,
-        ease: "none",
-      });
-    });
+    if (!bg2Ref.current) return;
 
     // Background Image Transition (Mask & Glow)
     let currentProgress = 0;
@@ -99,7 +28,7 @@ export default function ModelViewer({ url }: { url: string }) {
     });
 
     // Smoothly ease visual progress toward target
-    gsap.ticker.add(() => {
+    const onTick = () => {
       currentProgress += (targetProgress - currentProgress) * 0.08; // damping factor
       bg2Ref.current?.style.setProperty(
         "--progress",
@@ -113,9 +42,12 @@ export default function ModelViewer({ url }: { url: string }) {
           ? glowOpacity.toString()
           : "0"
       );
-    });
+    };
+
+    gsap.ticker.add(onTick);
 
     return () => {
+      gsap.ticker.remove(onTick);
       ScrollTrigger.getAll().forEach((t) => t.kill());
     };
   }, []);
@@ -134,9 +66,6 @@ export default function ModelViewer({ url }: { url: string }) {
           } as React.CSSProperties
         }
       >
-        {/* Blurred Fluid Cursor */}
-        <FluidCursor />
-
         {/* Background Layer 1: Initial Image */}
         <div
           className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat"
@@ -163,37 +92,6 @@ export default function ModelViewer({ url }: { url: string }) {
             opacity: `var(--glow-opacity)`,
           }}
         />
-      </div>
-
-      <div
-        ref={canvasRef}
-        className="absolute inset-0 z-10 pointer-events-auto"
-        style={{ top: "20px" }}
-      >
-        <Canvas
-          camera={{ position: [0, 0, 5.5], fov: 45 }}
-          gl={{ alpha: true }}
-          onCreated={({ gl }) => {
-            gl.setClearColor(0x000000, 0);
-            gl.autoClear = false;
-          }}
-        >
-          <ClearFrame />
-          <ambientLight intensity={0.5} />
-          <directionalLight position={[10, 10, 5]} intensity={1} />
-          <Environment preset="city" />
-          <Center>
-            <Model url={url} />
-          </Center>
-          <OrbitControls
-            makeDefault
-            enableZoom={false}
-            minAzimuthAngle={-Math.PI / 2}
-            maxAzimuthAngle={Math.PI / 2}
-            minPolarAngle={Math.PI / 3}
-            maxPolarAngle={Math.PI / 1.5}
-          />
-        </Canvas>
       </div>
     </div>
   );

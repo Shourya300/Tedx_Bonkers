@@ -1,19 +1,18 @@
-
 "use client";
-import FluidCursor from "@/components/FluidCursor";
 import TedxButton from "@/components/TedxButton";
 import dynamic from "next/dynamic";
 import { useRef, useEffect, useLayoutEffect } from "react";
 import gsap from "gsap";
+import FluidGlass from "@/components/FluidGlass/FluidGlass";
 
 const useIsomorphicLayoutEffect =
   typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
 // Dynamically import ModelViewer
-const ModelViewer = dynamic(
-  () => import("@/components/ModelViewer/ModelViewer"),
-  { ssr: false }
-);
+
+const ModelViewer = dynamic(() => import("@/components/client/ModelViewer"), {
+  ssr: false,
+});
 
 export default function Home() {
   const textWrapRef = useRef<HTMLDivElement>(null);
@@ -164,9 +163,8 @@ export default function Home() {
         </section>
       </div>
 
-      {/* Fake Scroll Space */}
       <div style={{ height: "200vh" }} />
+      <FluidGlass />
     </main>
   );
 }
-

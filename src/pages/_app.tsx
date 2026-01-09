@@ -2,6 +2,7 @@ import { ThemeProvider } from "next-themes";
 import "@/styles/globals.css";
 
 import Navbar from "@/components/Navbar/Navbar";
+import type { AppProps } from "next/app";
 
 function MyApp({ Component, pageProps, router }: AppProps) {
   const showHeaderFooter =

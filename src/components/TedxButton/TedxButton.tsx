@@ -38,14 +38,13 @@ const Cross = ({ className }: { className?: string }) => (
   </svg>
 );
 
-const BUTTON_CLIP =
-  `polygon(
-    2% 50%,
-    4% 0%,
-    96% 0%,
-    98% 50%,
-    96% 100%,
-    4% 100%
+const BUTTON_CLIP = `polygon(
+    5% 50%,
+    15% 0%,
+    85% 0%,
+    95% 50%,
+    85% 100%,
+    15% 100%
   )`;
 
 const TedxButton: React.FC<TedxButtonProps> = ({
@@ -55,15 +54,15 @@ const TedxButton: React.FC<TedxButtonProps> = ({
 }) => {
   return (
     <button
-      className={`relative px-11 py-3.5 bg-[#2a2a2a] cursor-pointer overflow-hidden transition-colors duration-300 hover:bg-[#1f1f1f] font-medium text-base tracking-[0.02em] ${className}`}
+      className={`relative px-10 md:px-14 py-2.5 md:py-3.5 bg-[#2a2a2a] cursor-pointer overflow-hidden transition-colors duration-300 hover:bg-[#1f1f1f] font-medium text-sm md:text-base tracking-[0.02em] ${className}`}
       onClick={onClick}
       style={{ clipPath: BUTTON_CLIP }}
     >
       {/* LEFT CROSS */}
-      <Cross className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 z-[3] size-3" />
+      <Cross className="pointer-events-none absolute left-5 md:left-7 top-1/2 -translate-y-1/2 z-[3] size-2.5 md:size-3" />
 
       {/* RIGHT CROSS */}
-      <Cross className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 z-[3] size-3" />
+      <Cross className="pointer-events-none absolute right-5 md:right-7 top-1/2 -translate-y-1/2 z-[3] size-2.5 md:size-3" />
 
       {/* BORDER SVG */}
       <svg
@@ -72,39 +71,14 @@ const TedxButton: React.FC<TedxButtonProps> = ({
         preserveAspectRatio="none"
       >
         <polygon
-          points="4,0 96,0 100,50 96,100 4,100 0,50"
+          points="7,50 16,8 84,8 93,50 84,92 16,92"
           fill="none"
-          stroke="#E62B1E"
-          strokeWidth="1.5"
+          stroke="rgba(244,194,160,0.7)"
+          strokeWidth="0.8"
           vectorEffect="non-scaling-stroke"
         />
       </svg>
 
-      <svg
-        className="absolute top-0 left-0 w-full h-full pointer-events-none z-[1]"
-        viewBox="0 0 100 100"
-        preserveAspectRatio="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <line
-          x1="0"
-          y1="0"
-          x2="100"
-          y2="100"
-          stroke="#E62B1E"
-          strokeWidth="2"
-          opacity="0.35"
-        />
-        <line
-          x1="100"
-          y1="0"
-          x2="0"
-          y2="100"
-          stroke="#E62B1E"
-          strokeWidth="2"
-          opacity="0.35"
-        />
-      </svg>
       <span className="relative z-[2] text-white inline-block">{text}</span>
     </button>
   );
