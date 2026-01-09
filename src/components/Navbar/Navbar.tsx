@@ -23,7 +23,7 @@ const NAV_CLIP_INNER = `
   )
 `;
 
-const Cross = ({ className }) => (
+const Cross = ({ className }: { className?: string }) => (
   <svg
     className={className}
     width="18"
