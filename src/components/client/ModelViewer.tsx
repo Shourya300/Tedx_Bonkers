@@ -20,7 +20,7 @@ export default function ModelViewer({ url }: { url: string }) {
     ScrollTrigger.create({
       trigger: "body",
       start: "top top+=1",
-      end: "+=1300",
+      end: "+=5000",
       scrub: false,
       onUpdate: (self) => {
         targetProgress = clamp(self.progress);

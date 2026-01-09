@@ -37,8 +37,13 @@ export default function Home() {
           scrollTrigger: {
             trigger: document.body,
             start: "top top",
-            end: "+=2000",
+            end: "+=5000", // Matches FluidGlass range
             scrub: true,
+            onUpdate: (self) => {
+              // Only start moving text after 70% of progression (slower lens growth)
+              const progress = Math.max(0, (self.progress - 0.3) / 0.7);
+              gsap.set(textWrapRef.current, { y: -totalShift * progress });
+            },
           },
         });
       });
@@ -57,7 +62,7 @@ export default function Home() {
       {/* Text Overlay */}
       <div
         ref={textWrapRef}
-        className="absolute inset-0 z-10 pointer-events-none will-change-transform md:mr-40"
+        className="absolute inset-0 z-20 pointer-events-none will-change-transform md:mr-40"
       >
         <section className="min-h-screen flex items-center justify-center" />
 
