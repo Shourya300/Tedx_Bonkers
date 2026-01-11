@@ -66,7 +66,8 @@ const ModeWrapper = memo(function ModeWrapper({
   const scrollProgressRef = useRef(0);
   const logoRef = useRef();
   const [isMobile, setIsMobile] = useState(false);
-  
+  const chromaticAberrationRef = useRef(0.15);
+
   // Idle detection for initial state only
   const lastPointerMoveTime = useRef(Date.now());
   const idleTime = useRef(0);
@@ -78,11 +79,11 @@ const ModeWrapper = memo(function ModeWrapper({
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768);
     };
-    
+
     checkMobile();
-    window.addEventListener('resize', checkMobile);
-    
-    return () => window.removeEventListener('resize', checkMobile);
+    window.addEventListener("resize", checkMobile);
+
+    return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
   useEffect(() => {
@@ -96,17 +97,17 @@ const ModeWrapper = memo(function ModeWrapper({
       geoWidthRef.current = geo.boundingBox.max.x - geo.boundingBox.min.x || 1;
     }
   }, [nodes, geometryKey]);
-  
+
   // Track pointer movement
   useEffect(() => {
     const handlePointerMove = () => {
       lastPointerMoveTime.current = Date.now();
       idleTime.current = 0;
     };
-    
-    if (typeof window !== 'undefined') {
-      window.addEventListener('pointermove', handlePointerMove);
-      return () => window.removeEventListener('pointermove', handlePointerMove);
+
+    if (typeof window !== "undefined") {
+      window.addEventListener("pointermove", handlePointerMove);
+      return () => window.removeEventListener("pointermove", handlePointerMove);
     }
   }, []);
 
@@ -122,28 +123,34 @@ const ModeWrapper = memo(function ModeWrapper({
 
     // PHASE 2: Content movement (synced via scrollSync)
     const contentProgress = scrollSync.progress;
-    
+
     // Check if user is idle ONLY before scrolling starts
     const timeSinceLastMove = Date.now() - lastPointerMoveTime.current;
     const isIdle = timeSinceLastMove > 2000 && scrollProgress === 0;
-    
+
     if (isIdle) {
       idleTime.current += delta;
     }
-    
+
     // Update shared state for cursor hiding
     scrollSync.isLensIdle = isIdle;
 
     /* ---------- LENS POSITION ---------- */
-    
+
     let destX, destY;
-    
+
     if (scrollProgress === 0 && isIdle) {
       // Before any scrolling, move randomly in small area at center to hint at hidden content
       const randomRadius = isMobile ? 0.3 : 0.19;
       const randomSpeed = 0.6;
-      destX = Math.sin(idleTime.current * randomSpeed) * randomRadius * (isMobile ? 0.5 : 1);
-      destY = Math.cos(idleTime.current * randomSpeed * 0.7) * randomRadius * (isMobile ? 0.8 : 0.5);
+      destX =
+        Math.sin(idleTime.current * randomSpeed) *
+        randomRadius *
+        (isMobile ? 0.5 : 1);
+      destY =
+        Math.cos(idleTime.current * randomSpeed * 0.7) *
+        randomRadius *
+        (isMobile ? 0.8 : 0.5);
     } else if (lensProgress < 1) {
       // During lens growth, follow pointer
       destX = ((pointer.x * v.width) / 2) * (1 - lensProgress);
@@ -159,11 +166,11 @@ const ModeWrapper = memo(function ModeWrapper({
     /* ---------- LENS SCALE ---------- */
 
     const baseScale = Math.min(
-      0.1,
-      (v.width * 0.9) / (geoWidthRef.current || 1)
+      0.15,
+      (v.width * 1.2) / (geoWidthRef.current || 1)
     );
 
-    const maxScale = (v.width * 2.5) / (geoWidthRef.current || 1);
+    const maxScale = (v.width * 3.0) / (geoWidthRef.current || 1);
 
     const targetScale = THREE.MathUtils.lerp(baseScale, maxScale, lensProgress);
 
@@ -183,20 +190,56 @@ const ModeWrapper = memo(function ModeWrapper({
       1
     );
 
+    // Chromatic aberration reduces during logo movement phase
+    const aberrationProgress = THREE.MathUtils.clamp(
+      contentProgress / LOGO_PHASE_DURATION,
+      0,
+      1
+    );
+
+    const targetChromaticAberration = THREE.MathUtils.lerp(
+      0.4, // strong distortion at start
+      0.001, // crystal clear
+      aberrationProgress
+    );
+
+    easing.damp(
+      chromaticAberrationRef,
+      "current",
+      targetChromaticAberration,
+      0.6,
+      delta
+    );
+    easing.damp(
+      chromaticAberrationRef,
+      "current",
+      targetChromaticAberration,
+      0.5,
+      delta
+    );
+
     // Target position - use actual viewport at logo's z position
     const logoViewport = viewport.getCurrentViewport(camera, [0, 0, -59.5]);
-    
+
     if (logoRef.current) {
       if (isMobile) {
         // On mobile, move logo up slightly
-        const targetLogoY = THREE.MathUtils.lerp(0, logoViewport.height * 0.15, logoShiftProgress);
+        const targetLogoY = THREE.MathUtils.lerp(
+          -3,
+          logoViewport.height * 0.15,
+          logoShiftProgress
+        );
         logoRef.current.position.x = 0;
         logoRef.current.position.y = targetLogoY;
       } else {
         // On desktop, move logo left
-        const targetLogoX = THREE.MathUtils.lerp(0, -logoViewport.width * 0.25, logoShiftProgress);
+        const targetLogoX = THREE.MathUtils.lerp(
+          0,
+          -logoViewport.width * 0.25,
+          logoShiftProgress
+        );
         logoRef.current.position.x = targetLogoX;
-        logoRef.current.position.y = 0;
+        logoRef.current.position.y = -1;
       }
     }
 
@@ -225,7 +268,11 @@ const ModeWrapper = memo(function ModeWrapper({
       {createPortal(
         <>
           <BackgroundPlane isMobile={isMobile} />
-          <mesh ref={logoRef} position={[0, isMobile ? -2 : -1, -59.5]} scale={isMobile ? 1 : 1.5}>
+          <mesh
+            ref={logoRef}
+            position={[0, isMobile ? -3 : -3, -59.5]}
+            scale={isMobile ? 1 : 1.5}
+          >
             <planeGeometry args={isMobile ? [10, 10] : [13, 13]} />
             <meshBasicMaterial map={logoTexture} transparent />
           </mesh>
@@ -254,7 +301,9 @@ const ModeWrapper = memo(function ModeWrapper({
           ior={ior ?? 1.1}
           thickness={thickness ?? 0.7}
           anisotropy={anisotropy ?? 0.1}
-          chromaticAberration={chromaticAberration ?? 0.05}
+          chromaticAberration={
+            chromaticAberration ?? chromaticAberrationRef.current
+          }
           transmission={1}
           roughness={0}
           attenuationDistance={0.8}
