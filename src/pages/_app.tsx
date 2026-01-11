@@ -3,6 +3,7 @@ import "@/styles/globals.css";
 
 import Navbar from "@/components/Navbar/Navbar";
 import CustomCursor from "@/components/ui/CustomCursor";
+import SmoothScroll from "@/components/SmoothScroll/SmoothScroll";
 import type { AppProps } from "next/app";
 
 function MyApp({ Component, pageProps, router }: AppProps) {
@@ -12,6 +13,7 @@ function MyApp({ Component, pageProps, router }: AppProps) {
 
   return (
     <ThemeProvider defaultTheme="dark" attribute="class">
+      <SmoothScroll />
       {showHeaderFooter && <Navbar />}
       <CustomCursor />
       <Component {...pageProps} />

@@ -3,7 +3,9 @@ import TedxButton from "@/components/TedxButton";
 import dynamic from "next/dynamic";
 import { useRef, useEffect, useLayoutEffect } from "react";
 import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import FluidGlass from "@/components/FluidGlass/FluidGlass";
+import { scrollSync } from "@/lib/scrollStore";
 
 const useIsomorphicLayoutEffect =
   typeof window !== "undefined" ? useLayoutEffect : useEffect;
@@ -18,38 +20,51 @@ export default function Home() {
   const textWrapRef = useRef<HTMLDivElement>(null);
 
   useIsomorphicLayoutEffect(() => {
-    if (typeof window === "undefined") return;
+    if (!textWrapRef.current) return;
 
-    let ctx: gsap.Context | undefined;
+    const PHASE_START = 0.45;
+    const isMobile = window.innerWidth < 768;
+    const totalShift = window.innerHeight * (isMobile ? 6.5 : 5.9); // More shift on mobile
 
-    (async () => {
-      const { ScrollTrigger } = await import("gsap/ScrollTrigger");
-      gsap.registerPlugin(ScrollTrigger);
+    const ctx = gsap.context(() => {
+      const setY = gsap.quickSetter(textWrapRef.current, "y", "px");
 
-      ctx = gsap.context(() => {
-        if (!textWrapRef.current) return;
+      ScrollTrigger.create({
+        trigger: document.body,
+        start: "top top",
+        end: "+=5000",
+        scrub: true,
+        onUpdate: (self) => {
+          // lens grows first
+          const scrollProgress = self.progress;
+          const contentProgress = Math.min(
+            Math.max((scrollProgress - PHASE_START) / (1 - PHASE_START), 0),
+            1
+          );
 
-        const totalShift = window.innerHeight * 2;
+          // expose ALL phases
+          scrollSync.rawProgress = scrollProgress;
+          scrollSync.progress = contentProgress;
 
-        gsap.to(textWrapRef.current, {
-          y: -totalShift,
-          ease: "none",
-          scrollTrigger: {
-            trigger: document.body,
-            start: "top top",
-            end: "+=5000", // Matches FluidGlass range
-            scrub: true,
-            onUpdate: (self) => {
-              // Only start moving text after 70% of progression (slower lens growth)
-              const progress = Math.max(0, (self.progress - 0.3) / 0.7);
-              gsap.set(textWrapRef.current, { y: -totalShift * progress });
-            },
-          },
-        });
+          // text moves ONLY in phase 2
+          const unclampedProgress =
+            (scrollProgress - PHASE_START) / (1 - PHASE_START);
+
+          setY(-totalShift * Math.max(unclampedProgress, 0));
+          
+          // Debug logging
+          if (Math.random() < 0.01) { // Log occasionally
+            console.log('Scroll:', {
+              scrollProgress: scrollProgress.toFixed(3),
+              contentProgress: contentProgress.toFixed(3),
+              yOffset: (-totalShift * Math.max(unclampedProgress, 0)).toFixed(1)
+            });
+          }
+        },
       });
-    })();
+    });
 
-    return () => ctx?.revert();
+    return () => ctx.revert();
   }, []);
 
   return (
@@ -57,12 +72,19 @@ export default function Home() {
       {/* Fixed Scene */}
       <div className="fixed inset-0 z-0 overflow-hidden">
         <ModelViewer url="/models/grid/Hoodie.glb" />
+        {/* Vignette overlay */}
+        <div 
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background: 'radial-gradient(circle at center, transparent 50%, rgba(0, 0, 0, 0.1) 80%, rgba(0, 0, 0, 0.3) 100%)'
+          }}
+        />
       </div>
 
       {/* Text Overlay */}
       <div
         ref={textWrapRef}
-        className="absolute inset-0 z-20 pointer-events-none will-change-transform md:mr-40"
+        className="fixed inset-0 z-20 pointer-events-none will-change-transform md:mr-40"
       >
         <section className="min-h-screen flex items-center justify-center" />
 
@@ -168,7 +190,7 @@ export default function Home() {
         </section>
       </div>
 
-      <div style={{ height: "200vh" }} />
+      <div style={{ height: "600vh" }} />
       <FluidGlass />
     </main>
   );
