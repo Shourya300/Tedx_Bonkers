@@ -51,7 +51,7 @@ export default function Home() {
             (scrollProgress - PHASE_START) / (1 - PHASE_START);
 
           setY(-totalShift * Math.max(unclampedProgress, 0));
-          
+
           // Debug logging
           if (Math.random() < 0.01) { // Log occasionally
             console.log('Scroll:', {
@@ -73,7 +73,7 @@ export default function Home() {
       <div className="fixed inset-0 z-0 overflow-hidden">
         <ModelViewer url="/models/grid/Hoodie.glb" />
         {/* Vignette overlay */}
-        <div 
+        <div
           className="absolute inset-0 pointer-events-none"
           style={{
             background: 'radial-gradient(circle at center, transparent 50%, rgba(0, 0, 0, 0.1) 80%, rgba(0, 0, 0, 0.3) 100%)'
