@@ -4,6 +4,7 @@ import { Canvas, createPortal, useFrame, useThree } from "@react-three/fiber";
 import BackgroundPlane from "./Backgroundplane";
 import { scrollSync } from "@/lib/scrollStore";
 
+
 import {
   useFBO,
   useGLTF,
@@ -66,7 +67,10 @@ const ModeWrapper = memo(function ModeWrapper({
   const scrollProgressRef = useRef(0);
   const logoRef = useRef();
   const [isMobile, setIsMobile] = useState(false);
-  const chromaticAberrationRef = useRef(0.15);
+  const chromaticAberrationRef = useRef(0.5);
+  const materialRef = useRef();
+  const lensProgressRef = useRef(0);
+
 
   // Idle detection for initial state only
   const lastPointerMoveTime = useRef(Date.now());
@@ -120,6 +124,7 @@ const ModeWrapper = memo(function ModeWrapper({
 
     // PHASE 1: Lens growth
     const lensProgress = Math.min(scrollProgress / PHASE_START, 1);
+    lensProgressRef.current = lensProgress;
 
     // PHASE 2: Content movement (synced via scrollSync)
     const contentProgress = scrollSync.progress;
@@ -141,7 +146,7 @@ const ModeWrapper = memo(function ModeWrapper({
 
     if (scrollProgress === 0 && isIdle) {
       // Before any scrolling, move randomly in small area at center to hint at hidden content
-      const randomRadius = isMobile ? 0.3 : 0.19;
+      const randomRadius = isMobile ? 0.5 : 0.35;
       const randomSpeed = 0.6;
       destX =
         Math.sin(idleTime.current * randomSpeed) *
@@ -161,13 +166,13 @@ const ModeWrapper = memo(function ModeWrapper({
       destY = 0;
     }
 
+    // Continue easing even after lens is grown for smooth settling
     easing.damp3(ref.current.position, [destX, destY, 15], 0.15, delta);
-
+    
     /* ---------- LENS SCALE ---------- */
-
     const baseScale = Math.min(
-      0.15,
-      (v.width * 1.2) / (geoWidthRef.current || 1)
+      0.13,
+      (v.width * 0.8) / (geoWidthRef.current || 1)
     );
 
     const maxScale = (v.width * 3.0) / (geoWidthRef.current || 1);
@@ -182,7 +187,6 @@ const ModeWrapper = memo(function ModeWrapper({
 
     /* ---------- LOGO MOVE (AFTER LENS FULL) ---------- */
 
-    // Logo reaches destination in the first 50% of content scroll, then stays fixed
     const LOGO_PHASE_DURATION = 0.5;
     const logoShiftProgress = THREE.MathUtils.clamp(
       contentProgress / LOGO_PHASE_DURATION,
@@ -190,16 +194,17 @@ const ModeWrapper = memo(function ModeWrapper({
       1
     );
 
-    // Chromatic aberration reduces during logo movement phase
-    const aberrationProgress = THREE.MathUtils.clamp(
-      contentProgress / LOGO_PHASE_DURATION,
+    // Chromatic aberration reduces as user scrolls down from the very beginning
+    // Using rawProgress to start reducing immediately on scroll
+    const aberrationProgress = THREE.MathUtils.smoothstep(
+      scrollProgress,
       0,
-      1
+      0.6
     );
 
     const targetChromaticAberration = THREE.MathUtils.lerp(
-      0.4, // strong distortion at start
-      0.001, // crystal clear
+      0.6,     // blurry at start
+      0.0005,  // crystal clear
       aberrationProgress
     );
 
@@ -207,43 +212,36 @@ const ModeWrapper = memo(function ModeWrapper({
       chromaticAberrationRef,
       "current",
       targetChromaticAberration,
-      0.6,
-      delta
-    );
-    easing.damp(
-      chromaticAberrationRef,
-      "current",
-      targetChromaticAberration,
-      0.5,
+      0.4,
       delta
     );
 
-    // Target position - use actual viewport at logo's z position
+    // 🔑 force material uniform update every frame
+    if (materialRef.current) {
+      materialRef.current.chromaticAberration =
+        chromaticAberrationRef.current;
+    }
+
+
     const logoViewport = viewport.getCurrentViewport(camera, [0, 0, -59.5]);
 
     if (logoRef.current) {
       if (isMobile) {
-        // On mobile, move logo up slightly
-        const targetLogoY = THREE.MathUtils.lerp(
-          -3,
-          logoViewport.height * 0.15,
-          logoShiftProgress
-        );
+        // On mobile, keep logo centered
         logoRef.current.position.x = 0;
-        logoRef.current.position.y = targetLogoY;
+        logoRef.current.position.y = 0;
       } else {
         // On desktop, move logo left
         const targetLogoX = THREE.MathUtils.lerp(
           0,
-          -logoViewport.width * 0.25,
+          -logoViewport.width * 0.18,
           logoShiftProgress
         );
         logoRef.current.position.x = targetLogoX;
-        logoRef.current.position.y = -1;
+        logoRef.current.position.y = -0.5;
       }
     }
 
-    /* ---------- FBO RENDER ---------- */
 
     gl.setRenderTarget(buffer);
     gl.render(scene, camera);
@@ -267,11 +265,11 @@ const ModeWrapper = memo(function ModeWrapper({
     <>
       {createPortal(
         <>
-          <BackgroundPlane isMobile={isMobile} />
+          <BackgroundPlane isMobile={isMobile} lensProgress={lensProgressRef.current} />
           <mesh
             ref={logoRef}
-            position={[0, isMobile ? -3 : -3, -59.5]}
-            scale={isMobile ? 1 : 1.5}
+            position={[0, isMobile ? 0 : -3, -59.5]}
+            scale={isMobile ? 1.5 : 1.5}
           >
             <planeGeometry args={isMobile ? [10, 10] : [13, 13]} />
             <meshBasicMaterial map={logoTexture} transparent />
@@ -297,18 +295,18 @@ const ModeWrapper = memo(function ModeWrapper({
         {...props}
       >
         <MeshTransmissionMaterial
-          buffer={buffer.texture}
-          ior={ior ?? 1.1}
-          thickness={thickness ?? 0.7}
-          anisotropy={anisotropy ?? 0.1}
-          chromaticAberration={
-            chromaticAberration ?? chromaticAberrationRef.current
-          }
-          transmission={1}
-          roughness={0}
-          attenuationDistance={0.8}
-          {...extraMat}
-        />
+  ref={materialRef}
+  buffer={buffer.texture}
+  ior={ior ?? 1.1}
+  thickness={thickness ?? 0.7}
+  anisotropy={anisotropy ?? 0.1}
+  chromaticAberration={chromaticAberrationRef.current}
+  transmission={1}
+  roughness={0}
+  attenuationDistance={0.8}
+  {...extraMat}
+/>
+
       </mesh>
     </>
   );
