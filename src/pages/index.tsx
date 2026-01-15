@@ -1,5 +1,6 @@
 "use client";
 import TedxButton from "@/components/TedxButton";
+import { MetalButton } from "@/components/metal-button";
 import dynamic from "next/dynamic";
 import { useRef, useEffect, useLayoutEffect } from "react";
 import gsap from "gsap";
@@ -103,7 +104,7 @@ export default function Home() {
                 spark curiosity, challenge perspectives, and inspire action.
               </p>
               <div className="mt-6">
-                <TedxButton />
+                <MetalButton variant="primary" className="text-md">Learn More</MetalButton>
               </div>
             </div>
           </div>

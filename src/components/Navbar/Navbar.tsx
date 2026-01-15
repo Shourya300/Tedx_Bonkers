@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { MetalButton } from "../metal-button";
 
 export default function Navbar() {
   const links = [
@@ -19,12 +20,12 @@ export default function Navbar() {
 
         <nav className="flex items-center gap-6 md:gap-8">
           {links.map((item) => (
-            <Link key={item.name} href={item.path} className="text-[#4a4a4a] text-sm md:text-base font-medium hover:opacity-80 transition-opacity">
+            <Link key={item.name} href={item.path} className="text-white text-sm md:text-base font-medium hover:opacity-80 transition-opacity">
               {item.name}
             </Link>
           ))}
-          <Link href="/register" className="bg-white text-red-600 px-4 md:px-6 py-2 rounded font-medium hover:bg-gray-100 transition-colors">
-            Get Tickets
+          <Link href="/register" >
+            <MetalButton variant="primary" className="text-md">Get Tickets</MetalButton>
           </Link>
         </nav>
       </div>

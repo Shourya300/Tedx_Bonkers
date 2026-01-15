@@ -57,7 +57,7 @@ export default function CustomCursor() {
   return (
     <div
       ref={cursorRef}
-      className="fixed top-0 left-0 w-3 h-3 bg-white rounded-full pointer-events-none z-[10000] -translate-x-1/2 -translate-y-1/2 shadow-[0_0_15px_3px_rgba(255,255,255,0.8),0_0_30px_6px_rgba(255,255,255,0.4)] transition-opacity duration-300"
+      className="fixed top-0 left-0 w-4 h-4 bg-white rounded-full pointer-events-none z-[10000] -translate-x-1/2 -translate-y-1/2 shadow-[0_0_15px_3px_rgba(255,255,255,0.8),0_0_30px_6px_rgba(255,255,255,0.4)] transition-opacity duration-300"
       style={{ opacity: isHidden ? 0 : 1 }}
     />
   );

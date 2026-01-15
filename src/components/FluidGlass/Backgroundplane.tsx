@@ -15,7 +15,7 @@ export default function BackgroundPlane({
     return new THREE.ShaderMaterial({
       uniforms: {
         uTexture: { value: texture },
-        uBlurAmount: { value: isMobile ? 0.004 : 0.006 }, // smaller = sharper
+        uBlurAmount: { value: isMobile ? 0.004 : 0.003 }, // smaller = sharper
       },
       vertexShader: `
       varying vec2 vUv;
