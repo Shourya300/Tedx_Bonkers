@@ -51,9 +51,9 @@ export default function BackgroundPlane({
     });
   }, [texture, isMobile]);
 
-  // Adjust dimensions for mobile
-  const width = isMobile ? 30 : 43;
-  const height = isMobile ? 18 : 26;
+  // Adjust dimensions for mobile - increased to prevent black lines
+  const width = isMobile ? 25 : 43;
+  const height = isMobile ? 21 : 26;
 
   return (
     <group>

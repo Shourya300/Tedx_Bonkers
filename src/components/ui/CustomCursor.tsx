@@ -7,9 +7,18 @@ import { scrollSync } from "@/lib/scrollStore";
 export default function CustomCursor() {
   const cursorRef = useRef<HTMLDivElement>(null);
   const [isHidden, setIsHidden] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const checkIdleRef = useRef<number>();
 
   useEffect(() => {
+    // Check if mobile device
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+
     const cursor = cursorRef.current;
     if (!cursor) return;
 
@@ -33,11 +42,17 @@ export default function CustomCursor() {
 
     return () => {
       window.removeEventListener("mousemove", onMouseMove);
+      window.removeEventListener("resize", checkMobile);
       if (checkIdleRef.current) {
         cancelAnimationFrame(checkIdleRef.current);
       }
     };
   }, []);
+
+  // Hide cursor completely on mobile
+  if (isMobile) {
+    return null;
+  }
 
   return (
     <div

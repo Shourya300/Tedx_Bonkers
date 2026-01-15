@@ -4,7 +4,6 @@ import { Canvas, createPortal, useFrame, useThree } from "@react-three/fiber";
 import BackgroundPlane from "./Backgroundplane";
 import { scrollSync } from "@/lib/scrollStore";
 
-
 import {
   useFBO,
   useGLTF,
@@ -71,7 +70,6 @@ const ModeWrapper = memo(function ModeWrapper({
   const materialRef = useRef();
   const lensProgressRef = useRef(0);
 
-
   // Idle detection for initial state only
   const lastPointerMoveTime = useRef(Date.now());
   const idleTime = useRef(0);
@@ -122,12 +120,17 @@ const ModeWrapper = memo(function ModeWrapper({
     // GSAP in index.tsx is the single source of truth
     const scrollProgress = scrollSync.rawProgress;
 
-    // PHASE 1: Lens growth
-    const lensProgress = Math.min(scrollProgress / PHASE_START, 1);
+    // PHASE 1: Lens growth - mobile takes longer to ensure full screen coverage
+    const phaseStart = isMobile ? 0.65 : 0.45;
+    const lensProgress = Math.min(scrollProgress / phaseStart, 1);
+
     lensProgressRef.current = lensProgress;
 
-    // PHASE 2: Content movement (synced via scrollSync)
-    const contentProgress = scrollSync.progress;
+    // PHASE 2: Content movement (ONLY after lens is done)
+    const contentProgress =
+      lensProgress < 1 ? 0 : (scrollProgress - phaseStart) / (1 - phaseStart);
+
+    const clampedContentProgress = THREE.MathUtils.clamp(contentProgress, 0, 1);
 
     // Check if user is idle ONLY before scrolling starts
     const timeSinceLastMove = Date.now() - lastPointerMoveTime.current;
@@ -146,16 +149,16 @@ const ModeWrapper = memo(function ModeWrapper({
 
     if (scrollProgress === 0 && isIdle) {
       // Before any scrolling, move randomly in small area at center to hint at hidden content
-      const randomRadius = isMobile ? 0.5 : 0.35;
+      const randomRadius = isMobile ? 0.4 : 0.35;
       const randomSpeed = 0.6;
       destX =
         Math.sin(idleTime.current * randomSpeed) *
         randomRadius *
-        (isMobile ? 0.5 : 1);
+        (isMobile ? 0.3 : 1);
       destY =
         Math.cos(idleTime.current * randomSpeed * 0.7) *
         randomRadius *
-        (isMobile ? 0.8 : 0.5);
+        (isMobile ? 0.4 : 0.5);
     } else if (lensProgress < 1) {
       // During lens growth, follow pointer
       destX = ((pointer.x * v.width) / 2) * (1 - lensProgress);
@@ -168,14 +171,17 @@ const ModeWrapper = memo(function ModeWrapper({
 
     // Continue easing even after lens is grown for smooth settling
     easing.damp3(ref.current.position, [destX, destY, 15], 0.15, delta);
-    
+
     /* ---------- LENS SCALE ---------- */
     const baseScale = Math.min(
       0.13,
       (v.width * 0.8) / (geoWidthRef.current || 1)
     );
 
-    const maxScale = (v.width * 3.0) / (geoWidthRef.current || 1);
+    const maxViewportSize = Math.max(v.width, v.height);
+
+    const maxScale =
+      (maxViewportSize * (isMobile ? 2.4 : 3.0)) / (geoWidthRef.current || 1);
 
     const targetScale = THREE.MathUtils.lerp(baseScale, maxScale, lensProgress);
 
@@ -195,7 +201,6 @@ const ModeWrapper = memo(function ModeWrapper({
     );
 
     // Chromatic aberration reduces as user scrolls down from the very beginning
-    // Using rawProgress to start reducing immediately on scroll
     const aberrationProgress = THREE.MathUtils.smoothstep(
       scrollProgress,
       0,
@@ -203,8 +208,8 @@ const ModeWrapper = memo(function ModeWrapper({
     );
 
     const targetChromaticAberration = THREE.MathUtils.lerp(
-      0.6,     // blurry at start
-      0.0005,  // crystal clear
+      0.6, // blurry at start
+      0.0005, // crystal clear
       aberrationProgress
     );
 
@@ -218,10 +223,8 @@ const ModeWrapper = memo(function ModeWrapper({
 
     // 🔑 force material uniform update every frame
     if (materialRef.current) {
-      materialRef.current.chromaticAberration =
-        chromaticAberrationRef.current;
+      materialRef.current.chromaticAberration = chromaticAberrationRef.current;
     }
-
 
     const logoViewport = viewport.getCurrentViewport(camera, [0, 0, -59.5]);
 
@@ -241,7 +244,6 @@ const ModeWrapper = memo(function ModeWrapper({
         logoRef.current.position.y = -0.5;
       }
     }
-
 
     gl.setRenderTarget(buffer);
     gl.render(scene, camera);
@@ -265,7 +267,10 @@ const ModeWrapper = memo(function ModeWrapper({
     <>
       {createPortal(
         <>
-          <BackgroundPlane isMobile={isMobile} lensProgress={lensProgressRef.current} />
+          <BackgroundPlane
+            isMobile={isMobile}
+            lensProgress={lensProgressRef.current}
+          />
           <mesh
             ref={logoRef}
             position={[0, isMobile ? 0 : -3, -59.5]}
@@ -295,18 +300,17 @@ const ModeWrapper = memo(function ModeWrapper({
         {...props}
       >
         <MeshTransmissionMaterial
-  ref={materialRef}
-  buffer={buffer.texture}
-  ior={ior ?? 1.1}
-  thickness={thickness ?? 0.7}
-  anisotropy={anisotropy ?? 0.1}
-  chromaticAberration={chromaticAberrationRef.current}
-  transmission={1}
-  roughness={0}
-  attenuationDistance={0.8}
-  {...extraMat}
-/>
-
+          ref={materialRef}
+          buffer={buffer.texture}
+          ior={ior ?? 1.1}
+          thickness={thickness ?? 0.7}
+          anisotropy={anisotropy ?? 0.1}
+          chromaticAberration={chromaticAberrationRef.current}
+          transmission={1}
+          roughness={0}
+          attenuationDistance={0.8}
+          {...extraMat}
+        />
       </mesh>
     </>
   );
