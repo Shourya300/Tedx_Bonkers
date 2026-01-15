@@ -230,9 +230,15 @@ const ModeWrapper = memo(function ModeWrapper({
 
     if (logoRef.current) {
       if (isMobile) {
-        // On mobile, keep logo centered
-        logoRef.current.position.x = 0;
-        logoRef.current.position.y = 0;
+        // On mobile, keep logo centered initially, then move up during sponsor section
+        // Use scrollSync.progress which goes 0-1 for the content phase
+        // Start moving logo up after ~80% of scroll content (when sponsors section appears)
+        const logoUpProgress = THREE.MathUtils.clamp((scrollSync.progress - 0.8) / 0.2, 0, 1);
+        const targetLogoY = THREE.MathUtils.lerp(0, 6, logoUpProgress);
+        
+        // Smooth easing for position changes
+        easing.damp(logoRef.current.position, "x", 0, 0.3, delta);
+        easing.damp(logoRef.current.position, "y", targetLogoY, 0.3, delta);
       } else {
         // On desktop, move logo left
         const targetLogoX = THREE.MathUtils.lerp(
@@ -240,8 +246,10 @@ const ModeWrapper = memo(function ModeWrapper({
           -logoViewport.width * 0.18,
           logoShiftProgress
         );
-        logoRef.current.position.x = targetLogoX;
-        logoRef.current.position.y = -0.5;
+        
+        // Smooth easing for position changes
+        easing.damp(logoRef.current.position, "x", targetLogoX, 0.3, delta);
+        easing.damp(logoRef.current.position, "y", -0.5, 0.3, delta);
       }
     }
 
@@ -274,7 +282,7 @@ const ModeWrapper = memo(function ModeWrapper({
           <mesh
             ref={logoRef}
             position={[0, isMobile ? 0 : -3, -59.5]}
-            scale={isMobile ? 1.5 : 1.5}
+            scale={isMobile ? 1.4 : 1.5}
           >
             <planeGeometry args={isMobile ? [10, 10] : [13, 13]} />
             <meshBasicMaterial map={logoTexture} transparent />

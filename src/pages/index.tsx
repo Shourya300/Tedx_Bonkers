@@ -188,9 +188,25 @@ export default function Home() {
             </div>
           </div>
         </section>
+
+        <section className="min-h-screen flex items-center pointer-events-auto px-6 md:px-12">
+          <div className="max-w-xl mx-auto md:ml-auto md:mr-0 text-center">
+            <div className="flex flex-col items-center">
+              <div className="w-32 h-[1px] bg-[#D3D3D3] shadow-[0_0_10px_rgba(230,230,230,230)] mt-4" />
+              <p className="text-center text-[16px] md:text-[24px] leading-[1.7] max-w-[480px] mx-auto font-medium font-sans tracking-[0.02em] text-[#EAEAEA] mt-8 px-4 md:px-0">
+                The TEDxNIITUniversity logo represents our commitment to innovation and ideas worth spreading. 
+                Designed with purpose, it embodies the spirit of curiosity, creativity, and community that 
+                defines our event. Every element tells a story of transformation and inspiration.
+              </p>
+              <div className="mt-6">
+                <TedxButton />
+              </div>
+            </div>
+          </div>
+        </section>
       </div>
 
-      <div style={{ height: "600vh" }} />
+      <div style={{ height: "625vh" }} />
       <FluidGlass />
     </main>
   );
