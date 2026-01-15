@@ -73,6 +73,8 @@ const ModeWrapper = memo(function ModeWrapper({
   // Idle detection for initial state only
   const lastPointerMoveTime = useRef(Date.now());
   const idleTime = useRef(0);
+  const lastThrottledPointerUpdateRef = useRef(0);
+  const POINTER_THROTTLE_MS = 16; // ~60fps throttling
 
   const logoTexture = useTexture("/images/Landing_Page/TEDx LOGO (NO BG).png");
 
@@ -100,15 +102,19 @@ const ModeWrapper = memo(function ModeWrapper({
     }
   }, [nodes, geometryKey]);
 
-  // Track pointer movement
+  // Track pointer movement with throttling
   useEffect(() => {
     const handlePointerMove = () => {
-      lastPointerMoveTime.current = Date.now();
-      idleTime.current = 0;
+      const now = Date.now();
+      if (now - lastThrottledPointerUpdateRef.current >= POINTER_THROTTLE_MS) {
+        lastPointerMoveTime.current = now;
+        idleTime.current = 0;
+        lastThrottledPointerUpdateRef.current = now;
+      }
     };
 
     if (typeof window !== "undefined") {
-      window.addEventListener("pointermove", handlePointerMove);
+      window.addEventListener("pointermove", handlePointerMove, { passive: true });
       return () => window.removeEventListener("pointermove", handlePointerMove);
     }
   }, []);
@@ -160,17 +166,21 @@ const ModeWrapper = memo(function ModeWrapper({
         randomRadius *
         (isMobile ? 0.4 : 0.5);
     } else if (lensProgress < 1) {
-      // During lens growth, follow pointer
-      destX = ((pointer.x * v.width) / 2) * (1 - lensProgress);
-      destY = ((pointer.y * v.height) / 2) * (1 - lensProgress);
+      // During lens growth, follow pointer - use reduced responsiveness for smoother tracking
+      const pointerX = (pointer.x * v.width) / 2;
+      const pointerY = (pointer.y * v.height) / 2;
+      const lerpAlpha = 1 - lensProgress;
+      
+      destX = pointerX * lerpAlpha * 0.85; // Reduced responsiveness for smoother tracking
+      destY = pointerY * lerpAlpha * 0.85;
     } else {
       // After lens fully grown, stay centered
       destX = 0;
       destY = 0;
     }
 
-    // Continue easing even after lens is grown for smooth settling
-    easing.damp3(ref.current.position, [destX, destY, 15], 0.15, delta);
+    // Continue easing with slightly increased damping for smoother motion
+    easing.damp3(ref.current.position, [destX, destY, 15], 0.12, delta);
 
     /* ---------- LENS SCALE ---------- */
     const baseScale = Math.min(
