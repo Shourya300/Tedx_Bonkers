@@ -19,7 +19,7 @@ export default function Navbar() {
 
         <nav className="flex items-center gap-6 md:gap-8">
           {links.map((item) => (
-            <Link key={item.name} href={item.path} className="text-[#4a4a4a] text-sm md:text-base font-medium hover:opacity-80 transition-opacity">
+            <Link key={item.name} href={item.path} className="text-white text-sm md:text-base font-medium hover:opacity-80 transition-opacity">
               {item.name}
             </Link>
           ))}
