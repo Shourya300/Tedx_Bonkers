@@ -53,7 +53,7 @@ export default function CustomCursor() {
         gsap.to(cursor, {
           borderRadius: "9999px",
           backgroundColor: "rgba(255,255,255,1)",
-          border: "none",
+          border: "2px solid rgba(255,255,255,0)",
           boxShadow:
             "0 0 15px 3px rgba(255,255,255,0.8), 0 0 30px 6px rgba(255,255,255,0.4)",
           duration: 0.25,
@@ -88,24 +88,36 @@ export default function CustomCursor() {
       let targetY = e.clientY;
       let targetWidth = 16;
       let targetHeight = 16;
-      let duration = 0.15;
+      let duration = 0.1;
 
       if (modeRef.current === "link" && targetRectRef.current) {
         const rect = targetRectRef.current;
-        const paddingX = 12;
-        const paddingY = 8;
-        targetWidth = Math.max(rect.width + paddingX, 24);
-        targetHeight = Math.max(rect.height + paddingY, 20);
-        
-        // Allow mouse offset from link center for smooth following
-        const linkCenterX = rect.left + rect.width / 2;
-        const linkCenterY = rect.top + rect.height / 2;
-        const offsetX = Math.max(-8, Math.min(8, e.clientX - linkCenterX)) * 0.3;
-        const offsetY = Math.max(-8, Math.min(8, e.clientY - linkCenterY)) * 0.3;
-        
-        targetX = linkCenterX + offsetX;
-        targetY = linkCenterY + offsetY;
-        duration = 0.18;
+        const isLargeTarget = rect.width > 200 || rect.height > 100;
+
+        if (isLargeTarget) {
+          targetWidth = 40;
+          targetHeight = 40;
+          targetX = e.clientX;
+          targetY = e.clientY;
+          duration = 0.15;
+        } else {
+          const paddingX = 12;
+          const paddingY = 8;
+          targetWidth = Math.max(rect.width + paddingX, 24);
+          targetHeight = Math.max(rect.height + paddingY, 20);
+
+          // Allow mouse offset from link center for smooth following
+          const linkCenterX = rect.left + rect.width / 2;
+          const linkCenterY = rect.top + rect.height / 2;
+          const offsetX =
+            Math.max(-8, Math.min(8, e.clientX - linkCenterX)) * 0.3;
+          const offsetY =
+            Math.max(-8, Math.min(8, e.clientY - linkCenterY)) * 0.3;
+
+          targetX = linkCenterX + offsetX;
+          targetY = linkCenterY + offsetY;
+          duration = 0.18;
+        }
       } else if (modeRef.current === "text") {
         targetWidth = 6;
         targetHeight = 28;
