@@ -7,7 +7,9 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
-  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+  --font-sans: "Google Sans Flex", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  --font-heading: "Google Sans Flex", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
     "Helvetica Neue", Arial, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
     "Liberation Mono", "Courier New", monospace;
@@ -155,6 +157,38 @@ body {
   }
   body {
     @apply bg-background text-foreground;
+    font-weight: 400; /* Regular weight for body */
+  }
+  
+  /* Apply Google Sans Flex to headings with bold weights */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+  }
+  
+  h1 {
+    font-weight: 700; /* Bold for main headings */
+  }
+  
+  h2 {
+    font-weight: 600; /* Semibold for secondary headings */
+  }
+  
+  h3 {
+    font-weight: 600; /* Semibold for tertiary headings */
+  }
+  
+  h4, h5, h6 {
+    font-weight: 500; /* Medium for smaller headings */
+  }
+  
+  /* Paragraph and text styles with lighter weights */
+  p {
+    font-weight: 400; /* Regular for paragraphs */
+  }
+  
+  /* Subtle text uses even lighter weight */
+  small, .text-muted, .text-subtle {
+    font-weight: 300; /* Light for subtle text */
   }
 }
 
