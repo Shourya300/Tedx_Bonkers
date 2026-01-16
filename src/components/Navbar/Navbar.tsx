@@ -24,9 +24,11 @@ export default function Navbar() {
               {item.name}
             </Link>
           ))}
-          <Link href="/register" >
-            <MetalButton variant="primary" className="text-md">Get Tickets</MetalButton>
-          </Link>
+          <MetalButton variant="primary" className="text-md">
+            <Link href="/register" >
+              Get Tickets
+            </Link>
+          </MetalButton>
         </nav>
       </div>
     </header>
