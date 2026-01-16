@@ -10,12 +10,14 @@ export default function BackgroundPlane({
   isMobile = false,
 }: BackgroundPlaneProps) {
   const texture = useTexture("/images/Landing_Page/Logo_Bg.png");
+  texture.generateMipmaps = false;
+  texture.minFilter = THREE.LinearFilter;
 
   const blurMaterial = useMemo(() => {
     return new THREE.ShaderMaterial({
       uniforms: {
         uTexture: { value: texture },
-        uBlurAmount: { value: isMobile ? 0.004 : 0.003 }, // smaller = sharper
+        uBlurAmount: { value: isMobile ? 0.004 : 0.003 },
       },
       vertexShader: `
       varying vec2 vUv;
@@ -31,20 +33,15 @@ export default function BackgroundPlane({
 
       void main() {
         vec4 color = vec4(0.0);
-
-        // Simple 9-tap blur (no brightness change)
         color += texture2D(uTexture, vUv + vec2(-uBlurAmount, -uBlurAmount));
         color += texture2D(uTexture, vUv + vec2( 0.0, -uBlurAmount));
         color += texture2D(uTexture, vUv + vec2( uBlurAmount, -uBlurAmount));
-
         color += texture2D(uTexture, vUv + vec2(-uBlurAmount, 0.0));
         color += texture2D(uTexture, vUv);
         color += texture2D(uTexture, vUv + vec2( uBlurAmount, 0.0));
-
         color += texture2D(uTexture, vUv + vec2(-uBlurAmount, uBlurAmount));
         color += texture2D(uTexture, vUv + vec2( 0.0, uBlurAmount));
         color += texture2D(uTexture, vUv + vec2( uBlurAmount, uBlurAmount));
-
         gl_FragColor = color / 9.0;
       }
     `,

@@ -52,15 +52,6 @@ export default function Home() {
             (scrollProgress - PHASE_START) / (1 - PHASE_START);
 
           setY(-totalShift * Math.max(unclampedProgress, 0));
-
-          // Debug logging
-          if (Math.random() < 0.01) { // Log occasionally
-            console.log('Scroll:', {
-              scrollProgress: scrollProgress.toFixed(3),
-              contentProgress: contentProgress.toFixed(3),
-              yOffset: (-totalShift * Math.max(unclampedProgress, 0)).toFixed(1)
-            });
-          }
         },
       });
     });

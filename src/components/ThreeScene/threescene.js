@@ -10,20 +10,6 @@ const ThreeScene = () => {
   const canvasRef = useRef(null);
 
   useEffect(() => {
-    // Utility functions
-    const Mathutils = {
-      normalize: ($value, $min, $max) => ($value - $min) / ($max - $min),
-      interpolate: ($normValue, $min, $max) =>
-        $min + ($max - $min) * $normValue,
-      map: ($value, $min1, $max1, $min2, $max2) => {
-        $value = Math.max($min1, Math.min($value, $max1));
-        return Mathutils.interpolate(
-          Mathutils.normalize($value, $min1, $max1),
-          $min2,
-          $max2
-        );
-      },
-    };
 
     // Scene setup
     const renderer = new THREE.WebGLRenderer({
@@ -59,7 +45,7 @@ const ThreeScene = () => {
     const path = new THREE.CatmullRomCurve3(points);
     path.tension = 0.5;
 
-    const geometry = new THREE.TubeGeometry(path, 300, 4, 32, false);
+    const geometry = new THREE.TubeGeometry(path, 200, 4, 16, false);
     const texture = new THREE.TextureLoader().load(
       "https://s3-us-west-2.amazonaws.com/s.cdpn.io/68819/3d_space_5.jpg",
       (texture) => {
@@ -71,7 +57,8 @@ const ThreeScene = () => {
     const material = new THREE.MeshPhongMaterial({
       side: THREE.BackSide,
       map: texture,
-      shininess: 20,
+      shininess: 10,
+      flatShading: true,
     });
 
     const tube = new THREE.Mesh(geometry, material);
