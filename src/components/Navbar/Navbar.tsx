@@ -81,14 +81,14 @@ export default function Navbar() {
         {/* Logo - Left Side on Desktop, Centered on Mobile */}
         <div className="flex-1 flex lg:justify-start justify-center">
           <Link href="/" className="flex shrink-0">
-            <img src="/images/logo-white.png" alt="TEDxNIITUniversity" className="h-10 md:h-14 w-auto object-contain" />
+            <img src="/images/logo-black.png" alt="TEDxNIITUniversity" className="h-10 md:h-14 w-auto object-contain" />
           </Link>
         </div>
 
         {/* Desktop Navigation - Centered */}
         <nav className="hidden lg:flex items-center gap-4 xl:gap-12">
           {links.map((item) => (
-            <Link key={item.name} href={item.path} className="text-white text-sm xl:text-base font-medium hover:opacity-80 transition-opacity whitespace-nowrap">
+            <Link key={item.name} href={item.path} className="text-text-color text-sm xl:text-base font-medium hover:text-ted-red transition-all whitespace-nowrap">
               {item.name}
             </Link>
           ))}
@@ -96,11 +96,11 @@ export default function Navbar() {
 
         {/* Right Side - Button (Desktop Only) */}
         <div className="flex-1 hidden lg:flex justify-end items-center">
-          <Link href="/register">
-            <MetalButton variant="primary" className="text-sm xl:text-base">
+          <MetalButton variant="primary" className="text-sm xl:text-base">
+            <Link href="/register">
               Get Tickets
-            </MetalButton>
-          </Link>
+            </Link>
+          </MetalButton>
         </div>
       </div>
 
