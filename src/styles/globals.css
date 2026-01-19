@@ -1,8 +1,64 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
 
+/*
+ * Mobile Viewport Fix
+ * -------------------
+ * This project uses modern viewport units (dvh, svh, lvh) to prevent layout jumps
+ * when the mobile browser address bar shows/hides on scroll.
+ *
+ * Legacy Issue:
+ * - 100vh = Initial viewport height (includes address bar space)
+ * - Address bar hides → Viewport grows → 100vh stays same → Content doesn't fill screen
+ *
+ * Solution:
+ * - 100dvh = Dynamic viewport (adjusts with address bar)
+ * - Tailwind config overrides: h-screen & min-h-screen use dvh
+ * - CSS classes: Use dvh directly for fixed/sticky containers
+ *
+ * Browser Support: Chrome 108+, Safari 15.4+, Firefox 101+
+ */
+
+@font-face {
+  font-family: 'logoFont';
+  src: url('/fonts/TitlingGothicFBWide-Bold-AF65ddb136479f5.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Mobile Hero Stabilization - Prevents flicker on address bar hide/show */
+@layer utilities {
+  /* Pre-size hero to maximum viewport (address bar hidden state) */
+  .hero-stable {
+    min-height: 100vh;  /* Fallback for older browsers */
+    min-height: 100lvh; /* Large viewport - sized for no address bar */
+    overflow: hidden;   /* Clip content when address bar visible */
+  }
+  
+  /* For backgrounds that should never resize */
+  .bg-no-resize {
+    min-height: 100vh;
+    min-height: 100lvh;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+  
+  /* Fixed background size on mobile - crops from top instead of resizing */
+  .bg-mobile-fixed {
+    background-size: auto 120vh; /* Fixed at 120vh height */
+  }
+  
+  @media (min-width: 768px) {
+    .bg-mobile-fixed {
+      background-size: cover; /* Responsive on desktop */
+    }
+  }
+}
 
 :root {
   --background: #ffffff;
@@ -30,6 +86,29 @@
   transition: all 0.5s ease-out;
 }
 
+html {
+  overflow-x: hidden;
+  overflow-y: auto;
+  /* Ensure smooth scrolling on all devices */
+  -webkit-overflow-scrolling: touch;
+  /* Prevent horizontal scroll */
+  width: 100%;
+  height: auto;
+  min-height: 100%;
+  /* Fix iOS Safari viewport issues */
+  position: relative;
+}
+
+/* Ensure main scroll container doesn't block scrolling */
+main {
+  position: relative;
+  width: 100%;
+  min-height: 100%;
+  overflow-x: hidden;
+  /* Allow content to determine height naturally */
+  height: auto;
+}
+
 body {
   color: var(--foreground);
   background: var(--background);
@@ -38,6 +117,13 @@ body {
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
   cursor: none;
+  /* Ensure body can scroll naturally */
+  overflow-x: hidden;
+  overflow-y: auto;
+  width: 100%;
+  min-height: 100%;
+  /* Prevent layout shifts on mobile */
+  position: relative;
 }
 
 * {
@@ -197,13 +283,13 @@ body {
   top: 0;
   left: 0;
   width: 100%;
-  height: 100vh;
+  height: 100dvh; /* Dynamic viewport - adapts to mobile address bar */
   z-index: 2;
 }
 
 .scrollTarget {
   position: absolute;
-  height: 1000vh;
+  height: 1000dvh; /* Dynamic viewport for consistent scroll behavior */
   width: 100px;
   top: 0;
   z-index: 0;

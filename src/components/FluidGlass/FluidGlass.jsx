@@ -33,7 +33,8 @@ export default function FluidGlass({
         top: 0,
         left: 0,
         width: "100%",
-        height: "100%",
+        height: "100dvh", // Use dynamic viewport height for mobile compatibility
+        minHeight: "100vh", // Fallback for older browsers
         pointerEvents: "none",
         zIndex: 5,
       }}
@@ -114,7 +115,9 @@ const ModeWrapper = memo(function ModeWrapper({
     };
 
     if (typeof window !== "undefined") {
-      window.addEventListener("pointermove", handlePointerMove, { passive: true });
+      window.addEventListener("pointermove", handlePointerMove, {
+        passive: true,
+      });
       return () => window.removeEventListener("pointermove", handlePointerMove);
     }
   }, []);
@@ -133,8 +136,13 @@ const ModeWrapper = memo(function ModeWrapper({
     lensProgressRef.current = lensProgress;
 
     // PHASE 2: Content movement (ONLY after lens is done)
+    // start logo movement when lens is ~45% grown
+    const LOGO_EARLY_START = 0.45;
+
     const contentProgress =
-      lensProgress < 1 ? 0 : (scrollProgress - phaseStart) / (1 - phaseStart);
+      lensProgress < LOGO_EARLY_START
+        ? 0
+        : (lensProgress - LOGO_EARLY_START) / (1 - LOGO_EARLY_START);
 
     const clampedContentProgress = THREE.MathUtils.clamp(contentProgress, 0, 1);
 
@@ -170,7 +178,7 @@ const ModeWrapper = memo(function ModeWrapper({
       const pointerX = (pointer.x * v.width) / 2;
       const pointerY = (pointer.y * v.height) / 2;
       const lerpAlpha = 1 - lensProgress;
-      
+
       destX = pointerX * lerpAlpha * 0.85; // Reduced responsiveness for smoother tracking
       destY = pointerY * lerpAlpha * 0.85;
     } else {
@@ -203,9 +211,9 @@ const ModeWrapper = memo(function ModeWrapper({
 
     /* ---------- LOGO MOVE (AFTER LENS FULL) ---------- */
 
-    const LOGO_PHASE_DURATION = 0.5;
+    const LOGO_PHASE_DURATION = isMobile ? 0.5 : 0.3;
     const logoShiftProgress = THREE.MathUtils.clamp(
-      contentProgress / LOGO_PHASE_DURATION,
+      contentProgress,
       0,
       1
     );
@@ -240,12 +248,16 @@ const ModeWrapper = memo(function ModeWrapper({
 
     if (logoRef.current) {
       if (isMobile) {
-        // On mobile, keep logo centered initially, then move up during sponsor section
-        // Use scrollSync.progress which goes 0-1 for the content phase
-        // Start moving logo up after ~80% of scroll content (when sponsors section appears)
-        const logoUpProgress = THREE.MathUtils.clamp((scrollSync.progress - 0.8) / 0.2, 0, 1);
-        const targetLogoY = THREE.MathUtils.lerp(0, 6, logoUpProgress);
-        
+        // Start moving logo up after ~85% of scroll content (when sponsors section appears)
+        const logoUpProgress = THREE.MathUtils.smoothstep(
+          scrollSync.rawProgress,
+          0.8,
+          0.95
+        );
+
+        const targetLogoY = THREE.MathUtils.lerp(0, 4, logoUpProgress);
+        easing.damp(logoRef.current.position, "y", targetLogoY, 0.3, delta);
+
         // Smooth easing for position changes
         easing.damp(logoRef.current.position, "x", 0, 0.3, delta);
         easing.damp(logoRef.current.position, "y", targetLogoY, 0.3, delta);
@@ -256,7 +268,7 @@ const ModeWrapper = memo(function ModeWrapper({
           -logoViewport.width * 0.18,
           logoShiftProgress
         );
-        
+
         // Smooth easing for position changes
         easing.damp(logoRef.current.position, "x", targetLogoX, 0.3, delta);
         easing.damp(logoRef.current.position, "y", -0.5, 0.3, delta);
@@ -295,7 +307,7 @@ const ModeWrapper = memo(function ModeWrapper({
             scale={isMobile ? 1.4 : 1.5}
             renderOrder={2}
           >
-            <planeGeometry args={isMobile ? [15, 10] : [19, 13]} />
+            <planeGeometry args={isMobile ? [15, 10] : [21, 15]} />
             <meshBasicMaterial map={logoTexture} transparent />
           </mesh>
           {children}

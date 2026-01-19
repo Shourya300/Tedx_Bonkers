@@ -85,11 +85,8 @@ export default function Navbar() {
         {/* Desktop Navigation */}
         <nav className="hidden lg:flex items-center gap-4 xl:gap-6">
           {links.map((item) => (
-<<<<<<< HEAD
-            <Link key={item.name} href={item.path} className="text-white text-sm md:text-base font-medium hover:opacity-80 transition-opacity">
-=======
+
             <Link key={item.name} href={item.path} className="text-white text-sm xl:text-base font-medium hover:opacity-80 transition-opacity">
->>>>>>> 511ae490c8456ff7451d9378b6519265da37b8aa
               {item.name}
             </Link>
           ))}
