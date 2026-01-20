@@ -77,11 +77,11 @@ export default function Navbar() {
 
   return (
     <header className="fixed top-0 left-0 w-full z-[1000]">
-      <div className="mt-5 max-h-[55px] md:max-h-[75px] max-w-6xl mx-auto px-4 md:px-8 py-2 md:py-4 flex items-center border border-white/20 border-t-white/40 border-l-white/30 backdrop-blur-lg rounded-full shadow-md">
+      <div className="mt-5 max-h-[75px] max-w-6xl mx-auto px-4 md:px-8 py-4 flex items-center border border-white/20 border-t-white/40 border-l-white/30 backdrop-blur-lg rounded-full shadow-md">
         {/* Logo - Left Side on Desktop, Centered on Mobile */}
         <div className="flex-1 flex lg:justify-start justify-center">
           <Link href="/" className="flex shrink-0">
-            <img src="/images/logo-black.png" alt="TEDxNIITUniversity" className="h-8 md:h-14 w-auto object-contain" />
+            <img src="/images/logo-black.png" alt="TEDxNIITUniversity" className="h-10 md:h-14 w-auto object-contain" />
           </Link>
         </div>
 

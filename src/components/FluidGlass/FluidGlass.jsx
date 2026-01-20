@@ -39,7 +39,7 @@ export default function FluidGlass({
         zIndex: 5,
       }}
     >
-      <Canvas camera={{ position: [0, 0, 20], fov: 15 }} gl={{ alpha: true, antialias: true, precision: "mediump" }}>
+      <Canvas camera={{ position: [0, 0, 20], fov: 15 }} gl={{ alpha: true }}>
         <ambientLight intensity={0.5} />
         <directionalLight position={[10, 10, 5]} intensity={1.5} />
         <Environment preset="city" />
@@ -68,7 +68,7 @@ const ModeWrapper = memo(function ModeWrapper({
   const logoRef = useRef();
   const [isMobile, setIsMobile] = useState(false);
   const chromaticAberrationRef = useRef(0.5);
-  const materialRef = useRef(); 
+  const materialRef = useRef();
   const lensProgressRef = useRef(0);
 
   // Idle detection for initial state only
@@ -136,6 +136,7 @@ const ModeWrapper = memo(function ModeWrapper({
     lensProgressRef.current = lensProgress;
 
     // PHASE 2: Content movement (ONLY after lens is done)
+    // start logo movement when lens is ~45% grown
     const LOGO_EARLY_START = 0.45;
 
     const contentProgress =
@@ -177,10 +178,10 @@ const ModeWrapper = memo(function ModeWrapper({
       const pointerX = (pointer.x * v.width) / 2;
       const pointerY = (pointer.y * v.height) / 2;
 
-      destX = pointerX * 0.9;
-      destY = pointerY * 0.9;
+      destX = pointerX * 0.85;
+      destY = pointerY * 0.85;
     } else {
-      // Once scroll starts, move to center and stay there while growing
+      // Once scrolling starts, move to center and grow from there
       destX = 0;
       destY = 0;
     }
@@ -197,7 +198,7 @@ const ModeWrapper = memo(function ModeWrapper({
     const maxViewportSize = Math.max(v.width, v.height);
 
     const maxScale =
-      (maxViewportSize * (isMobile ? 2.4 : 3.0)) / (geoWidthRef.current || 1);
+      (maxViewportSize * 2.5) / (geoWidthRef.current || 1);
 
     const targetScale = THREE.MathUtils.lerp(baseScale, maxScale, lensProgress);
 
