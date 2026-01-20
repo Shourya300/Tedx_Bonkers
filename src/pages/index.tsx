@@ -83,11 +83,11 @@ export default function Home() {
         <section className="min-h-screen flex items-center justify-center pointer-events-auto px-6 md:px-12">
           <div className="max-w-xl mx-auto md:ml-auto md:mr-0 text-center">
             <div className="flex flex-col items-center">
-              <h2 className="text-4xl md:text-7xl font-bold text-white text-glow">
+              <h2 className="text-4xl md:text-7xl font-bold text-text-color">
                 Speakers
               </h2>
-              <div className="w-36 h-[1px] bg-[#D3D3D3] shadow-[0_0_10px_rgba(230,230,230,230)] mt-4" />
-              <p className="text-center text-[16px] md:text-[24px] leading-[1.7] max-w-[460px] mx-auto font-medium font-sans tracking-[0.02em] text-[#EAEAEA] mt-8 px-4 md:px-0">
+              <div className="w-36 h-[1px] bg-text-color mt-4" />
+              <p className="text-center text-[16px] md:text-[24px] leading-[1.7] max-w-[460px] mx-auto font-medium font-sans tracking-[0.02em] text-text-color mt-8 px-4 md:px-0">
                 Ideas shape the future—and our speakers are the voices leading
                 that change. Meet innovators, thinkers, creators, and
                 storytellers from diverse fields who will take the stage to
@@ -104,11 +104,11 @@ export default function Home() {
         <section className="min-h-screen flex items-center pointer-events-auto px-6 md:px-12">
           <div className="max-w-xl mx-auto md:ml-auto md:mr-0 text-center">
             <div className="flex flex-col items-center">
-              <h2 className="text-4xl md:text-7xl font-bold text-white text-glow">
+              <h2 className="text-4xl md:text-7xl font-bold text-text-color">
                 Pre-Events
               </h2>
-              <div className="w-48 h-[1px] bg-[#D3D3D3] shadow-[0_0_10px_rgba(230,230,230,230)] mt-4" />
-              <p className="text-center text-[16px] md:text-[24px] leading-[1.7] max-w-[460px] mx-auto font-medium font-sans tracking-[0.02em] text-[#EAEAEA] mt-8 px-4 md:px-0">
+              <div className="w-48 h-[1px] bg-text-color shadow-[0_0_10px_rgba(230,230,230,230)] mt-4" />
+              <p className="text-center text-[16px] md:text-[24px] leading-[1.7] max-w-[460px] mx-auto font-medium font-sans tracking-[0.02em] text-text-color mt-8 px-4 md:px-0">
                 Before the main TEDx experience, we bring the community together
                 through engaging pre-events. From workshops and panel
                 discussions to interactive meetups, these sessions are designed
@@ -124,11 +124,11 @@ export default function Home() {
         <section className="min-h-screen flex items-center pointer-events-auto px-6 md:px-12">
           <div className="max-w-xl mx-auto md:ml-auto md:mr-0 text-center">
             <div className="flex flex-col items-center">
-              <h2 className="text-4xl md:text-7xl font-bold text-white text-glow">
+              <h2 className="text-4xl md:text-7xl font-bold text-text-color">
                 Rewind
               </h2>
-              <div className="w-24 h-[1px] bg-[#D3D3D3] shadow-[0_0_10px_rgba(230,230,230,230)] mt-4" />
-              <p className="text-center text-[16px] md:text-[24px] leading-[1.7] max-w-[460px] mx-auto font-medium font-sans tracking-[0.02em] text-[#EAEAEA] mt-8 px-4 md:px-0">
+              <div className="w-24 h-[1px] bg-text-color shadow-[0_0_10px_rgba(230,230,230,230)] mt-4" />
+              <p className="text-center text-[16px] md:text-[24px] leading-[1.7] max-w-[460px] mx-auto font-medium font-sans tracking-[0.02em] text-text-color mt-8 px-4 md:px-0">
                 Rewind is a podcast that explores the intersection of technology
                 and society. From discussions on the latest trends to in-depth
                 analysis of emerging technologies, Rewind offers a unique
@@ -144,11 +144,11 @@ export default function Home() {
         <section className="min-h-screen flex items-center pointer-events-auto px-6 md:px-12">
           <div className="max-w-xl mx-auto md:ml-auto md:mr-0 text-center">
             <div className="flex flex-col items-center">
-              <h2 className="text-4xl md:text-7xl font-bold text-white text-glow">
+              <h2 className="text-4xl md:text-7xl font-bold text-text-color">
                 About
               </h2>
-              <div className="w-24 h-[1px] bg-[#D3D3D3] shadow-[0_0_10px_rgba(230,230,230,230)] mt-4" />
-              <p className="text-center text-[16px] md:text-[24px] leading-[1.7] max-w-[480px] mx-auto font-sans font-medium tracking-[0.02em] text-[#EAEAEA] mt-8 px-4 md:px-0">
+              <div className="w-24 h-[1px] bg-text-color shadow-[0_0_10px_rgba(230,230,230,230)] mt-4" />
+              <p className="text-center text-[16px] md:text-[24px] leading-[1.7] max-w-[480px] mx-auto font-sans font-medium tracking-[0.02em] text-text-color mt-8 px-4 md:px-0">
                 TEDx is a global movement dedicated to sharing ideas that
                 matter. <br />
                 TEDxNIIT University is an independently organized event driven
@@ -164,11 +164,11 @@ export default function Home() {
         <section className="min-h-screen flex items-center pointer-events-auto px-6 md:px-12">
           <div className="max-w-xl mx-auto md:ml-auto md:mr-0 text-center">
             <div className="flex flex-col items-center">
-              <h2 className="text-4xl md:text-7xl font-bold text-white text-glow">
+              <h2 className="text-4xl md:text-7xl font-bold text-text-color">
                 Sponsors
               </h2>
-              <div className="w-36 h-[1px] bg-[#D3D3D3] shadow-[0_0_10px_rgba(230,230,230,230)] mt-4" />
-              <p className="text-center text-[16px] md:text-[24px] leading-[1.7] max-w-[480px] mx-auto font-medium font-sans tracking-[0.02em] text-[#EAEAEA] mt-8 px-4 md:px-0">
+              <div className="w-36 h-[1px] bg-text-color shadow-[0_0_10px_rgba(230,230,230,230)] mt-4" />
+              <p className="text-center text-[16px] md:text-[24px] leading-[1.7] max-w-[480px] mx-auto font-medium font-sans tracking-[0.02em] text-text-color mt-8 px-4 md:px-0">
                 Our sponsors make ideas possible. We are grateful to the
                 organizations and partners who support our vision and help bring
                 TEDxNIITUniversity to life. Their collaboration enables us to
@@ -184,8 +184,8 @@ export default function Home() {
         <section className="min-h-screen flex items-center pointer-events-auto px-6 md:px-12">
           <div className="max-w-xl mx-auto md:ml-auto md:mr-0 text-center">
             <div className="flex flex-col items-center">
-              <div className="w-32 h-[1px] bg-[#D3D3D3] shadow-[0_0_10px_rgba(230,230,230,230)] mt-4" />
-              <p className="text-center text-[16px] md:text-[24px] leading-[1.7] max-w-[480px] mx-auto font-medium font-sans tracking-[0.02em] text-[#EAEAEA] mt-8 px-4 md:px-0">
+              <div className="w-32 h-[1px] bg-text-color shadow-[0_0_10px_rgba(230,230,230,230)] mt-4" />
+              <p className="text-center text-[16px] md:text-[24px] leading-[1.7] max-w-[480px] mx-auto font-medium font-sans tracking-[0.02em] text-text-color mt-8 px-4 md:px-0">
                 The TEDxNIITUniversity logo represents our commitment to innovation and ideas worth spreading. 
                 Designed with purpose, it embodies the spirit of curiosity, creativity, and community that 
                 defines our event. Every element tells a story of transformation and inspiration.

@@ -9,8 +9,16 @@ export default {
   theme: {
     extend: {
       colors: {
+        navy: "#132440",
+        "ted-red": "#eb0028",
+        "text-color": "var(--text-color)",
         background: "var(--background)",
         foreground: "var(--foreground)",
+        ted: {
+          red: "var(--ted-red)",
+          "dark-red": "var(--ted-dark-red)",
+          "official-red": "var(--ted-official-red)",
+        },
       },
       fontFamily: {
         sans: ["var(--font-sans)", "sans-serif"],

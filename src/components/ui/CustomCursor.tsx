@@ -16,7 +16,7 @@ const CURSOR_STYLES = {
   },
   underline: {
     borderRadius: "0px",
-    backgroundColor: "rgba(255,255,255,1)",
+    backgroundColor: "#eb0028",
     border: "none",
     boxShadow: "none",
     duration: 0.2,
