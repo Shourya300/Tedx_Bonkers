@@ -68,7 +68,7 @@ const ModeWrapper = memo(function ModeWrapper({
   const logoRef = useRef();
   const [isMobile, setIsMobile] = useState(false);
   const chromaticAberrationRef = useRef(0.5);
-  const materialRef = useRef();
+  const materialRef = useRef(); 
   const lensProgressRef = useRef(0);
 
   // Idle detection for initial state only
@@ -136,7 +136,6 @@ const ModeWrapper = memo(function ModeWrapper({
     lensProgressRef.current = lensProgress;
 
     // PHASE 2: Content movement (ONLY after lens is done)
-    // start logo movement when lens is ~45% grown
     const LOGO_EARLY_START = 0.45;
 
     const contentProgress =
@@ -173,16 +172,15 @@ const ModeWrapper = memo(function ModeWrapper({
         Math.cos(idleTime.current * randomSpeed * 0.7) *
         randomRadius *
         (isMobile ? 0.4 : 0.5);
-    } else if (lensProgress < 1) {
-      // During lens growth, follow pointer - use reduced responsiveness for smoother tracking
+    } else if (scrollProgress === 0) {
+      // Before scrolling starts, follow pointer
       const pointerX = (pointer.x * v.width) / 2;
       const pointerY = (pointer.y * v.height) / 2;
-      const lerpAlpha = 1 - lensProgress;
 
-      destX = pointerX * lerpAlpha * 0.85; // Reduced responsiveness for smoother tracking
-      destY = pointerY * lerpAlpha * 0.85;
+      destX = pointerX * 0.9;
+      destY = pointerY * 0.9;
     } else {
-      // After lens fully grown, stay centered
+      // Once scroll starts, move to center and stay there while growing
       destX = 0;
       destY = 0;
     }
