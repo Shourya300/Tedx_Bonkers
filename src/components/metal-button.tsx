@@ -8,7 +8,8 @@ type ColorVariant =
   | "success"
   | "error"
   | "gold"
-  | "bronze";
+  | "bronze"
+  | "purple";
 
 interface MetalButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -67,6 +68,13 @@ const colorVariants: Record<
     textColor: "text-[#FFF7F0]",
     textShadow: "[text-shadow:_0_-1px_0_rgb(124_45_18_/_100%)]",
   },
+  purple: {
+    outer: "bg-gradient-to-b from-[#1e1b4b] to-[#4c1d95]",
+    inner: "bg-gradient-to-b from-[#312e81] via-[#1e1b4b] to-[#3730a3]",
+    button: "bg-gradient-to-b from-[#4338ca] to-[#312e81]",
+    textColor: "text-[#E0E7FF]",
+    textShadow: "[text-shadow:_0_-1px_0_rgb(30_27_75_/_100%)]",
+  },
 };
 
 const metalButtonVariants = (
@@ -106,7 +114,7 @@ const metalButtonVariants = (
         isHovered && !isPressed && !isTouchDevice ? "brightness(1.05)" : "none",
     },
     button: cn(
-      "relative z-10 m-[2.5px] inline-flex h-11 transform-gpu cursor-pointer items-center justify-center overflow-hidden rounded-full px-6 pt-4 pb-5 text-2xl leading-none font-bold will-change-transform outline-none",
+      "relative z-10 m-[2.5px] inline-flex h-9 transform-gpu cursor-pointer items-center justify-center overflow-hidden rounded-full px-4 pt-2.5 pb-3 text-lg leading-none font-bold will-change-transform outline-none",
       colors.button,
       colors.textColor,
       colors.textShadow,
