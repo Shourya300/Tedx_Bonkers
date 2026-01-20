@@ -31,10 +31,10 @@ const CURSOR_STYLES = {
 };
 
 const CURSOR_SIZES = {
-  default: { width: 16, height: 16, duration: 0.25 },
-  text: { width: 6, height: 28, duration: 0.25 },
-  card: { width: 40, height: 40, duration: 0.3 },
-  underline: { width: 0, height: 2, duration: 0.25 }, // width calculated dynamically
+  default: { width: 16, height: 16, duration: 0.15 },
+  text: { width: 6, height: 28, duration: 0.15 },
+  card: { width: 40, height: 40, duration: 0.2 },
+  underline: { width: 0, height: 2, duration: 0.15 }, // width calculated dynamically
 };
 
 export default function CustomCursor() {
@@ -107,7 +107,7 @@ export default function CustomCursor() {
       y: targetY,
       width: size.width,
       height: size.height,
-      duration: 0.4,
+      duration: 0.01,
       ease: "power2.out",
       overwrite: "auto",
     });
