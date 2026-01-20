@@ -88,7 +88,7 @@ export default function Navbar() {
         {/* Desktop Navigation - Centered */}
         <nav className="hidden lg:flex items-center gap-4 xl:gap-12">
           {links.map((item) => (
-            <Link key={item.name} href={item.path} className="text-text-color text-sm xl:text-base font-medium hover:text-ted-red transition-all whitespace-nowrap">
+            <Link key={item.name} href={item.path} className="text-white text-sm md:text-base font-medium hover:opacity-80 transition-opacity">
               {item.name}
             </Link>
           ))}

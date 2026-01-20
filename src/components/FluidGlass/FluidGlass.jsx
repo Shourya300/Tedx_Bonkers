@@ -76,7 +76,7 @@ const ModeWrapper = memo(function ModeWrapper({
   const lastThrottledPointerUpdateRef = useRef(0);
   const POINTER_THROTTLE_MS = 16; // ~60fps throttling
 
-  const logoTexture = useTexture("/images/Landing_Page/TEDx LOGO (NO BG).png");
+  const logoTexture = useTexture("/images/Landing_Page/BetterLightLogo.png");
 
   // Detect mobile devices
   useEffect(() => {
@@ -293,8 +293,9 @@ const ModeWrapper = memo(function ModeWrapper({
             ref={logoRef}
             position={[0, isMobile ? 0 : -3, -59.5]}
             scale={isMobile ? 1.4 : 1.5}
+            renderOrder={2}
           >
-            <planeGeometry args={isMobile ? [10, 10] : [13, 13]} />
+            <planeGeometry args={isMobile ? [15, 10] : [19, 13]} />
             <meshBasicMaterial map={logoTexture} transparent />
           </mesh>
           {children}
