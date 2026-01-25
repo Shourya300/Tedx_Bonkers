@@ -81,7 +81,7 @@ export default function Navbar() {
         {/* Logo - Left Side on Desktop, Centered on Mobile */}
         <div className="flex-1 flex lg:justify-start justify-center">
           <Link href="/" className="flex shrink-0">
-            <img src="/images/logo-white.png" alt="TEDxNIITUniversity" className="h-10 md:h-14 w-auto object-contain" />
+            <img src="/images/logo-black.png" alt="TEDxNIITUniversity" className="h-10 md:h-14 w-auto object-contain" />
           </Link>
         </div>
 
@@ -90,6 +90,7 @@ export default function Navbar() {
           {links.map((item) => (
 
             <Link key={item.name} href={item.path} className="text-white text-sm xl:text-base font-medium hover:opacity-80 transition-opacity">
+
               {item.name}
             </Link>
           ))}
