@@ -11,30 +11,30 @@ const CURSOR_STYLES = {
     borderRadius: "9999px",
     backgroundColor: "rgba(255,255,255,1)",
     border: "2px solid rgba(255,255,255,0)",
-    boxShadow: "none",
-    duration: 0.5,
+    boxShadow: "0 0 16px 6px rgba(255,255,255,0.7)", // white glow
+    duration: 0,
   },
   underline: {
     borderRadius: "0px",
     backgroundColor: "rgba(255,255,255,1)",
     border: "none",
-    boxShadow: "none",
-    duration: 0.2,
+    boxShadow: "0 0 10px 3px rgba(255,255,255,0.6)", // white glow
+    duration: 0,
   },
   interactive: {
     borderRadius: "999px",
     backgroundColor: "rgba(255,255,255,0.9)",
     border: "none",
-    boxShadow: "none",
-    duration: 0.2,
+    boxShadow: "0 0 16px 6px rgba(255,255,255,0.7)", // white glow
+    duration: 0,
   },
 };
 
 const CURSOR_SIZES = {
-  default: { width: 16, height: 16, duration: 0.15 },
-  text: { width: 6, height: 28, duration: 0.15 },
-  card: { width: 40, height: 40, duration: 0.2 },
-  underline: { width: 0, height: 2, duration: 0.15 }, // width calculated dynamically
+  default: { width: 8, height: 8, duration: 0 },
+  text: { width: 3, height: 16, duration: 0 },
+  card: { width: 24, height: 24, duration: 0 },
+  underline: { width: 0, height: 2, duration: 0 }, // width calculated dynamically
 };
 
 export default function CustomCursor() {
@@ -107,8 +107,8 @@ export default function CustomCursor() {
       y: targetY,
       width: size.width,
       height: size.height,
-      duration: 0.01,
-      ease: "power2.out",
+      duration: 0,
+      ease: "none",
       overwrite: "auto",
     });
   }, [setCursorMode]);
@@ -142,7 +142,7 @@ export default function CustomCursor() {
   return (
     <div
       ref={cursorRef}
-      className="fixed top-0 left-0 w-4 h-4 bg-white rounded-full pointer-events-none z-[10000] -translate-x-1/2 -translate-y-1/2 transition-opacity duration-300"
+      className="fixed top-0 left-0 w-1 h-1 bg-white rounded-full pointer-events-none z-[10000] -translate-x-1/2 -translate-y-1/2 transition-opacity duration-300"
       style={{ opacity: isHidden ? 0 : 1 }}
     />
   );

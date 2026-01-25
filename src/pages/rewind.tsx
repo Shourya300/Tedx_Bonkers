@@ -1,12 +1,17 @@
 "use client";
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { YearSelector } from "@/components/YearSelector/YearSelector";
-import { ThemeImage } from "@/components/ThemeImage/ThemeImage";
-import { Description } from "@/components/desc/desc";
-import { SpeakersList } from "@/components/SpeakersList/SpeakersList";
+import { useState, useEffect, useRef } from "react";
+import {
+  motion,
+  useScroll,
+  useTransform,
+  useInView,
+  AnimatePresence,
+} from "framer-motion";
+import Image from "next/image";
 import TopBanner from "@/components/XHero/XHero";
+import Carousel from "@/components/Carousel/Carousel";
 
+// --- DATA OBJECT (All Years) ---
 const yearContent: {
   [key: number]: {
     theme: string;
@@ -16,449 +21,169 @@ const yearContent: {
       name: string;
       topic: string;
       image: string;
-      socialLinks: {
-        linkedin?: string;
-        twitter?: string;
-      };
       tedTalkUrl: string;
+      imagePosition?: string;
     }>;
-    gallery: Array<string>;
   };
 } = {
-  2018: {
-    theme: "The Precipice",
-    description: "On the brink of change",
-    themeImage: "/rewind/18.jpg",
+  2025: {
+    theme: "Inverso Clesiddra",
+    description: "As time folds, perspectives unfold.",
+    themeImage:
+      "https://images.unsplash.com/photo-1506784983877-45594efa4cbe?auto=format&fit=crop&q=80&w=1000",
     speakers: [
       {
-        name: "Prasanth Nori",
-        topic: "Flaws in Education",
-        image: "/rewind/Precipice/Prasanth_Nori.jpg",
-        socialLinks: {},
-        tedTalkUrl:
-          "https://www.youtube.com/watch?v=zxusiA7UsHI&list=PLsRNoUx8w3rNdvD1tNTtHmyWfqTofEDB4&index=1",
+        name: "Tirth Parsana",
+        topic: "Aham Brahmasmi",
+        image: "/rewind/25/tirth.jpg",
+        tedTalkUrl: "https://www.youtube.com/watch?v=5CAXlKPZTHA",
       },
       {
-        name: "Nimisha Verma",
-        topic: "Isolation",
-        image: "/rewind/Precipice/Nimisha_Verma.jpg",
-        socialLinks: {},
-        tedTalkUrl:
-          "https://www.youtube.com/watch?v=RsqOdZepzVs&list=PLsRNoUx8w3rNdvD1tNTtHmyWfqTofEDB4&index=2",
+        name: "Sneha Chakraborty",
+        topic: "Flow over Fear",
+        image: "/rewind/25/sneha.jpg",
+        tedTalkUrl: "https://www.youtube.com/watch?v=KGWfQHL1HmY",
       },
       {
-        name: "Anuv Jain",
-        topic: "How Sadness Can Be Turned into One of Your Biggest Assets",
-        image: "/rewind/Precipice/anuv_jain.jpg",
-        socialLinks: {},
-        tedTalkUrl:
-          "https://www.youtube.com/watch?v=fAYaSIMsxQs&list=PLsRNoUx8w3rNdvD1tNTtHmyWfqTofEDB4&index=3",
+        name: "Palakh Khanna",
+        topic: "Flipping the narrative",
+        image: "/rewind/25/palakh.png",
+        tedTalkUrl: "https://www.youtube.com/watch?v=B3raZ8P1frI",
       },
       {
-        name: "Dr Ananta Singh Raghuvanshi",
-        topic: "Lead at the Edge of The Precipice",
-        image: "/rewind/Precipice/Ananta_Singhi.jpg",
-        socialLinks: {},
-        tedTalkUrl:
-          "https://www.youtube.com/watch?v=BjRjuQnmJLY&list=PLsRNoUx8w3rNdvD1tNTtHmyWfqTofEDB4&index=4",
+        name: "Nainika Mukherjee",
+        topic: "Trust the Process: The Power of Movement",
+        image: "/rewind/25/nainika.jpg",
+        tedTalkUrl: "https://www.youtube.com/watch?v=NYocIjAxXl4",
       },
       {
-        name: "Sushant Kalra",
-        topic:
-          "Aao baat karein- Beginning of Eradication of Child Sexual Abuse",
-        image: "/rewind/Precipice/sushant_kalra.jpg",
-        socialLinks: {},
-        tedTalkUrl:
-          "https://www.youtube.com/watch?v=tZoxCmda56I&list=PLsRNoUx8w3rNdvD1tNTtHmyWfqTofEDB4&index=5",
+        name: "Manas Chopra",
+        topic: "Why Community Building is the Key to Personal Growth",
+        image: "/rewind/25/manas.JPG",
+        tedTalkUrl: "https://www.youtube.com/watch?v=SUU0WteEYus",
       },
       {
-        name: "Maj Gen. Umang Sethi",
-        topic: "We Before I ",
-        image: "/rewind/Precipice/Umang_Sethi.jpg",
-        socialLinks: {},
-        tedTalkUrl:
-          "https://www.youtube.com/watch?v=nZkhF12fO8c&list=PLsRNoUx8w3rNdvD1tNTtHmyWfqTofEDB4&index=6",
+        name: "Humaira Mushtaq",
+        topic: "Architect of Her Own Reality",
+        image: "/rewind/25/humaira.webp",
+        tedTalkUrl: "https://www.youtube.com/watch?v=wA-Pmcz8HvI",
       },
       {
-        name: "Narayani Gupta",
-        topic: "Conversations with the Past",
-        image: "/rewind/Precipice/narayanai-gupta.jpg",
-        socialLinks: {},
-        tedTalkUrl:
-          "https://www.youtube.com/watch?v=yc8-XT-awzY&list=PLsRNoUx8w3rNdvD1tNTtHmyWfqTofEDB4&index=7",
+        name: "Dr. Gajendra Purohit",
+        topic: "The Timeless Equation",
+        image: "/rewind/25/gajendra.jpg",
+        tedTalkUrl: "https://www.youtube.com/watch?v=2WmABjM2gSw",
       },
       {
-        name: "Pankhuri Gidwani",
-        topic: "Break the Stereotypes",
-        image: "/rewind/Precipice/pankhuri_gidwani.jpg",
-        socialLinks: {},
-        tedTalkUrl:
-          "https://www.youtube.com/watch?v=XmE4mk8x00s&list=PLsRNoUx8w3rNdvD1tNTtHmyWfqTofEDB4&index=8",
+        name: "Dr. Mitali Rathod",
+        topic: "Navigating Adulthood",
+        image: "/rewind/25/uterus.jpg",
+        tedTalkUrl: "https://www.youtube.com/watch?v=PfxqMAC-39A",
       },
       {
-        name: "Dr Prem Atreja",
-        topic: "To be healthy or not to be",
-        image: "/rewind/Precipice/Prem_Atreja.jpg",
-        socialLinks: {},
-        tedTalkUrl:
-          "https://www.youtube.com/watch?v=531nxrBke88&list=PLsRNoUx8w3rNdvD1tNTtHmyWfqTofEDB4&index=9",
+        name: "Amit Dubey",
+        topic: "Whispers of the Web",
+        image: "/rewind/25/amit.jpeg",
+        tedTalkUrl: "https://www.youtube.com/watch?v=6MHYtNKaC1k",
       },
-    ],
-    gallery: [
-      "/gallery/2018-1.jpg",
-      "/gallery/2018-2.jpg",
-      "/gallery/2018-3.jpg",
+      {
+        name: "Aiman Khan",
+        topic: "Timeless Influence",
+        image: "/rewind/25/aiman.jpg",
+        tedTalkUrl: "https://www.youtube.com/watch?v=gjecwTZgvo0",
+      },
+      {
+        name: "Dr. L Venakata Subramaniam",
+        topic: "India's Time",
+        image: "/rewind/25/venkata.jpg",
+        tedTalkUrl: "https://www.youtube.com/watch?v=JYlIMogFDi8",
+      },
     ],
   },
-  2019: {
-    theme: "Sparking Metanoia",
-    description: "",
-    themeImage: "/rewind/19.jpg",
+  2024: {
+    theme: "Saptaranga",
+    description: "Where Spectrums Unite",
+    themeImage: "/themes/saptaranga.png",
     speakers: [
       {
-        name: "Atif Khan",
-        topic: "How Drones Impact the Society",
-        image: "/rewind/Sparking/atif_khan.jpg",
-        socialLinks: {},
-        tedTalkUrl:
-          "https://www.youtube.com/watch?v=VaegXWjUhN0&list=PLsRNoUx8w3rO01rum8RfjQn5LVl5Vq7Ka&index=8",
+        name: "Nikita Sharma",
+        topic: "You Are It",
+        image: "/prev-speakers/nikita24.png",
+        tedTalkUrl: "https://www.youtube.com/watch?v=goCrg3YuQmA",
+        imagePosition: "10% 10%",
       },
       {
-        name: "Digital Gandhi",
-        topic: "Love Has All the Answers",
-        image: "/rewind/Sparking/digital-gandhi.jpg",
-        socialLinks: {},
-        tedTalkUrl:
-          "https://www.youtube.com/watch?v=umH9yka1siY&list=PLsRNoUx8w3rO01rum8RfjQn5LVl5Vq7Ka&index=6",
+        name: "Dr Vijender Chauhan",
+        topic: "No Success is Monocolor",
+        image: "/prev-speakers/vijendra24.png",
+        tedTalkUrl: "https://www.youtube.com/watch?v=LdK_eQExh1M",
       },
       {
-        name: "Salman Khurshid",
-        topic: "The Mind of a Judge",
-        image: "/rewind/Sparking/Salman_Khurshid.jpg",
-        socialLinks: {},
-        tedTalkUrl:
-          "https://www.youtube.com/watch?v=ZljJEjJ7n_g&list=PLsRNoUx8w3rO01rum8RfjQn5LVl5Vq7Ka&index=1",
-      },
-      {
-        name: "Richard Rekhy",
-        topic: "Leading from the Heart",
-        image: "/rewind/Sparking/Richard_Rekhy.jpg",
-        socialLinks: {},
-        tedTalkUrl:
-          "https://www.youtube.com/watch?v=PjrM3G8PCb8&list=PLsRNoUx8w3rO01rum8RfjQn5LVl5Vq7Ka&index=2",
-      },
-      {
-        name: "Sangeeta Sindhi Bahl",
-        topic: "Transforming Setbacks into Opportunities",
-        image: "/rewind/Sparking/sangeeta-bahl.jpg",
-        socialLinks: {},
-        tedTalkUrl:
-          "https://www.youtube.com/watch?v=ysYik6Ptfy4&list=PLsRNoUx8w3rO01rum8RfjQn5LVl5Vq7Ka&index=3",
-      },
-      {
-        name: "Nidhi Lauria",
-        topic: "A Case for Generosity",
-        image: "/rewind/Sparking/Nidhi_Lauria.jpg",
-        socialLinks: {},
-        tedTalkUrl:
-          "https://www.youtube.com/watch?v=umH9yka1siY&list=PLsRNoUx8w3rO01rum8RfjQn5LVl5Vq7Ka&index=6",
-      },
-      {
-        name: "Sanchit Batra",
-        topic: "An Illusion Act",
-        image: "/rewind/Sparking/Sanchit_Batra.jpg",
-        socialLinks: {},
-        tedTalkUrl:
-          "https://www.youtube.com/watch?v=0qsQpUJv-Ck&list=PLsRNoUx8w3rO01rum8RfjQn5LVl5Vq7Ka&index=6",
-      },
-      {
-        name: "Kamal Morya",
-        topic: "Dance Performance",
-        image: "/rewind/Sparking/Kamal_Morya.jpg",
-        socialLinks: {},
-        tedTalkUrl:
-          "https://www.youtube.com/watch?v=B8QRhZi_PVk&list=PLsRNoUx8w3rO01rum8RfjQn5LVl5Vq7Ka&index=8",
-      },
-      {
-        name: "Siya Jain",
-        topic: "Kathak Performance",
-        image: "/rewind/Sparking/siya-jain.jpg",
-        socialLinks: {},
-        tedTalkUrl:
-          "https://www.youtube.com/watch?v=1i2Fruw4Vf4&list=PLsRNoUx8w3rO01rum8RfjQn5LVl5Vq7Ka&index=9",
-      },
-      {
-        name: "Lt Gen Vinod Bhatia (Retd.)",
-        topic: "Who Dares, Wins",
-        image: "/rewind/Sparking/Vinod_Bhatia.jpg",
-        socialLinks: {},
-        tedTalkUrl:
-          "https://www.youtube.com/watch?v=4wa3XDh72lE&list=PLsRNoUx8w3rO01rum8RfjQn5LVl5Vq7Ka&index=10",
-      },
-    ],
-    gallery: [
-      "/gallery/2019-1.jpg",
-      "/gallery/2019-2.jpg",
-      "/gallery/2019-3.jpg",
-    ],
-  },
-  2020: {
-    theme: "Quo Vadis",
-    description: "where are we headed?",
-    themeImage: "/rewind/20.jpg",
-    speakers: [
-      {
-        name: "Aditya Bhandari",
-        topic: "Young India: Art, Community & Coding",
-        image: "/rewind/QuoVadis/Aditya_Bhandari.jpg",
-        socialLinks: {},
-        tedTalkUrl:
-          "https://www.youtube.com/watch?v=N2Xnkg4OP2w&list=PLsRNoUx8w3rMVM5oshCcRJou8f8S4S7Zx&index=6",
-      },
-      {
-        name: "As We Keep Searching",
-        topic: "Musical Performance",
-        image: "/rewind/QuoVadis/aswekeepsearching.jpg",
-        socialLinks: {},
-        tedTalkUrl:
-          "https://www.youtube.com/watch?v=3YOpdfr-agQ&list=PLsRNoUx8w3rMVM5oshCcRJou8f8S4S7Zx&index=8",
-      },
-      {
-        name: "Chameli Debnath",
-        topic: "Kathak Dance Performance",
-        image: "/rewind/QuoVadis/Chameli_Debnath.jpg",
-        socialLinks: {},
-        tedTalkUrl:
-          "https://www.youtube.com/watch?v=aCQv_A2wxrw&list=PLsRNoUx8w3rMVM5oshCcRJou8f8S4S7Zx&index=4",
-      },
-      {
-        name: "Manoj Keshwar",
-        topic: "Life Lessons from an Epic Road Trip",
-        image: "/rewind/QuoVadis/manoj_keshwar.jpg",
-        socialLinks: {},
-        tedTalkUrl:
-          "https://www.youtube.com/watch?v=3YOpdfr-agQ&list=PLsRNoUx8w3rMVM5oshCcRJou8f8S4S7Zx&index=8",
-      },
-      {
-        name: "Manraj Singh & Arpit Vyas",
-        topic: "What Goes Around, Comes Around",
-        image: "/rewind/QuoVadis/msingh_avyas.jpg",
-        socialLinks: {},
-        tedTalkUrl:
-          "https://www.youtube.com/watch?v=JeH9v7ohjWc&list=PLsRNoUx8w3rMVM5oshCcRJou8f8S4S7Zx&index=10",
-      },
-      {
-        name: "Shalin IPS",
-        topic: "Connected by Consumption, Consumed by Con",
-        image: "/rewind/QuoVadis/shalin_IPS.jpg",
-        socialLinks: {},
-        tedTalkUrl:
-          "https://www.youtube.com/watch?v=sSqYNOIvoI8&list=PLsRNoUx8w3rMVM5oshCcRJou8f8S4S7Zx&index=7",
-      },
-      {
-        name: "Sugata Mitra",
-        topic: "The Future of Work",
-        image: "/rewind/QuoVadis/Sugata_mitra.jpg",
-        socialLinks: {},
-        tedTalkUrl:
-          "https://www.youtube.com/watch?v=jrH3_NANVJA&list=PLsRNoUx8w3rMVM5oshCcRJou8f8S4S7Zx&index=2",
-      },
-      {
-        name: "Sushruthi Krishna",
-        topic: "The success story of a girl from Bangalore",
-        image: "/rewind/QuoVadis/Sushruthi-Krishna.jpeg",
-        socialLinks: {},
-        tedTalkUrl:
-          "https://www.youtube.com/watch?v=3YOpdfr-agQ&list=PLsRNoUx8w3rMVM5oshCcRJou8f8S4S7Zx&index=8",
-      },
-      {
-        name: "Tirthak Saha",
-        topic: "The Myth of the 3 RS - Sustainabilitys Road Ahead",
-        image: "/rewind/QuoVadis/Tirthak_Saha.jpg",
-        socialLinks: {},
-        tedTalkUrl:
-          "https://www.youtube.com/watch?v=GBplgW4c3gY&list=PLsRNoUx8w3rMVM5oshCcRJou8f8S4S7Zx&index=4",
-      },
-      {
-        name: "Zoe Modgill",
-        topic: "Strength is an Inside Job",
-        image: "/rewind/QuoVadis/Zoe_Modgill.jpg",
-        socialLinks: {},
-        tedTalkUrl:
-          "https://www.youtube.com/watch?v=_JAWKCanBTA&list=PLsRNoUx8w3rMVM5oshCcRJou8f8S4S7Zx&index=10",
-      },
-    ],
-    gallery: [
-      "/gallery/2020-1.jpg",
-      "/gallery/2020-2.jpg",
-      "/gallery/2020-3.jpg",
-    ],
-  },
-  2021: {
-    theme: "Swadhyaya",
-    description: "An interview with oneself",
-    themeImage: "/rewind/21.png",
-    speakers: [
-      {
-        name: "Aabir Vyas",
-        topic: "Hard Work,Consistency and Patience",
-        image: "/rewind/Swadhyaya/aabir_vyas.jpg",
-        socialLinks: {},
-        tedTalkUrl:
-          "https://www.youtube.com/watch?v=ftMj6E4wX60&list=PLsRNoUx8w3rOE8ZdaLiqWRvt8QDozjwEo&index=7",
-      },
-      {
-        name: "Abhash Jha",
-        topic: "When No One Helped Me, I Helped Myself",
-        image: "/rewind/Swadhyaya/Abhash_Jha.jpg",
-        socialLinks: {},
-        tedTalkUrl:
-          "https://www.youtube.com/watch?v=k_FdxLP2qIk&list=PLsRNoUx8w3rOE8ZdaLiqWRvt8QDozjwEo&index=5",
-      },
-      {
-        name: "Anirban Bhattacharyya",
-        topic: "Morning Raaga",
-        image: "/rewind/Swadhyaya/anirban_bhattacharyya.jpg",
-        socialLinks: {},
-        tedTalkUrl:
-          "https://www.youtube.com/watch?v=jsX0MMr35lk&list=PLsRNoUx8w3rOE8ZdaLiqWRvt8QDozjwEo&index=2",
-      },
-      {
-        name: "Avinash Singh",
-        topic: "Prosper. Or Perish",
-        image: "/rewind/Swadhyaya/Avinash_Singh.jpg",
-        socialLinks: {},
-        tedTalkUrl:
-          "https://www.youtube.com/watch?v=IiVl2UgszFc&list=PLsRNoUx8w3rOE8ZdaLiqWRvt8QDozjwEo&index=4",
-      },
-      {
-        name: " EPR Iyer",
-        topic: "Hip Hop Empowers",
-        image: "/rewind/Swadhyaya/EPR_Iyer.jpeg",
-        socialLinks: {},
-        tedTalkUrl:
-          "https://www.youtube.com/watch?v=IaHkabRhBq4&list=PLsRNoUx8w3rOE8ZdaLiqWRvt8QDozjwEo&index=6",
-      },
-      {
-        name: "Richie Mehta",
-        topic: "The Meaning of .....",
-        image: "/rewind/Swadhyaya/Richie_Mehta.jpg",
-        socialLinks: {},
-        tedTalkUrl:
-          "https://www.youtube.com/watch?v=N_8CsLScgKg&list=PLsRNoUx8w3rOE8ZdaLiqWRvt8QDozjwEo&index=3",
-      },
-      {
-        name: "Vanndana Vaadera",
-        topic: "Mental Workouts, the Pathway to Abundance",
-        image: "/rewind/Swadhyaya/vanndana_vaadera.jpg",
-        socialLinks: {},
-        tedTalkUrl:
-          "https://www.youtube.com/watch?v=bB97hvh-7sI&list=PLsRNoUx8w3rOE8ZdaLiqWRvt8QDozjwEo&index=8",
-      },
-    ],
-    gallery: [
-      "/gallery/2021-1.jpg",
-      "/gallery/2021-2.jpg",
-      "/gallery/2021-3.jpg",
-    ],
-  },
-  2022: {
-    theme: "Parvaaz",
-    description: "Azaad. Aagaaz. Aseem",
-    themeImage: "/rewind/22.png",
-    speakers: [
-      {
-        name: "Kevin Missal",
-        topic: "Space Exploration and Humanity",
-        image: "/rewind/Parvaaz/kevin_missal.jpg",
-        socialLinks: {},
-        tedTalkUrl:
-          "https://www.ted.com/talks/emily_watson_space_exploration_and_humanity",
-      },
-      {
-        name: "Harish Mehta",
-        topic: "Joy of Failing",
-        image: "/rewind/Parvaaz/Harish_Mehta.jpg",
-        socialLinks: {},
-        tedTalkUrl:
-          "https://www.youtube.com/watch?v=u4KNmBXKe-4&list=PL2LgFpGtqcj4UP5WSECTitMitbzvf0UMU&index=1",
-      },
-      {
-        name: "Supreet Singh Arora",
-        topic: "Psychology of Personal Identity",
-        image: "/rewind/Parvaaz/Author_sherry.jpg",
-        socialLinks: {},
-        tedTalkUrl:
-          "https://www.youtube.com/watch?v=cxGsANXP3OQ&list=PL2LgFpGtqcj4UP5WSECTitMitbzvf0UMU&index=8",
-      },
-      {
-        name: "Lakshay Jangid",
-        topic: "Patience on one wheel",
-        image: "/rewind/Parvaaz/lakshay.jpg",
-        socialLinks: {},
-        tedTalkUrl:
-          "https://www.youtube.com/watch?v=7sXgpj_Co9I&list=PL2LgFpGtqcj4UP5WSECTitMitbzvf0UMU&index=3",
-      },
-      {
-        name: "Major General D.Bipin Bakshi",
-        topic: "Seeking new horizons,Breaking mindsets",
-        image: "/rewind/Parvaaz/maj.jpg",
-        socialLinks: {},
-        tedTalkUrl:
-          "https://www.ted.com/talks/alex_tran_blockchain_and_social_good",
-      },
-      {
-        name: "Rakshit Tandon",
-        topic: "Blockchain and Social Good",
-        image: "/rewind/Parvaaz/Rakshit_Tandon.jpg",
-        socialLinks: {},
-        tedTalkUrl:
-          "https://www.ted.com/talks/alex_tran_blockchain_and_social_good",
-      },
-      {
-        name: "Ridhi Khakhar",
-        topic: "On carving your own path through perseverance",
-        image: "/rewind/Parvaaz/ridhi.jpg",
-        socialLinks: {},
-        tedTalkUrl:
-          "https://www.youtube.com/watch?v=fA6ady8Xrq8&list=PL2LgFpGtqcj4UP5WSECTitMitbzvf0UMU&index=4",
-      },
-      {
-        name: "Sagar Lalwani",
-        topic: "Take the risk or lose the chance",
-        image: "/rewind/Parvaaz/Sagar_Lalwani.jpg",
-        socialLinks: {},
-        tedTalkUrl:
-          "https://www.youtube.com/watch?v=Fg9ixhDzPEo&list=PL2LgFpGtqcj4UP5WSECTitMitbzvf0UMU&index=5",
-      },
-      {
-        name: "Sangeeta Sindhi Bahl",
-        topic: "Become who you aspire to be",
-        image: "/rewind/Parvaaz/sangeeta.jpeg",
-        socialLinks: {},
-        tedTalkUrl:
-          "https://www.youtube.com/watch?v=7-8v_IM7OKs&list=PL2LgFpGtqcj4UP5WSECTitMitbzvf0UMU&index=6",
-      },
-      {
-        name: "Srikanth Velamakanni",
-        topic: "Unveiling the magic behind great AI",
-        image: "/rewind/Parvaaz/srikant.jpg",
-        socialLinks: {},
-        tedTalkUrl:
-          "https://www.youtube.com/watch?v=PuyKr-jnguA&list=PL2LgFpGtqcj4UP5WSECTitMitbzvf0UMU&index=7",
-      },
-      {
-        name: "Yoga Bhabagna Jonala",
-        topic: "Will Classical Dancing help in life",
-        image: "/rewind/Parvaaz/yoga.jpg",
-        socialLinks: {},
+        name: "Gaurav Juyal",
+        topic: "Drapery and How It is Awesome",
+        image: "/prev-speakers/gaurav24.png",
         tedTalkUrl: "",
       },
-    ],
-    gallery: [
-      "/gallery/2022-1.jpg",
-      "/gallery/2022-2.jpg",
-      "/gallery/2022-3.jpg",
+      {
+        name: "Siddharth Jain",
+        topic: "Finding Your Superpower",
+        image: "/prev-speakers/siddharth24.png",
+        tedTalkUrl: "https://www.youtube.com/watch?v=l7w3bUkyFb0",
+      },
+      {
+        name: "Devyani Sharma",
+        topic: "Life Driven by Dance",
+        image: "/rewind/24/devyani.jpg",
+        tedTalkUrl: "https://www.youtube.com/watch?v=WHZBHGE7b-g",
+      },
+      {
+        name: "Akshay Chopra",
+        topic: "From Nothing to Something",
+        image: "/rewind/24/akshay.jpg",
+        tedTalkUrl: "https://www.youtube.com/watch?v=vkTNMjEYoh0",
+      },
+      {
+        name: "Navin Reddy",
+        topic: "The New Way of Learning Tech",
+        image: "/rewind/24/navin.jpg",
+        tedTalkUrl: "https://www.youtube.com/watch?v=YBe4EE8QIAU",
+      },
+      {
+        name: "Vipin Mishra",
+        topic: "In The Zone",
+        image: "/rewind/24/vipin.jpg",
+        tedTalkUrl: "https://www.youtube.com/watch?v=YIO37VZ8Zvg",
+      },
+      {
+        name: "Padamjeet Sehrawat",
+        topic: "You Are Your Best Answer",
+        image: "/rewind/24/pad.jpg",
+        tedTalkUrl: "https://www.youtube.com/watch?v=pQF-tUolRGc",
+      },
+      {
+        name: "Nirbhik Datta",
+        topic: "Unveiling the Subconscious",
+        image: "/rewind/24/nirbhik.jpg",
+        tedTalkUrl: "https://www.youtube.com/watch?v=zAKyzgdkOA4",
+      },
+      {
+        name: "Aditya Goela CFA",
+        topic: "How CFA Course Changed my Life",
+        image: "/rewind/24/aditya.jpg",
+        tedTalkUrl: "https://www.youtube.com/watch?v=thR82rUg8VI",
+      },
+      {
+        name: "Dr Kausar Shah",
+        topic: "Dark Sides of Confident Leadership",
+        image: "/rewind/24/kausar.jpg",
+        tedTalkUrl: "https://www.youtube.com/watch?v=Y7MdhKjFCOk",
+      },
+      {
+        name: "Shivani Kalra",
+        topic: "Because I Said No",
+        image: "/rewind/24/shi.jpg",
+        tedTalkUrl: "https://www.youtube.com/watch?v=mKexuy238zA",
+      },
     ],
   },
   2023: {
@@ -470,257 +195,638 @@ const yearContent: {
         name: "Aastha Tiwari",
         topic: "The Heart Way or the Hard Way",
         image: "/rewind/THINC/11.jpg",
-        socialLinks: {},
-        tedTalkUrl:
-          "https://www.youtube.com/watch?v=xZzVeKW_3yU&list=PL2LgFpGtqcj6XxtHVl43VNYAKVwhqI6uz&index=1",
+        tedTalkUrl: "https://www.youtube.com/watch?v=xZzVeKW_3yU",
       },
       {
         name: "Dr. Aqsa Shaikh",
         topic: "The White Coat Has A Rainbow",
         image: "/rewind/THINC/12.jpg",
-        socialLinks: {},
-        tedTalkUrl:
-          "https://www.youtube.com/watch?v=1ckPQR64wwM&list=PL2LgFpGtqcj6XxtHVl43VNYAKVwhqI6uz&index=2",
+        tedTalkUrl: "https://www.youtube.com/watch?v=1ckPQR64wwM",
       },
       {
         name: "Anuranjita Kumar",
-        topic: "Can I Have It All: Trials and Tribulations of Working Women",
+        topic: "Can I Have It All",
         image: "/rewind/THINC/8.jpg",
-        socialLinks: {},
-        tedTalkUrl:
-          "https://www.youtube.com/watch?v=frWC8qmCuOQ&list=PL2LgFpGtqcj6XxtHVl43VNYAKVwhqI6uz&index=3",
+        tedTalkUrl: "https://www.youtube.com/watch?v=frWC8qmCuOQ",
       },
       {
         name: "Deepak Pareek",
-        topic: "No Guts, No Glory! ",
+        topic: "No Guts, No Glory!",
         image: "/rewind/THINC/9.jpg",
-        socialLinks: {},
-        tedTalkUrl:
-          "https://www.youtube.com/watch?v=kdIOiNHyDyM&list=PL2LgFpGtqcj6XxtHVl43VNYAKVwhqI6uz&index=4",
+        tedTalkUrl: "https://www.youtube.com/watch?v=kdIOiNHyDyM",
       },
       {
         name: "Ganesh Sahai",
-        topic: "P-3 Way To Innovation: Play, Pilot, Production",
+        topic: "P-3 Way To Innovation",
         image: "/rewind/THINC/3.jpg",
-        socialLinks: {},
-        tedTalkUrl:
-          "https://www.youtube.com/watch?v=FZS-RSRl73w&list=PL2LgFpGtqcj6XxtHVl43VNYAKVwhqI6uz&index=5",
+        tedTalkUrl: "https://www.youtube.com/watch?v=FZS-RSRl73w",
       },
       {
         name: "Harsh Goela",
         topic: "Stories in Stock Markets",
         image: "/rewind/THINC/10.jpg",
-        socialLinks: {},
-        tedTalkUrl:
-          "https://www.youtube.com/watch?v=6DItV7xFDSQ&list=PL2LgFpGtqcj6XxtHVl43VNYAKVwhqI6uz&index=6",
+        tedTalkUrl: "https://www.youtube.com/watch?v=6DItV7xFDSQ",
       },
       {
         name: "Nishtha Khushu",
         topic: "The Dancing Dream",
         image: "/rewind/THINC/6.jpg",
-        socialLinks: {},
-        tedTalkUrl:
-          "https://www.youtube.com/watch?v=M2fb3S9DTj8&list=PL2LgFpGtqcj6XxtHVl43VNYAKVwhqI6uz&index=7",
+        tedTalkUrl: "https://www.youtube.com/watch?v=M2fb3S9DTj8",
       },
       {
         name: "Pravishi Das",
-        topic: "Be the Sun. Where you are. As who you are.",
+        topic: "Be the Sun",
         image: "/rewind/THINC/1.jpg",
-        socialLinks: {},
-        tedTalkUrl:
-          "https://www.youtube.com/watch?v=cuoNArh218Y&list=PL2LgFpGtqcj6XxtHVl43VNYAKVwhqI6uz&index=8",
+        tedTalkUrl: "https://www.youtube.com/watch?v=cuoNArh218Y",
       },
       {
         name: "Sanghamitra Bose",
-        topic: "The Invisible Children - My Ikigai",
+        topic: "The Invisible Children",
         image: "/rewind/THINC/2.jpg",
-        socialLinks: {},
-        tedTalkUrl:
-          "https://www.youtube.com/watch?v=nd6vtdczD04&list=PL2LgFpGtqcj6XxtHVl43VNYAKVwhqI6uz&index=9",
+        tedTalkUrl: "https://www.youtube.com/watch?v=nd6vtdczD04",
       },
       {
         name: "Sushma Gaikwad",
         topic: "Awaken The Warrior Within",
         image: "/rewind/THINC/7.jpg",
-        socialLinks: {},
-        tedTalkUrl:
-          "https://www.youtube.com/watch?v=_pXgXRKmpXE&list=PL2LgFpGtqcj6XxtHVl43VNYAKVwhqI6uz&index=10",
+        tedTalkUrl: "https://www.youtube.com/watch?v=_pXgXRKmpXE",
       },
       {
         name: "Tapesh Kumar",
         topic: "Stories of Failure",
         image: "/rewind/THINC/4.jpg",
-        socialLinks: {},
-        tedTalkUrl:
-          "https://www.youtube.com/watch?v=4hafBaWCifU&list=PL2LgFpGtqcj6XxtHVl43VNYAKVwhqI6uz&index=11",
+        tedTalkUrl: "https://www.youtube.com/watch?v=4hafBaWCifU",
       },
       {
         name: "Vijay Prakash Sharma",
         topic: "Music is my passion",
         image: "/rewind/THINC/5.jpg",
-        socialLinks: {},
-        tedTalkUrl:
-          "https://www.youtube.com/watch?v=TGNYCxoUQWU&list=PL2LgFpGtqcj6XxtHVl43VNYAKVwhqI6uz&index=12",
+        tedTalkUrl: "https://www.youtube.com/watch?v=TGNYCxoUQWU",
       },
-    ],
-    gallery: [
-      "/gallery/2023-1.jpg",
-      "/gallery/2023-2.jpg",
-      "/gallery/2023-3.jpg",
     ],
   },
-  2024: {
-    theme: "Saptaranga",
-    description: " Where Spectrums Unite",
-    themeImage: "/themes/saptaranga.png",
+  2022: {
+    theme: "Parvaaz",
+    description: "Azaad. Aagaaz. Aseem",
+    themeImage: "/rewind/22.png",
     speakers: [
       {
-        name: "Nikita Sharma",
-        topic: "You Are It",
-        image: "/prev-speakers/nikita24.png",
-        socialLinks: {},
-        tedTalkUrl:
-          "https://www.youtube.com/watch?v=goCrg3YuQmA&list=PLvllwQSEky3NIo-Xfj-uJWiCoeh8XlNb5&index=11",
-      },
-      {
-        name: "Dr Vijender Chauhan",
-        topic: "No Success is Monocolor",
-        image: "/prev-speakers/vijendra24.png",
-        socialLinks: {},
-        tedTalkUrl:
-          "https://www.youtube.com/watch?v=LdK_eQExh1M&list=PLvllwQSEky3NIo-Xfj-uJWiCoeh8XlNb5&index=5",
-      },
-      {
-        name: "Gaurav Juyal",
-        topic: "Drapery and How It is Awesome",
-        image: "/prev-speakers/gaurav24.png",
-        socialLinks: {},
+        name: "Kevin Missal",
+        topic: "Space Exploration",
+        image: "/rewind/Parvaaz/kevin_missal.jpg",
         tedTalkUrl: "",
       },
       {
-        name: "Siddharth Jain",
-        topic: "Finding Your Superpower",
-        image: "/prev-speakers/siddharth24.png",
-        socialLinks: {},
-        tedTalkUrl:
-          "https://www.youtube.com/watch?v=l7w3bUkyFb0&list=PLvllwQSEky3NIo-Xfj-uJWiCoeh8XlNb5&index=6",
+        name: "Harish Mehta",
+        topic: "Joy of Failing",
+        image: "/rewind/Parvaaz/Harish_Mehta.jpg",
+        tedTalkUrl: "https://www.youtube.com/watch?v=u4KNmBXKe-4",
       },
       {
-        name: "Devyani Sharma",
-        topic: "Life Driven by Dance",
-        image: "/rewind/24/devyani.jpg",
-        socialLinks: {},
-        tedTalkUrl:
-          "https://www.youtube.com/watch?v=WHZBHGE7b-g&list=PLvllwQSEky3NIo-Xfj-uJWiCoeh8XlNb5&index=7",
+        name: "Supreet Singh Arora",
+        topic: "Personal Identity",
+        image: "/rewind/Parvaaz/Author_sherry.jpg",
+        tedTalkUrl: "https://www.youtube.com/watch?v=cxGsANXP3OQ",
       },
       {
-        name: "Akshay Chopra",
-        topic: "From Nothing to Something & Beyond - Lessons from the trenches",
-        image: "/rewind/24/akshay.jpg",
-        socialLinks: {},
-        tedTalkUrl:
-          "https://www.youtube.com/watch?v=vkTNMjEYoh0&list=PLvllwQSEky3NIo-Xfj-uJWiCoeh8XlNb5&index=12",
+        name: "Lakshay Jangid",
+        topic: "Patience on one wheel",
+        image: "/rewind/Parvaaz/lakshay.jpg",
+        tedTalkUrl: "https://www.youtube.com/watch?v=7sXgpj_Co9I",
       },
       {
-        name: "Navin Reddy",
-        topic: "The New Way of Learning Tech",
-        image: "/rewind/24/navin.jpg",
-        socialLinks: {},
-        tedTalkUrl:
-          "https://www.youtube.com/watch?v=YBe4EE8QIAU&list=PLvllwQSEky3NIo-Xfj-uJWiCoeh8XlNb5&index=8",
+        name: "Major General D.Bipin Bakshi",
+        topic: "Seeking new horizons",
+        image: "/rewind/Parvaaz/maj.jpg",
+        tedTalkUrl: "",
       },
       {
-        name: "Vipin Mishra",
-        topic: "In The Zone: Finding Fulfillment & Joy",
-        image: "/rewind/24/vipin.jpg",
-        socialLinks: {},
-        tedTalkUrl:
-          'https://www.youtube.com/watch?v=YIO37VZ8Zvg&list=PLvllwQSEky3NIo-Xfj-uJWiCoeh8XlNb5&index=3          "https://www.youtube.com/watch?v=YIO37VZ8Zvg&list=PLvllwQSEky3NIo-Xfj-uJWiCoeh8XlNb5&index=3',
+        name: "Rakshit Tandon",
+        topic: "Blockchain",
+        image: "/rewind/Parvaaz/Rakshit_Tandon.jpg",
+        tedTalkUrl: "",
       },
       {
-        name: "Padamjeet Sehrawat",
-        topic: "You Are Your Best Answer",
-        image: "/rewind/24/pad.jpg",
-        socialLinks: {},
-        tedTalkUrl:
-          "https://www.youtube.com/watch?v=pQF-tUolRGc&list=PLvllwQSEky3NIo-Xfj-uJWiCoeh8XlNb5&index=2",
+        name: "Ridhi Khakhar",
+        topic: "Carving your own path",
+        image: "/rewind/Parvaaz/ridhi.jpg",
+        tedTalkUrl: "https://www.youtube.com/watch?v=fA6ady8Xrq8",
       },
       {
-        name: "Nirbhik Datta",
-        topic:
-          "Unveiling the Subconscious: Exploring the Depths with Mentalism",
-        image: "/rewind/24/nirbhik.jpg",
-        socialLinks: {},
-        tedTalkUrl:
-          "https://www.youtube.com/watch?v=zAKyzgdkOA4&list=PLvllwQSEky3NIo-Xfj-uJWiCoeh8XlNb5&index=1",
+        name: "Sagar Lalwani",
+        topic: "Take the risk",
+        image: "/rewind/Parvaaz/Sagar_Lalwani.jpg",
+        tedTalkUrl: "https://www.youtube.com/watch?v=Fg9ixhDzPEo",
       },
       {
-        name: "Aditya Goela CFA",
-        topic: "How CFA Course Changed my Life",
-        image: "/rewind/24/aditya.jpg",
-        socialLinks: {},
-        tedTalkUrl:
-          "https://www.youtube.com/watch?v=thR82rUg8VI&list=PLvllwQSEky3NIo-Xfj-uJWiCoeh8XlNb5&index=10",
+        name: "Sangeeta Sindhi Bahl",
+        topic: "Become who you aspire",
+        image: "/rewind/Parvaaz/sangeeta.jpeg",
+        tedTalkUrl: "https://www.youtube.com/watch?v=7-8v_IM7OKs",
       },
       {
-        name: "Dr Kausar Shah",
-        topic: "Dark Sides of Confident Leadership",
-        image: "/rewind/24/kausar.jpg",
-        socialLinks: {},
-        tedTalkUrl:
-          "https://www.youtube.com/watch?v=Y7MdhKjFCOk&list=PLvllwQSEky3NIo-Xfj-uJWiCoeh8XlNb5&index=9",
+        name: "Srikanth Velamakanni",
+        topic: "Magic behind AI",
+        image: "/rewind/Parvaaz/srikant.jpg",
+        tedTalkUrl: "https://www.youtube.com/watch?v=PuyKr-jnguA",
       },
       {
-        name: "Shivani Kalra",
-        topic: "Because I Said No",
-        image: "/rewind/24/shi.jpg",
-        socialLinks: {},
-        tedTalkUrl:
-          "https://www.youtube.com/watch?v=mKexuy238zA&list=PLvllwQSEky3NIo-Xfj-uJWiCoeh8XlNb5&index=5",
+        name: "Yoga Bhabagna Jonala",
+        topic: "Classical Dancing",
+        image: "/rewind/Parvaaz/yoga.jpg",
+        tedTalkUrl: "",
       },
     ],
-    gallery: ["/bulletin/symp1.png", "/gallery/bulletin/symp2.png", ""],
+  },
+  2021: {
+    theme: "Swadhyaya",
+    description: "An interview with oneself",
+    themeImage: "/rewind/21.png",
+    speakers: [
+      {
+        name: "Aabir Vyas",
+        topic: "Hard Work",
+        image: "/rewind/Swadhyaya/aabir_vyas.jpg",
+        tedTalkUrl: "https://www.youtube.com/watch?v=ftMj6E4wX60",
+      },
+      {
+        name: "Abhash Jha",
+        topic: "I Helped Myself",
+        image: "/rewind/Swadhyaya/Abhash_Jha.jpg",
+        tedTalkUrl: "https://www.youtube.com/watch?v=k_FdxLP2qIk",
+      },
+      {
+        name: "Anirban Bhattacharyya",
+        topic: "Morning Raaga",
+        image: "/rewind/Swadhyaya/anirban_bhattacharyya.jpg",
+        tedTalkUrl: "https://www.youtube.com/watch?v=jsX0MMr35lk",
+      },
+      {
+        name: "Avinash Singh",
+        topic: "Prosper. Or Perish",
+        image: "/rewind/Swadhyaya/Avinash_Singh.jpg",
+        tedTalkUrl: "https://www.youtube.com/watch?v=IiVl2UgszFc",
+      },
+      {
+        name: "EPR Iyer",
+        topic: "Hip Hop Empowers",
+        image: "/rewind/Swadhyaya/EPR_Iyer.jpeg",
+        tedTalkUrl: "https://www.youtube.com/watch?v=IaHkabRhBq4",
+      },
+      {
+        name: "Richie Mehta",
+        topic: "The Meaning of...",
+        image: "/rewind/Swadhyaya/Richie_Mehta.jpg",
+        tedTalkUrl: "https://www.youtube.com/watch?v=N_8CsLScgKg",
+      },
+      {
+        name: "Vanndana Vaadera",
+        topic: "Mental Workouts",
+        image: "/rewind/Swadhyaya/vanndana_vaadera.jpg",
+        tedTalkUrl: "https://www.youtube.com/watch?v=bB97hvh-7sI",
+      },
+    ],
+  },
+  2020: {
+    theme: "Quo Vadis",
+    description: "Where are we headed?",
+    themeImage: "/rewind/20.jpg",
+    speakers: [
+      {
+        name: "Aditya Bhandari",
+        topic: "Young India",
+        image: "/rewind/QuoVadis/Aditya_Bhandari.jpg",
+        tedTalkUrl: "https://www.youtube.com/watch?v=N2Xnkg4OP2w",
+      },
+      {
+        name: "As We Keep Searching",
+        topic: "Musical Performance",
+        image: "/rewind/QuoVadis/aswekeepsearching.jpg",
+        tedTalkUrl: "https://www.youtube.com/watch?v=3YOpdfr-agQ",
+      },
+      {
+        name: "Chameli Debnath",
+        topic: "Kathak",
+        image: "/rewind/QuoVadis/Chameli_Debnath.jpg",
+        tedTalkUrl: "https://www.youtube.com/watch?v=aCQv_A2wxrw",
+      },
+      {
+        name: "Manoj Keshwar",
+        topic: "Life Lessons",
+        image: "/rewind/QuoVadis/manoj_keshwar.jpg",
+        tedTalkUrl: "https://www.youtube.com/watch?v=3YOpdfr-agQ",
+      },
+      {
+        name: "Manraj Singh & Arpit Vyas",
+        topic: "What Goes Around",
+        image: "/rewind/QuoVadis/msingh_avyas.jpg",
+        tedTalkUrl: "https://www.youtube.com/watch?v=JeH9v7ohjWc",
+      },
+      {
+        name: "Shalin IPS",
+        topic: "Connected by Consumption",
+        image: "/rewind/QuoVadis/shalin_IPS.jpg",
+        tedTalkUrl: "https://www.youtube.com/watch?v=sSqYNOIvoI8",
+      },
+      {
+        name: "Sugata Mitra",
+        topic: "Future of Work",
+        image: "/rewind/QuoVadis/Sugata_mitra.jpg",
+        tedTalkUrl: "https://www.youtube.com/watch?v=jrH3_NANVJA",
+      },
+      {
+        name: "Sushruthi Krishna",
+        topic: "Success story",
+        image: "/rewind/QuoVadis/Sushruthi-Krishna.jpeg",
+        tedTalkUrl: "https://www.youtube.com/watch?v=3YOpdfr-agQ",
+      },
+      {
+        name: "Tirthak Saha",
+        topic: "Sustainability",
+        image: "/rewind/QuoVadis/Tirthak_Saha.jpg",
+        tedTalkUrl: "https://www.youtube.com/watch?v=GBplgW4c3gY",
+      },
+      {
+        name: "Zoe Modgill",
+        topic: "Strength is an Inside Job",
+        image: "/rewind/QuoVadis/Zoe_Modgill.jpg",
+        tedTalkUrl: "https://www.youtube.com/watch?v=_JAWKCanBTA",
+      },
+    ],
+  },
+  2019: {
+    theme: "Sparking Metanoia",
+    description: "",
+    themeImage: "/rewind/19.jpg",
+    speakers: [
+      {
+        name: "Atif Khan",
+        topic: "Drones",
+        image: "/rewind/Sparking/atif_khan.jpg",
+        tedTalkUrl: "https://www.youtube.com/watch?v=VaegXWjUhN0",
+      },
+      {
+        name: "Digital Gandhi",
+        topic: "Love",
+        image: "/rewind/Sparking/digital-gandhi.jpg",
+        tedTalkUrl: "https://www.youtube.com/watch?v=umH9yka1siY",
+      },
+      {
+        name: "Salman Khurshid",
+        topic: "Mind of a Judge",
+        image: "/rewind/Sparking/Salman_Khurshid.jpg",
+        tedTalkUrl: "https://www.youtube.com/watch?v=ZljJEjJ7n_g",
+      },
+      {
+        name: "Richard Rekhy",
+        topic: "Leading from Heart",
+        image: "/rewind/Sparking/Richard_Rekhy.jpg",
+        tedTalkUrl: "https://www.youtube.com/watch?v=PjrM3G8PCb8",
+      },
+      {
+        name: "Sangeeta Sindhi Bahl",
+        topic: "Setbacks",
+        image: "/rewind/Sparking/sangeeta-bahl.jpg",
+        tedTalkUrl: "https://www.youtube.com/watch?v=ysYik6Ptfy4",
+      },
+      {
+        name: "Nidhi Lauria",
+        topic: "Generosity",
+        image: "/rewind/Sparking/Nidhi_Lauria.jpg",
+        tedTalkUrl: "https://www.youtube.com/watch?v=umH9yka1siY",
+      },
+      {
+        name: "Sanchit Batra",
+        topic: "Illusion",
+        image: "/rewind/Sparking/Sanchit_Batra.jpg",
+        tedTalkUrl: "https://www.youtube.com/watch?v=0qsQpUJv-Ck",
+      },
+      {
+        name: "Kamal Morya",
+        topic: "Dance",
+        image: "/rewind/Sparking/Kamal_Morya.jpg",
+        tedTalkUrl: "https://www.youtube.com/watch?v=B8QRhZi_PVk",
+      },
+      {
+        name: "Siya Jain",
+        topic: "Kathak",
+        image: "/rewind/Sparking/siya-jain.jpg",
+        tedTalkUrl: "https://www.youtube.com/watch?v=1i2Fruw4Vf4",
+      },
+      {
+        name: "Lt Gen Vinod Bhatia",
+        topic: "Who Dares Wins",
+        image: "/rewind/Sparking/Vinod_Bhatia.jpg",
+        tedTalkUrl: "https://www.youtube.com/watch?v=4wa3XDh72lE",
+      },
+    ],
+  },
+  2018: {
+    theme: "The Precipice",
+    description: "On the brink of change",
+    themeImage: "/rewind/18.jpg",
+    speakers: [
+      {
+        name: "Prasanth Nori",
+        topic: "Education",
+        image: "/rewind/Precipice/Prasanth_Nori.jpg",
+        tedTalkUrl: "https://www.youtube.com/watch?v=zxusiA7UsHI",
+      },
+      {
+        name: "Nimisha Verma",
+        topic: "Isolation",
+        image: "/rewind/Precipice/Nimisha_Verma.jpg",
+        tedTalkUrl: "https://www.youtube.com/watch?v=RsqOdZepzVs",
+      },
+      {
+        name: "Anuv Jain",
+        topic: "Sadness",
+        image: "/rewind/Precipice/anuv_jain.jpg",
+        tedTalkUrl: "https://www.youtube.com/watch?v=fAYaSIMsxQs",
+      },
+      {
+        name: "Dr Ananta Singh",
+        topic: "Leadership",
+        image: "/rewind/Precipice/Ananta_Singhi.jpg",
+        tedTalkUrl: "https://www.youtube.com/watch?v=BjRjuQnmJLY",
+      },
+      {
+        name: "Sushant Kalra",
+        topic: "Child Abuse",
+        image: "/rewind/Precipice/sushant_kalra.jpg",
+        tedTalkUrl: "https://www.youtube.com/watch?v=tZoxCmda56I",
+      },
+      {
+        name: "Maj Gen. Umang Sethi",
+        topic: "We Before I",
+        image: "/rewind/Precipice/Umang_Sethi.jpg",
+        tedTalkUrl: "https://www.youtube.com/watch?v=nZkhF12fO8c",
+      },
+      {
+        name: "Narayani Gupta",
+        topic: "Past",
+        image: "/rewind/Precipice/narayanai-gupta.jpg",
+        tedTalkUrl: "https://www.youtube.com/watch?v=yc8-XT-awzY",
+      },
+      {
+        name: "Pankhuri Gidwani",
+        topic: "Stereotypes",
+        image: "/rewind/Precipice/pankhuri_gidwani.jpg",
+        tedTalkUrl: "https://www.youtube.com/watch?v=XmE4mk8x00s",
+      },
+      {
+        name: "Dr Prem Atreja",
+        topic: "Health",
+        image: "/rewind/Precipice/Prem_Atreja.jpg",
+        tedTalkUrl: "https://www.youtube.com/watch?v=531nxrBke88",
+      },
+    ],
   },
 };
-export default function RewindPage() {
-  const [selectedYear, setSelectedYear] = useState<number>(2024);
 
-  const content = yearContent[selectedYear];
-  if (!content) {
-    return (
-      <main className="min-h-screen bg-black text-white flex items-center justify-center">
-        <p className="text-2xl">No content available for the selected year.</p>
-      </main>
-    );
-  }
+// --- COMPONENT: YEAR SECTION ---
+const YearSection = ({
+  year,
+  data,
+  onInView,
+  imageRef,
+}: {
+  year: number;
+  data: (typeof yearContent)[2025];
+  onInView: (year: number) => void;
+  imageRef?: React.RefObject<HTMLDivElement>;
+}) => {
+  const ref = useRef<HTMLElement | null>(null);
+  const isInView = useInView(ref, { amount: 0.3 });
+
+  useEffect(() => {
+    if (isInView) {
+      onInView(year);
+    }
+  }, [isInView, year, onInView]);
 
   return (
-    <main className="min-h-screen bg-black text-white">
-      <TopBanner />
-      <section className="bg-[#1A0000] py-4 top-0 z-20">
-        <div className="container mx-auto">
-          <YearSelector
-            onSelectYear={setSelectedYear}
-            selectedYear={selectedYear}
-          />
-        </div>
-      </section>
-      <AnimatePresence mode="wait">
-        <motion.section
-          key={selectedYear}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -20 }}
-          transition={{ duration: 0.5 }}
-          className="py-20 bg-gradient-to-b from-black to-[#1A0000]"
-        >
-          <div className="container mx-auto px-4">
-            <ThemeImage theme={content.theme} imageSrc={content.themeImage} />
-            <Description description={content.description} />
-            <SpeakersList speakers={content.speakers} />
+    <section
+      id={`year-section-${year}`}
+      ref={ref}
+      className="min-h-screen py-24 relative border-b border-white/5 z-10"
+    >
+      <div className="container mx-auto px-4 relative ml-4 md:ml-20">
+        <div className="flex flex-col md:flex-row gap-8 items-end mb-16">
+          <div
+            ref={imageRef}
+            className="relative w-full md:w-1/2 aspect-video rounded-2xl overflow-hidden border-2 border-cyan-500/20 shadow-2xl group"
+          >
+            <Image
+              src={data.themeImage}
+              alt={data.theme}
+              fill
+              unoptimized={data.themeImage.startsWith("http")}
+              className="object-cover transition-transform duration-700 group-hover:scale-105"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-80" />
+            <div className="absolute bottom-6 left-6">
+              <h2 className="text-5xl md:text-7xl font-bold text-white mb-2">
+                {year}
+              </h2>
+              <h3 className="text-2xl md:text-3xl text-cyan-400 font-light">
+                {data.theme}
+              </h3>
+            </div>
           </div>
-        </motion.section>
-      </AnimatePresence>
+          <div className="w-full md:w-1/2 pb-6">
+            <p className="text-xl md:text-2xl text-cyan-100/80 italic border-l-4 border-cyan-500 pl-6">
+              "{data.description}"
+            </p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-16 gap-y-16">
+          {data.speakers.map((speaker, idx) => (
+            <motion.div
+              key={idx}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: idx * 0.05 }}
+              className="group w-full max-w-[280px]"
+            >
+              {/* Frameless Image Container */}
+              <div className="relative aspect-[4/5] w-full overflow-hidden rounded-lg mb-4">
+                <Image
+                  src={speaker.image}
+                  alt={speaker.name}
+                  fill
+                  unoptimized={speaker.image.startsWith("http")}
+                  className="object-cover transition-transform duration-700 group-hover:scale-105"
+                  style={{
+                    objectPosition: speaker.imagePosition || "center",
+                  }}
+                />
+              </div>
+
+              {/* Text Content Below */}
+              <div>
+                <h4 className="font-bold text-white text-xl mb-1">
+                  {speaker.name}
+                </h4>
+                <p className="text-cyan-400 text-sm mb-2">{speaker.topic}</p>
+                {speaker.tedTalkUrl && (
+                  <a
+                    href={speaker.tedTalkUrl}
+                    target="_blank"
+                    className="text-sm text-gray-400 hover:text-white underline underline-offset-4 decoration-cyan-500/50 hover:decoration-cyan-400 transition-colors"
+                  >
+                    Watch Talk &rarr;
+                  </a>
+                )}
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export default function RewindPage() {
+  const imageRef = useRef<HTMLDivElement>(null);
+  const [activeYear, setActiveYear] = useState(2025);
+
+  // Ref for hero section
+  const heroRef = useRef<HTMLDivElement | null>(null);
+  const [isSticky, setIsSticky] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (heroRef.current) {
+        const heroBottom =
+          heroRef.current.offsetTop + heroRef.current.offsetHeight;
+        // Check if we have scrolled past the hero section
+        // Adding a small offset/buffer if needed, e.g. -100 to trigger strictly after it disappears
+        setIsSticky(window.scrollY > heroBottom - 100);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    handleScroll(); // Check initial state
+
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const sortedYears = Object.keys(yearContent)
+    .map(Number)
+    .sort((a, b) => b - a);
+
+  return (
+    <main className="relative bg-black text-white min-h-screen">
+      {/* HERO SECTION */}
+      <div ref={heroRef}>
+        <TopBanner />
+      </div>
+
+      {/* MAIN CONTENT WRAPPER */}
+      <div className="relative z-10 w-full flex flex-col md:flex-row justify-between items-start gap-12 px-6 md:px-12">
+        {/* MOBILE YEAR SELECTOR */}
+        <div className="md:hidden w-full mb-2 sticky top-20 z-40">
+          <div className="flex overflow-x-auto gap-3 py-4 px-2 no-scrollbar bg-black/60 backdrop-blur-xl border-b border-white/10 -mx-6 px-6">
+            {sortedYears.map((year) => (
+              <button
+                key={year}
+                onClick={() => setActiveYear(year)}
+                className={`px-4 py-2 rounded-full text-base font-bold transition-all whitespace-nowrap
+                  ${
+                    activeYear === year
+                      ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/50"
+                      : "text-gray-400 hover:text-white border border-transparent"
+                  }
+                `}
+              >
+                {year}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* LEFT COLUMN: Main Content (Tab View) */}
+        <div className="flex-1 min-h-[60vh] max-w-7xl">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeYear}
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <YearSection
+                year={activeYear}
+                data={yearContent[activeYear]}
+                onInView={() => {}}
+              />
+            </motion.div>
+          </AnimatePresence>
+        </div>
+
+        {/* RIGHT COLUMN: Placeholder for Layout + The Selector */}
+        <div className="hidden md:flex flex-col w-32 lg:w-48 relative shrink-0 ml-12 md:ml-24 mr-8 md:mr-32 min-h-[200px]">
+          {/* Layout placeholder to keep width reservation. Content only appears when isSticky. */}
+
+          <AnimatePresence>
+            {isSticky && (
+              <motion.div
+                initial={{ opacity: 0, x: 50, scale: 0.9 }}
+                animate={{ opacity: 1, x: 0, scale: 1 }}
+                exit={{
+                  opacity: 0,
+                  x: 50,
+                  scale: 0.9,
+                  transition: { duration: 0.2 },
+                }}
+                transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                className="fixed top-32 lg:top-40 right-8 md:right-32 z-50 w-32 lg:w-48"
+              >
+                <div className="relative flex flex-col gap-1.5 px-6 py-14 bg-black/60 backdrop-blur-2xl border-2 border-white/60 shadow-[0_0_40px_rgba(34,211,238,0.1)]">
+                  {/* Decorative Markers */}
+                  {/* Corners */}
+                  <div className="absolute -top-1 -left-1 w-2 h-2 bg-white/80 rotate-45 shadow-[0_0_10px_white]" />
+                  <div className="absolute -top-1 -right-1 w-2 h-2 bg-white/80 rotate-45 shadow-[0_0_10px_white]" />
+                  <div className="absolute -bottom-1 -right-1 w-2 h-2 bg-white/80 rotate-45 shadow-[0_0_10px_white]" />
+                  <div className="absolute -bottom-1 -left-1 w-2 h-2 bg-white/80 rotate-45 shadow-[0_0_10px_white]" />
+
+                  {/* Midpoints */}
+                  <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-white/60 rotate-45" />
+                  <div className="absolute top-1/2 -right-1 -translate-y-1/2 w-1.5 h-1.5 bg-white/60 rotate-45" />
+                  <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-white/60 rotate-45" />
+                  <div className="absolute top-1/2 -left-1 -translate-y-1/2 w-1.5 h-1.5 bg-white/60 rotate-45" />
+
+                  {sortedYears.map((year) => (
+                    <button
+                      key={year}
+                      onClick={() => setActiveYear(year)}
+                      className={`relative flex items-center justify-center p-1.5 text-xl lg:text-[1.75rem] font-bold tracking-wide transition-all duration-300 w-full group font-serif
+                        ${
+                          activeYear === year
+                            ? `text-white scale-110 drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]`
+                            : `text-gray-500 hover:text-gray-300 hover:scale-105`
+                        }
+                      `}
+                    >
+                      {activeYear === year && (
+                        <motion.div
+                          layoutId="activeGlow"
+                          className="absolute inset-0 bg-white/5 blur-xl rounded-full -z-10"
+                          transition={{ duration: 0.3 }}
+                        />
+                      )}
+                      {year}
+                    </button>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </div>
     </main>
   );
 }

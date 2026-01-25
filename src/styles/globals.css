@@ -38,7 +38,7 @@
     min-height: 100lvh; /* Large viewport - sized for no address bar */
     overflow: hidden;   /* Clip content when address bar visible */
   }
-  
+
   /* For backgrounds that should never resize */
   .bg-no-resize {
     min-height: 100vh;
@@ -47,12 +47,12 @@
     background-position: center;
     background-repeat: no-repeat;
   }
-  
+
   /* Fixed background size on mobile - crops from top instead of resizing */
   .bg-mobile-fixed {
     background-size: auto 120vh; /* Fixed at 120vh height */
   }
-  
+
   @media (min-width: 768px) {
     .bg-mobile-fixed {
       background-size: cover; /* Responsive on desktop */
@@ -77,8 +77,6 @@
     --foreground: #ededed;
   }
 }
-
-
 
 .animated-section {
   opacity: 0;
@@ -235,6 +233,10 @@ body {
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
   }
+  .theme {
+    --animate-grid: grid 15s linear infinite;
+    --animate-ripple: ripple var(--duration,2s) ease calc(var(--i, 0)*.2s) infinite;
+  }
 }
 
 @layer base {
@@ -245,33 +247,33 @@ body {
     @apply bg-background text-foreground;
     font-weight: 400; /* Regular weight for body */
   }
-  
+
   /* Apply Google Sans Flex to headings with bold weights */
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-heading);
   }
-  
+
   h1 {
     font-weight: 700; /* Bold for main headings */
   }
-  
+
   h2 {
     font-weight: 600; /* Semibold for secondary headings */
   }
-  
+
   h3 {
     font-weight: 600; /* Semibold for tertiary headings */
   }
-  
+
   h4, h5, h6 {
     font-weight: 500; /* Medium for smaller headings */
   }
-  
+
   /* Paragraph and text styles with lighter weights */
   p {
     font-weight: 400; /* Regular for paragraphs */
   }
-  
+
   /* Subtle text uses even lighter weight */
   small, .text-muted, .text-subtle {
     font-weight: 300; /* Light for subtle text */
@@ -333,7 +335,7 @@ Code
   border-radius: inherit; 
   overflow: hidden; 
   z-index: 3; 
-  
+
   -webkit-backdrop-filter: var(--filter-glass3d); 
   backdrop-filter: var(--filter-glass3d); 
   background-color: var(--color-glass3d); 
@@ -350,7 +352,7 @@ Code
   border-radius: inherit; 
   overflow: hidden; 
   z-index: 5; 
-  
+
   box-shadow: 
     inset 2px 2px 1px -3px hsl(205 20% 90% / 0.8), 
     inset 4px 4px 2px -6px hsl(205 20% 90% / 0.3), 
@@ -362,4 +364,27 @@ Code
 .glass3d > * { 
   position: relative; 
   z-index: 6; 
+}
+
+/*
+ ---break---
+ */
+
+@theme inline {
+  @keyframes grid {
+  0% {
+    transform: translateY(-50%);
+    }
+  100% {
+    transform: translateY(0);
+    }
+  }
+  @keyframes ripple {
+  0%, 100% {
+    transform: translate(-50%, -50%) scale(1);
+    }
+  50% {
+    transform: translate(-50%, -50%) scale(0.9);
+    }
+  }
 }

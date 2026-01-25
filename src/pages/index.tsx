@@ -488,9 +488,7 @@ export default function Home() {
                 Our logo represents the spirit of innovation and connection that
                 defines TEDxNIITUniversity. It embodies the convergence of ideas,
                 technology, and human creativity—symbolizing how diverse
-                perspectives come together to create something extraordinary. The
-                design reflects our commitment to pushing boundaries and
-                inspiring change within our community and beyond.
+                perspectives come together to create something extraordinary.
               </p>
 
             </div>

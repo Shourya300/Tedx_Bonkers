@@ -10,10 +10,9 @@ export default function Navbar() {
 
   const links = [
     { name: "Speakers", path: "/speakers" },
-    { name: "Sponsors", path: "/sponsors" },
-    { name: "Timeline", path: "/timeline" },
+    { name: "Sponsors", path: "/sponsor" },
     { name: "Rewind", path: "/rewind" },
-    { name: "Pre Events", path: "/pre-events" },
+    { name: "Pre Events", path: "/preevents" },
     { name: "About", path: "/about" },
   ];
 
@@ -35,7 +34,7 @@ export default function Navbar() {
             duration: 0.25,
             ease: "power2.out",
             delay: 0,
-          }
+          },
         );
 
         // Stagger animation for menu items
@@ -52,7 +51,7 @@ export default function Navbar() {
             duration: 0.25,
             stagger: 0.08,
             ease: "power2.out",
-          }
+          },
         );
       } else {
         // Closing animation - downward
@@ -77,20 +76,26 @@ export default function Navbar() {
 
   return (
     <header className="fixed top-0 left-0 w-full z-[1000]">
-      <div className="mt-5 max-h-[75px] max-w-6xl mx-auto px-4 md:px-8 py-4 flex items-center border border-white/20 border-t-white/40 border-l-white/30 backdrop-blur-lg rounded-full shadow-md">
+      <div className="mt-3 max-h-[64px] max-w-6xl mx-auto px-4 md:px-8 py-2.5 flex items-center border border-white/20 border-t-white/40 border-l-white/30 backdrop-blur-lg rounded-full shadow-md">
         {/* Logo - Left Side on Desktop, Centered on Mobile */}
         <div className="flex-1 flex lg:justify-start justify-center">
           <Link href="/" className="flex shrink-0">
-            <img src="/images/logo-black.png" alt="TEDxNIITUniversity" className="h-10 md:h-14 w-auto object-contain" />
+            <img
+              src="/images/logo-white.png"
+              alt="TEDxNIITUniversity"
+              className="h-8 md:h-11 w-auto object-contain"
+            />
           </Link>
         </div>
 
         {/* Desktop Navigation - Centered */}
         <nav className="hidden lg:flex items-center gap-4 xl:gap-12">
           {links.map((item) => (
-
-            <Link key={item.name} href={item.path} className="text-white text-sm xl:text-base font-medium hover:opacity-80 transition-opacity">
-
+            <Link
+              key={item.name}
+              href={item.path}
+              className="text-white text-sm xl:text-base font-medium hover:opacity-80 transition-opacity"
+            >
               {item.name}
             </Link>
           ))}
@@ -99,9 +104,7 @@ export default function Navbar() {
         {/* Right Side - Button (Desktop Only) */}
         <div className="flex-1 hidden lg:flex justify-end items-center">
           <MetalButton variant="primary" className="text-sm xl:text-base">
-            <Link href="/register">
-              Get Tickets
-            </Link>
+            <Link href="/register">Get Tickets</Link>
           </MetalButton>
         </div>
       </div>

@@ -3,7 +3,6 @@ import { Mona_Sans } from "next/font/google";
 import Ticket from "@/components/Ticket/Ticket";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import { ScratchToReveal } from "@/components/ui/scratch-to-reveal";
 import {
   Dialog,
   DialogContent,
@@ -146,16 +145,6 @@ const Register: React.FC = () => {
                 Get your tickets @
               </p>
 
-              <ScratchToReveal
-                width={250}
-                height={80}
-                minScratchPercentage={70}
-                className="flex items-center justify-center overflow-hidden rounded-2xl"
-                onComplete={handleComplete}
-                gradientColors={["#007595", "#00B8DB", "#ffffff"]}
-              >
-                <p className="text-7xl text-white font-bold">2199/-</p>
-              </ScratchToReveal>
             </div>
             <div className="flex justify-center mt-16">
               <Button
@@ -221,16 +210,6 @@ const Register: React.FC = () => {
                 Get your tickets @
               </p>
 
-              <ScratchToReveal
-                width={250}
-                height={80}
-                minScratchPercentage={70}
-                className="flex items-center justify-center overflow-hidden rounded-2xl"
-                onComplete={handleComplete}
-                gradientColors={["#C10007", "#FB2C36", "#ffffff"]}
-              >
-                <p className="text-7xl text-white font-bold">699/-</p>
-              </ScratchToReveal>
             </div>
             <div className="flex justify-center mt-16">
               <Button

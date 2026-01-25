@@ -49,7 +49,7 @@ export default function BackgroundPlane({
         }
       `,
       }),
-    []
+    [],
   );
 
   useEffect(() => {
@@ -66,7 +66,7 @@ export default function BackgroundPlane({
   }, [texture, isMobile, blurMaterial]);
 
   // Adjust dimensions for mobile - increased to prevent black lines
-  const width = isMobile ? 25 : 43;
+  const width = isMobile ? 35 : 47;
   const height = isMobile ? 21 : 26;
 
   return (

@@ -1,142 +1,223 @@
-import React, { useState } from "react";
-import Image from "next/image";
-import { motion, AnimatePresence } from "framer-motion";
-import { TeamMemberX } from "../TeamMemberX/TeamMemberX";
+import { useEffect, useRef, useState } from "react";
+import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
+import { Sparkles } from "lucide-react";
 
-interface SpeakerCardProps {
+type Speaker = {
+  id: number;
   name: string;
-  title: string;
+  role: string;
+  topic: string;
+  category: string;
+  bio: string;
   image: string;
-  longDescription: string;
-  additionalStyles?: string;
-}
-
-const SpeakerCard: React.FC<SpeakerCardProps> = ({
-  name,
-  title,
-  image,
-  longDescription,
-}) => {
-  const [isExpanded, setIsExpanded] = useState(false);
-  const toggleExpand = () => setIsExpanded(!isExpanded);
-
-  return (
-    <div className="relative">
-      <motion.div
-        className="relative group overflow-hidden rounded-xl bg-gradient-to-br from-red-800/20 via-black to-gray-900 shadow-lg cursor-pointer h-96 w-[100%] transform transition-transform"
-        whileHover={{ scale: 1.1 }}
-        transition={{ duration: 0.2 }}
-        onClick={toggleExpand}
-      >
-        <div className="absolute inset-0 top-[-96px] bg-slate-800 opacity-40 z-0">
-          <svg className="w-full h-full scale-125" viewBox="0 0 100 100">
-            <clipPath id="halfXClip">
-              <rect x="0" y="0" width="50" height="100" />
-            </clipPath>
-            <path
-              d="M20 20 L80 80 M80 20 L20 80"
-              stroke="currentColor"
-              strokeWidth="15"
-              clipPath="url(#halfXClip)"
-            />
-          </svg>
-        </div>
-        <div className="absolute inset-0 z-[-1]">
-          <div className="w-full h-full bg-gradient-to-tr from-red-500/20 via-transparent to-red-800/10 opacity-60 transform rotate-45 scale-150"></div>
-        </div>
-        <div className="relative w-full h-[75%] grayscale group-hover:grayscale-0 transition-all duration-200">
-          <Image
-            src={image || "/placeholder.svg"}
-            alt={name}
-            layout="fill"
-            objectFit="cover"
-            objectPosition="center"
-            className="rounded-t-lg"
-          />
-        </div>
-        <div className="p-4 h-[30%] flex flex-col justify-start items-center text-center bg-black">
-          <h3 className="text-xl font-bold text-white mb-1">{name}</h3>
-          <p className="text-red-600">{title}</p>
-        </div>
-        <div className="absolute bottom-0 left-0 w-full h-1 bg-red-600 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-10" />
-      </motion.div>
-
-      <AnimatePresence>
-        {isExpanded && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-90"
-            onClick={toggleExpand}
-          >
-            <div className="relative w-full h-[85%] max-w-[900px]">
-              {/* Laptop view */}
-              <div className="hidden md:block relative w-full h-full">
-                <div className="absolute inset-0 z-0 top-0 flex flex-col items-center">
-                  <div className="relative w-[60%] h-[90%] mt-22">
-                    <Image
-                      src={image || "/placeholder.svg"}
-                      alt={name}
-                      layout="fill"
-                      objectFit="cover"
-                      objectPosition="center"
-                      quality={100}
-                      className="rounded-lg"
-                    />
-                  </div>
-                </div>
-
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/70 to-transparent z-10">
-                  <div className="absolute bottom-0 left-0 right-0 p-8 text-white">
-                    <h2 className="text-3xl md:text-6xl font-bold mb-2">{name}</h2>
-                    <p className="text-xl md:text-2xl text-red-600 mb-4">{title}</p>
-                    <p className="text-sm md:text-lg leading-relaxed max-w-6xl">
-                      {longDescription}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Mobile view */}
-              <div className="md:hidden flex flex-col w-full h-full">
-                <div className="relative w-full h-[60%] flex items-center justify-center pt-12">
-                  <div className="relative w-[80%] h-[100%]">
-                    <Image
-                      src={image || "/placeholder.svg"}
-                      alt={name}
-                      layout="fill"
-                      objectFit="cover"
-                      objectPosition="center"
-                      quality={100}
-                      className="rounded-lg"
-                    />
-                  </div>
-                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/70 to-transparent">
-                    <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
-                      <h2 className="text-3xl font-bold mb-2">{name}</h2>
-                      <p className="text-xl text-red-600 mb-4">{title}</p>
-                    </div>
-                  </div>
-                </div>
-                <div className="w-full h-[40%] bg-black p-4 overflow-y-auto">
-                  <p className="text-sm leading-relaxed text-white">
-                    {longDescription}
-                  </p>
-                </div>
-              </div>
-
-              {/* Team Member X in the background */}
-              <div className="absolute inset-0 z-[-10] transform scale-x-[1.75] scale-y-[1.75]">
-                <TeamMemberX className="text-red-600" />
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  );
+  linkedin: string;
+  twitter: string;
+  featured?: boolean;
 };
 
-export default SpeakerCard;
+interface SpeakerCardProps {
+  speaker: Speaker;
+  onClick: () => void;
+  index: number;
+}
+
+/* ================== HOOKS ================== */
+
+const SCRAMBLE_CHARS = "!@#$%^&*()_+-=[]{}|;:,.<>?";
+const isMobile =
+  typeof window !== "undefined" && window.innerWidth < 768;
+
+function useTextScramble(text: string, trigger: boolean): string {
+  const [displayText, setDisplayText] = useState(text);
+
+useEffect(() => {
+  if (!trigger) {
+    setDisplayText(text);
+    return;
+  }
+
+  let iteration = 0;
+  let raf: number;
+
+  const run = () => {
+    setDisplayText(
+      text
+        .split("")
+        .map((char, index) => {
+          if (index < iteration) return text[index];
+          if (char === " ") return " ";
+          return SCRAMBLE_CHARS[Math.floor(Math.random() * SCRAMBLE_CHARS.length)];
+        })
+        .join("")
+    );
+
+    iteration += 0.5;
+    if (iteration < text.length) {
+      raf = requestAnimationFrame(run);
+    }
+  };
+
+  raf = requestAnimationFrame(run);
+  return () => cancelAnimationFrame(raf);
+}, [text, trigger]);
+
+
+  return displayText;
+}
+
+function use3DEffect(ref: React.RefObject<HTMLDivElement | null>) {
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  const rotateX = useSpring(useTransform(y, [-0.5, 0.5], [10, -10]), {
+    stiffness: 400,
+    damping: 35,
+  });
+  const rotateY = useSpring(useTransform(x, [-0.5, 0.5], [-10, 10]), {
+    stiffness: 400,
+    damping: 35,
+  });
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+
+    const handleMove = (e: MouseEvent) => {
+      const rect = el.getBoundingClientRect();
+      x.set((e.clientX - rect.left - rect.width / 2) / rect.width);
+      y.set((e.clientY - rect.top - rect.height / 2) / rect.height);
+    };
+
+    const handleLeave = () => {
+      x.set(0);
+      y.set(0);
+    };
+
+    el.addEventListener("mousemove", handleMove);
+    el.addEventListener("mouseleave", handleLeave);
+    return () => {
+      el.removeEventListener("mousemove", handleMove);
+      el.removeEventListener("mouseleave", handleLeave);
+    };
+  }, [ref, x, y]);
+
+  return { rotateX, rotateY };
+}
+
+function useGlare(ref: React.RefObject<HTMLDivElement | null>) {
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+
+    const handleMove = (e: MouseEvent) => {
+      const r = el.getBoundingClientRect();
+      el.style.setProperty(
+        "--gx",
+        `${((e.clientX - r.left) / r.width) * 100}%`,
+      );
+      el.style.setProperty(
+        "--gy",
+        `${((e.clientY - r.top) / r.height) * 100}%`,
+      );
+    };
+
+    const handleLeave = () => {
+      el.style.setProperty("--gx", "50%");
+      el.style.setProperty("--gy", "50%");
+    };
+
+    el.addEventListener("mousemove", handleMove);
+    el.addEventListener("mouseleave", handleLeave);
+    return () => {
+      el.removeEventListener("mousemove", handleMove);
+      el.removeEventListener("mouseleave", handleLeave);
+    };
+  }, [ref]);
+}
+
+/* ================== COMPONENT ================== */
+
+export function SpeakerCard({ speaker, onClick, index }: SpeakerCardProps) {
+  const ref = useRef<HTMLDivElement>(null);
+const { rotateX, rotateY } = isMobile
+  ? { rotateX: 0, rotateY: 0 }
+  : use3DEffect(ref);
+
+if (!isMobile) {
+  useGlare(ref);
+}
+
+  const [isHovered, setIsHovered] = useState(false);
+  const scrambledName = useTextScramble(speaker.name, isHovered);
+
+  return (
+    <motion.div
+      ref={ref}
+      onClick={onClick}
+onMouseEnter={() => !isMobile && setIsHovered(true)}
+onMouseLeave={() => !isMobile && setIsHovered(false)}
+
+      whileInView={{ opacity: 1, y: 0 }}
+initial={{ opacity: 0, y: 60 }}
+viewport={{ once: true, margin: "-100px" }}
+
+      transition={{ duration: 0.5, delay: index * 0.05, ease: "easeOut" }}
+      style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
+      className="speaker-card"
+      tabIndex={0}
+      role="button"
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onClick();
+        }
+      }}
+    >
+      <div className="card-glow" />
+      <div className="card-glare" />
+      <div className="scan-line" />
+
+      <div className="card-image-container">
+        <div className="image-overlay" />
+        <motion.img
+  src={speaker.image}
+  alt={speaker.name}
+  width={400}
+  height={500}
+  loading={index < 6 ? "eager" : "lazy"}
+  decoding="async"
+  fetchPriority={index < 4 ? "high" : "auto"}
+  className="card-image"
+/>
+
+        <div className="holographic-overlay" />
+        <div className="category-badge">{speaker.category}</div>
+      </div>
+
+      <div className="card-content">
+        <div className="card-header">
+          <div className="status-indicator" />
+          <span className="speaker-tag">SPEAKER</span>
+        </div>
+
+        <h3 className="speaker-name">{scrambledName}</h3>
+
+        <div className="topic-container">
+          <Sparkles size={14} className="topic-icon" />
+          <p className="speaker-topic">{speaker.topic}</p>
+        </div>
+
+        <motion.div
+          className="view-more"
+          animate={isHovered ? { opacity: 1, x: 0 } : { opacity: 0, x: -10 }}
+        >
+          <span>View Profile →</span>
+        </motion.div>
+      </div>
+
+      <div className="corner-accent corner-tl" />
+      <div className="corner-accent corner-tr" />
+      <div className="corner-accent corner-bl" />
+      <div className="corner-accent corner-br" />
+    </motion.div>
+  );
+}
