@@ -39,7 +39,17 @@ export default function FluidGlass({
         zIndex: 5,
       }}
     >
-      <Canvas camera={{ position: [0, 0, 20], fov: 15 }} gl={{ alpha: true }}>
+      <Canvas
+        dpr={
+          typeof window !== "undefined" && window.innerWidth < 768 ? 1 : [1, 2]
+        }
+        camera={{ position: [0, 0, 20], fov: 15 }}
+        gl={{
+          alpha: true,
+          antialias: false,
+          powerPreference: "high-performance",
+        }}
+      >
         <ambientLight intensity={0.5} />
         <directionalLight position={[10, 10, 5]} intensity={1.5} />
         <Environment preset="city" />
@@ -58,15 +68,18 @@ const ModeWrapper = memo(function ModeWrapper({
   modeProps = {},
   ...props
 }) {
+  const [isMobile, setIsMobile] = useState(false);
   const ref = useRef();
   const { nodes } = useGLTF(glb);
-  const buffer = useFBO();
+  const buffer = useFBO({
+    resolution: isMobile ? 512 : 1024,
+  });
+
   const { viewport: vp } = useThree();
   const [scene] = useState(() => new THREE.Scene());
   const geoWidthRef = useRef(1);
   const scrollProgressRef = useRef(0);
   const logoRef = useRef();
-  const [isMobile, setIsMobile] = useState(false);
   const chromaticAberrationRef = useRef(0.5);
   const materialRef = useRef();
   const lensProgressRef = useRef(0);
@@ -77,7 +90,7 @@ const ModeWrapper = memo(function ModeWrapper({
   const lastThrottledPointerUpdateRef = useRef(0);
   const POINTER_THROTTLE_MS = 16; // ~60fps throttling
 
-  const logoTexture = useTexture("/images/Landing_Page/BetterLightLogo.png");
+  const logoTexture = useTexture("/images/Landing_Page/AuraLogo.png");
 
   // Detect mobile devices
   useEffect(() => {
@@ -118,7 +131,10 @@ const ModeWrapper = memo(function ModeWrapper({
       window.addEventListener("pointermove", handlePointerMove, {
         passive: true,
       });
-      return () => window.removeEventListener("pointermove", handlePointerMove);
+      return () => {
+        window.removeEventListener("pointermove", handlePointerMove);
+        scrollSync.isLensIdle = false; // Reset on unmount
+      };
     }
   }, []);
 
@@ -192,13 +208,12 @@ const ModeWrapper = memo(function ModeWrapper({
     /* ---------- LENS SCALE ---------- */
     const baseScale = Math.min(
       0.13,
-      (v.width * 0.8) / (geoWidthRef.current || 1)
+      (v.width * 0.8) / (geoWidthRef.current || 1),
     );
 
     const maxViewportSize = Math.max(v.width, v.height);
 
-    const maxScale =
-      (maxViewportSize * 2.5) / (geoWidthRef.current || 1);
+    const maxScale = (maxViewportSize * 2.5) / (geoWidthRef.current || 1);
 
     const targetScale = THREE.MathUtils.lerp(baseScale, maxScale, lensProgress);
 
@@ -211,23 +226,19 @@ const ModeWrapper = memo(function ModeWrapper({
     /* ---------- LOGO MOVE (AFTER LENS FULL) ---------- */
 
     const LOGO_PHASE_DURATION = isMobile ? 0.5 : 0.3;
-    const logoShiftProgress = THREE.MathUtils.clamp(
-      contentProgress,
-      0,
-      1
-    );
+    const logoShiftProgress = THREE.MathUtils.clamp(contentProgress, 0, 1);
 
     // Chromatic aberration reduces as user scrolls down from the very beginning
     const aberrationProgress = THREE.MathUtils.smoothstep(
       scrollProgress,
       0,
-      0.6
+      0.6,
     );
 
     const targetChromaticAberration = THREE.MathUtils.lerp(
       0.6, // blurry at start
       0.0005, // crystal clear
-      aberrationProgress
+      aberrationProgress,
     );
 
     easing.damp(
@@ -235,7 +246,7 @@ const ModeWrapper = memo(function ModeWrapper({
       "current",
       targetChromaticAberration,
       0.4,
-      delta
+      delta,
     );
 
     // 🔑 force material uniform update every frame
@@ -246,37 +257,45 @@ const ModeWrapper = memo(function ModeWrapper({
     const logoViewport = viewport.getCurrentViewport(camera, [0, 0, -59.5]);
 
     if (logoRef.current) {
-      if (isMobile) {
-        // Start moving logo up after ~85% of scroll content (when sponsors section appears)
-        const logoUpProgress = THREE.MathUtils.smoothstep(
-          scrollSync.rawProgress,
-          0.8,
-          0.95
-        );
+      if (logoRef.current) {
+        if (isMobile) {
+          // MOBILE: logo moves UP only
+          const logoStart = 0.78;
+          const logoEnd = 0.92;
 
-        const targetLogoY = THREE.MathUtils.lerp(0, 4, logoUpProgress);
-        easing.damp(logoRef.current.position, "y", targetLogoY, 0.3, delta);
+          const logoUpProgress = THREE.MathUtils.clamp(
+            (scrollProgress - logoStart) / (logoEnd - logoStart),
+            0,
+            1,
+          );
 
-        // Smooth easing for position changes
-        easing.damp(logoRef.current.position, "x", 0, 0.3, delta);
-        easing.damp(logoRef.current.position, "y", targetLogoY, 0.3, delta);
-      } else {
-        // On desktop, move logo left
-        const targetLogoX = THREE.MathUtils.lerp(
-          0,
-          -logoViewport.width * 0.18,
-          logoShiftProgress
-        );
+          const targetLogoY = THREE.MathUtils.lerp(0, 3.5, logoUpProgress);
 
-        // Smooth easing for position changes
-        easing.damp(logoRef.current.position, "x", targetLogoX, 0.3, delta);
-        easing.damp(logoRef.current.position, "y", -0.5, 0.3, delta);
+          easing.damp(logoRef.current.position, "y", targetLogoY, 0.25, delta);
+          easing.damp(logoRef.current.position, "x", 0, 0.25, delta);
+        } else {
+          // DESKTOP: lock Y to center, animate X only
+          logoRef.current.position.y = -0.5;
+
+          const targetLogoX = THREE.MathUtils.lerp(
+            0,
+            -logoViewport.width * 0.18,
+            logoShiftProgress,
+          );
+
+          easing.damp(logoRef.current.position, "x", targetLogoX, 0.3, delta);
+        }
       }
     }
 
-    gl.setRenderTarget(buffer);
-    gl.render(scene, camera);
-    gl.setRenderTarget(null);
+    const shouldRenderBuffer = lensProgress < 1 || scrollProgress < 0.9;
+
+    if (shouldRenderBuffer) {
+      gl.setRenderTarget(buffer);
+      gl.render(scene, camera);
+      gl.setRenderTarget(null);
+    }
+
     gl.setClearColor(0x000000, 0);
   });
 
@@ -311,7 +330,7 @@ const ModeWrapper = memo(function ModeWrapper({
           </mesh>
           {children}
         </>,
-        scene
+        scene,
       )}
       <mesh scale={[vp.width, vp.height, 1]}>
         <planeGeometry />
@@ -332,13 +351,14 @@ const ModeWrapper = memo(function ModeWrapper({
         <MeshTransmissionMaterial
           ref={materialRef}
           buffer={buffer.texture}
-          ior={ior ?? 1.1}
-          thickness={thickness ?? 0.7}
-          anisotropy={anisotropy ?? 0.1}
+          ior={ior ?? 1.05}
+          thickness={isMobile ? 0.4 : 0.7}
+          anisotropy={isMobile ? 0 : 0.1}
           chromaticAberration={chromaticAberrationRef.current}
           transmission={1}
           roughness={0}
           attenuationDistance={0.8}
+          samples={isMobile ? 4 : 8}
           {...extraMat}
         />
       </mesh>

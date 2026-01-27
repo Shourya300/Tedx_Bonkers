@@ -8,8 +8,7 @@ import {
   AnimatePresence,
 } from "framer-motion";
 import Image from "next/image";
-import TopBanner from "@/components/XHero/XHero";
-import Carousel from "@/components/Carousel/Carousel";
+import DomeGallery from "@/components/DomeGallery/DomeGallery.jsx";
 
 // --- DATA OBJECT (All Years) ---
 const yearContent: {
@@ -24,13 +23,14 @@ const yearContent: {
       tedTalkUrl: string;
       imagePosition?: string;
     }>;
+    themeImageScale?: number;
   };
 } = {
   2025: {
     theme: "Inverso Clesiddra",
     description: "As time folds, perspectives unfold.",
-    themeImage:
-      "https://images.unsplash.com/photo-1506784983877-45594efa4cbe?auto=format&fit=crop&q=80&w=1000",
+    themeImage: "/themes/Logo.png",
+    themeImageScale: 1.65,
     speakers: [
       {
         name: "Tirth Parsana",
@@ -623,6 +623,11 @@ const YearSection = ({
               fill
               unoptimized={data.themeImage.startsWith("http")}
               className="object-cover transition-transform duration-700 group-hover:scale-105"
+              style={{
+                transform: data.themeImageScale
+                  ? `scale(${data.themeImageScale})`
+                  : "scale(1)",
+              }}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-80" />
             <div className="absolute bottom-6 left-6">
@@ -721,8 +726,31 @@ export default function RewindPage() {
   return (
     <main className="relative bg-black text-white min-h-screen">
       {/* HERO SECTION */}
-      <div ref={heroRef}>
-        <TopBanner />
+      <div
+        ref={heroRef}
+        className="relative h-[80vh] w-full overflow-hidden bg-black flex items-center justify-center"
+      >
+        {/* Dome Gallery Background */}
+        <div className="absolute inset-0">
+          <DomeGallery
+            fit={0.7}
+            minRadius={800}
+            grayscale={false}
+            overlayBlurColor="rgba(0,0,0,0.5)"
+          />
+        </div>
+
+        {/* Hero Content Overlay */}
+        <div className="relative z-10 text-center px-6 pointer-events-none">
+          <motion.h1
+            className="text-6xl md:text-8xl font-bold leading-tight mb-6 text-white"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+          >
+            TEDx <span className="text-[#FF3A3A]">Rewind</span>
+          </motion.h1>
+        </div>
       </div>
 
       {/* MAIN CONTENT WRAPPER */}

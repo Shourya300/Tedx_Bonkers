@@ -1,8 +1,14 @@
 "use client";
 import React, { useState, useRef, useEffect } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import {
+  AnimatePresence,
+  motion,
+  useScroll,
+  useTransform,
+} from "framer-motion";
 import { ChevronDown } from "lucide-react";
 import Hyperspeed from "@/components/HyperSpeed/Hyperspeed";
+import Image from "next/image";
 
 interface Event {
   id: number;
@@ -28,6 +34,8 @@ interface FogParticle {
   blobs: FogBlob[];
 }
 
+const MemoHyperspeed = React.memo(Hyperspeed);
+
 const TedxRippleWebsite = () => {
   const rippleBgRef = useRef<HTMLDivElement>(null);
   const heroRef = useRef<HTMLDivElement>(null);
@@ -39,6 +47,30 @@ const TedxRippleWebsite = () => {
   );
   const [introDismissed, setIntroDismissed] = useState(false);
   const lastInteractionRef = useRef<number>(Date.now());
+
+  const RippleLayer = React.useMemo(
+    () => (
+      <div
+        ref={rippleBgRef}
+        className="absolute inset-0 z-20 pointer-events-auto bg-image-responsive"
+        style={{
+          backgroundImage: "url('/images/test/tpe.png')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+        }}
+      />
+    ),
+    [],
+  );
+
+  const preloadImages = (images: string[]) => {
+    images.forEach((src) => {
+      const img = new window.Image();
+
+      img.src = src;
+    });
+  };
 
   // Hero scroll animations
   const { scrollYProgress } = useScroll({
@@ -53,9 +85,9 @@ const TedxRippleWebsite = () => {
   const events: Event[] = [
     {
       id: 1,
-      title: "THEME REVEAL",
+      title: "PIERCING THE VEIL",
       description:
-        "Discover the central theme that will guide all TEDxNIIT University talks and discussions.",
+        "Our theme reveal event, built excitement through games and shared anticipation leading up to the moment everyone was waiting for. The unveiling of SUBLIS.",
       images: [
         "/preevents/themrev/DSC_0676.webp",
         "/preevents/themrev/DSC01336.webp",
@@ -64,9 +96,9 @@ const TedxRippleWebsite = () => {
     },
     {
       id: 2,
-      title: "LUMIERE",
+      title: "LUMIÈRE",
       description:
-        "An illuminating experience that brought light to innovative ideas and creative thinking.",
+        "In early October, TEDx NIIT University unveiled Lumière, a vibrant festival of light, art, games, interactive stalls, laughter, creativity, and wonder everywhere.",
       images: [
         "/preevents/lumiere/DSC05830.jpg",
         "/preevents/lumiere/DSC05855.webp",
@@ -77,7 +109,7 @@ const TedxRippleWebsite = () => {
       id: 3,
       title: "UNMUTE",
       description:
-        "A platform where voices were heard and conversations that matter began to unfold.",
+        "Unmute, our interactive awareness session led by Ms. Harleen Kaur Chadda, encouraged open dialogue on mental well-being empowered participants",
       images: [
         "/preevents/unmute/IMG_8770.JPG",
         "/preevents/unmute/DSC_0723.webp",
@@ -172,7 +204,7 @@ const TedxRippleWebsite = () => {
       >
         {/* Hyperspeed Background */}
         <div className="absolute inset-0 z-0" style={{ opacity: 1 }}>
-          <Hyperspeed />
+          <MemoHyperspeed />
         </div>
 
         <motion.div
@@ -237,15 +269,9 @@ const TedxRippleWebsite = () => {
         id="events-section"
         className="relative w-full min-h-screen bg-black"
       >
+        {/* CLICK + RIPPLE LAYER */}
         <div
-          ref={rippleBgRef}
-          className="absolute inset-0 z-20 pointer-events-auto bg-image-responsive"
-          style={{
-            backgroundImage: "url('/images/test/tpe.png')",
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            backgroundRepeat: "no-repeat",
-          }}
+          className="absolute inset-0 z-30"
           onClick={(e) => {
             lastInteractionRef.current = Date.now();
 
@@ -253,62 +279,79 @@ const TedxRippleWebsite = () => {
             const x = e.clientX - rect.left;
             const y = e.clientY - rect.top;
 
-            // click ripple
             if ((window as any).$ && rippleBgRef.current) {
-              (window as any)
-                .$(rippleBgRef.current)
-                .ripples("drop", x, y, 55, 0.09);
+              requestAnimationFrame(() => {
+                (window as any)
+                  .$(rippleBgRef.current)
+                  .ripples("drop", x, y, 55, 0.09);
+              });
             }
 
-            // next event (no delay)
-            const nextEventIndex = (clickCount + 1) % events.length;
-            setActiveEvent(events[nextEventIndex]);
-            setClickCount((prev) => prev + 1);
+            const nextIndex = (clickCount + 1) % events.length;
+            setActiveEvent(events[nextIndex]);
+
+            requestAnimationFrame(() => {
+              preloadImages(events[nextIndex].images);
+            });
+            setClickCount((c) => c + 1);
           }}
-        />
+        >
+          {RippleLayer}
+        </div>
 
-        {activeEvent && (
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-40">
-            <motion.div
-              key={activeEvent.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, ease: "easeOut" }}
-              className="text-center max-w-4xl mx-4 pointer-events-auto"
-              style={{ fontFamily: "Google Sans Flex, sans-serif" }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <h2 className="text-3xl md:text-6xl font-bold text-white mb-4 md:mb-8">
-                {activeEvent.title}
-              </h2>
+        <AnimatePresence initial={false} mode="sync">
+          {activeEvent && (
+            <div className="absolute inset-0 flex items-center justify-center z-40 pointer-events-none">
+              <motion.div
+                key={activeEvent.id}
+                initial={{ opacity: 0, y: 18, scale: 0.985 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -12, scale: 0.99 }}
+                transition={{
+                  opacity: { duration: 0.25, ease: "easeInOut" },
+                  y: { duration: 0.4, ease: [0.4, 0, 0.2, 1] }, // Material ease-in-out
+                }}
+                className="pointer-events-auto"
+              >
+                <div
+                  className="text-center max-w-4xl mx-4"
+                  style={{ fontFamily: "Google Sans Flex, sans-serif" }}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <h2 className="text-3xl md:text-6xl font-bold text-white mb-4 md:mb-8">
+                    {activeEvent.title}
+                  </h2>
 
-              <p className="text-lg md:text-3xl text-gray-200 leading-relaxed mb-6 md:mb-8">
-                {activeEvent.description}
-              </p>
+                  <p className="text-base md:text-2xl text-gray-200 leading-relaxed mb-6 md:mb-8">
+                    {activeEvent.description}
+                  </p>
 
-              <div className="flex flex-row justify-center gap-6 md:gap-10 mt-2 md:mt-4 flex-wrap">
-                {activeEvent.images.map((imgSrc, index) => (
-                  <div
-                    key={index}
-                    className="w-[40vw] md:w-[370px] h-[150px] md:h-[250px] rounded-1xl overflow-hidden shadow-2xl hover:scale-105 transition-transform duration-300 cursor-pointer border-2 border-white/20"
-                    style={{ maxWidth: '100%', maxHeight: '100%' }}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setSelectedImageIndex(index);
-                    }}
-                  >
-                    <img
-                      src={imgSrc}
-                      alt={`Event image ${index + 1}`}
-                      className="w-full h-full object-cover object-center"
-                      style={{ display: 'block' }}
-                    />
+                  <div className="flex flex-row justify-center gap-6 md:gap-10 mt-2 md:mt-4 flex-wrap">
+                    {activeEvent.images.map((imgSrc, index) => (
+                      <div
+                        key={index}
+                        className="relative w-[40vw] md:w-[370px] h-[150px] md:h-[250px] rounded-xl overflow-hidden shadow-2xl hover:scale-105 transition-transform duration-300 cursor-pointer border border-white/20"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedImageIndex(index);
+                        }}
+                      >
+                        <Image
+                          src={imgSrc}
+                          alt={`Event image ${index + 1}`}
+                          fill
+                          sizes="(max-width: 768px) 40vw, 370px"
+                          className="object-cover"
+                          priority={index === 0}
+                        />
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-            </motion.div>
-          </div>
-        )}
+                </div>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
 
         {/* Hover Dock Navigation */}
         <div

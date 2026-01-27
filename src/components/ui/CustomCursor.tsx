@@ -49,11 +49,12 @@ export default function CustomCursor() {
     if (modeRef.current === mode || !cursorRef.current) return;
     modeRef.current = mode;
 
-    const style = mode === "underline" 
-      ? CURSOR_STYLES.underline 
-      : mode === "default" 
-      ? CURSOR_STYLES.default 
-      : CURSOR_STYLES.interactive;
+    const style =
+      mode === "underline"
+        ? CURSOR_STYLES.underline
+        : mode === "default"
+          ? CURSOR_STYLES.default
+          : CURSOR_STYLES.interactive;
 
     gsap.to(cursorRef.current, {
       ...style,
@@ -62,60 +63,86 @@ export default function CustomCursor() {
     });
   }, []);
 
-  const onMouseMove = useCallback((e: MouseEvent) => {
-    const cursor = cursorRef.current;
-    if (!cursor) return;
+  const onMouseMove = useCallback(
+    (e: MouseEvent) => {
+      const cursor = cursorRef.current;
+      if (!cursor) return;
 
-    const target = document.elementFromPoint(e.clientX, e.clientY) as HTMLElement | null;
-    const interactiveEl = target?.closest("a, [role='link'], button") as HTMLElement | null;
-    
-    let mode: CursorMode = "default";
-    let rect: DOMRect | null = null;
+      const target = document.elementFromPoint(
+        e.clientX,
+        e.clientY,
+      ) as HTMLElement | null;
+      const interactiveEl = target?.closest(
+        "a, [role='link'], button",
+      ) as HTMLElement | null;
 
-    if (interactiveEl) {
-      rect = interactiveEl.getBoundingClientRect();
-      const isLargeTarget = rect.width > 200 || rect.height > 100;
-      
-      if (isLargeTarget) {
-        mode = "card";
-      } else {
-        const isTextLink = (interactiveEl.tagName.toLowerCase() === 'a' || 
-                           interactiveEl.getAttribute('role') === 'link') &&
-                          !interactiveEl.querySelector('img, svg') &&
-                          interactiveEl.tagName.toLowerCase() !== 'button';
-        mode = isTextLink ? "underline" : "default";
+      let mode: CursorMode = "default";
+      let rect: DOMRect | null = null;
+
+      if (interactiveEl) {
+        rect = interactiveEl.getBoundingClientRect();
+        const isLargeTarget = rect.width > 200 || rect.height > 100;
+
+        if (isLargeTarget) {
+          mode = "card";
+        } else {
+          const isTextLink =
+            (interactiveEl.tagName.toLowerCase() === "a" ||
+              interactiveEl.getAttribute("role") === "link") &&
+            !interactiveEl.querySelector("img, svg") &&
+            interactiveEl.tagName.toLowerCase() !== "button";
+          mode = isTextLink ? "underline" : "default";
+        }
+      } else if (
+        target?.closest(
+          "input, textarea, [contenteditable='true'], p, span, li, h1, h2, h3, h4, h5, h6",
+        )
+      ) {
+        mode = "text";
       }
-    } else if (target?.closest("input, textarea, [contenteditable='true'], p, span, li, h1, h2, h3, h4, h5, h6")) {
-      mode = "text";
+
+      setCursorMode(mode);
+      targetRectRef.current = rect;
+
+      let targetX = e.clientX;
+      let targetY = e.clientY;
+      let size = CURSOR_SIZES[mode === "default" ? "default" : mode];
+
+      if (mode === "underline" && rect) {
+        size = { ...size, width: rect.width };
+        targetX = rect.left + rect.width / 2;
+        targetY = rect.bottom;
+      }
+
+      gsap.to(cursor, {
+        x: targetX,
+        y: targetY,
+        width: size.width,
+        height: size.height,
+        duration: 0,
+        ease: "none",
+        overwrite: "auto",
+      });
+    },
+    [setCursorMode],
+  );
+
+  useEffect(() => {
+    // Reset idle state on mount to prevent stale state from previous page
+    scrollSync.isLensIdle = false;
+    setIsHidden(false);
+
+    // Initial style application
+    if (cursorRef.current) {
+      gsap.set(cursorRef.current, {
+        ...CURSOR_STYLES.default,
+      });
     }
-
-    setCursorMode(mode);
-    targetRectRef.current = rect;
-
-    let targetX = e.clientX;
-    let targetY = e.clientY;
-    let size = CURSOR_SIZES[mode === "default" ? "default" : mode];
-
-    if (mode === "underline" && rect) {
-      size = { ...size, width: rect.width };
-      targetX = rect.left + rect.width / 2;
-      targetY = rect.bottom;
-    }
-
-    gsap.to(cursor, {
-      x: targetX,
-      y: targetY,
-      width: size.width,
-      height: size.height,
-      duration: 0,
-      ease: "none",
-      overwrite: "auto",
-    });
-  }, [setCursorMode]);
+  }, []);
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
-    
+
     checkMobile();
     window.addEventListener("resize", checkMobile);
     window.addEventListener("mousemove", onMouseMove);

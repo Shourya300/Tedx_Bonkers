@@ -1,3 +1,4 @@
+"use client";
 import { useEffect, useRef, useState, useMemo } from "react";
 import {
   motion,
@@ -6,19 +7,13 @@ import {
   useTransform,
   MotionValue,
 } from "framer-motion";
-import {
-  ChevronDown,
-  Search,
-  Filter,
-  ArrowUp,
-  Users,
-} from "lucide-react";
+import { ChevronDown, Search, Filter, ArrowUp, Users } from "lucide-react";
 import Hyperspeed from "@/components/HyperSpeed/Hyperspeed";
 import { SpeakerModal } from "@/components/SpeakerModal/SpeakerModal";
 import { SpeakerCard } from "@/components/SpeakerCard/SpeakerCard";
 import { speakers, categories, type Speaker } from "@/data/speakers";
 import { SpeakersStyles } from "@/styles/speakers.styles";
-
+import FloatingLines from "@/components/FloatingLines/FloatingLines";
 
 /* ================== HOOKS ================== */
 
@@ -48,7 +43,6 @@ function ParticleField() {
       })),
     [],
   );
-
 
   return (
     <div className="particles-container">
@@ -208,8 +202,10 @@ function SearchModal({
                 <img
                   src={speaker.image}
                   alt={speaker.name}
-                  className="search-result-image"
+                  loading="lazy"
+                  decoding="async"
                 />
+
                 <div className="search-result-info">
                   <span className="search-result-name">{speaker.name}</span>
                   <span className="search-result-topic">{speaker.topic}</span>
@@ -310,6 +306,21 @@ export default function SpeakersPage() {
   }, [activeCategory]);
 
   useEffect(() => {
+    let timeout: any;
+
+    const onScroll = () => {
+      document.body.classList.add("is-scrolling");
+      clearTimeout(timeout);
+      timeout = setTimeout(() => {
+        document.body.classList.remove("is-scrolling");
+      }, 150);
+    };
+
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === "k") {
         e.preventDefault();
@@ -333,17 +344,42 @@ export default function SpeakersPage() {
       </div>
 
       {/* HERO */}
-      <section ref={heroRef} id="hero" className="hero-section" style={{ height: '101vh', backgroundColor: '#000000' }}>
-        
-        {/* RetroGrid Background */}
-        
-        
+      <section
+        ref={heroRef}
+        id="hero"
+        className="hero-section"
+        style={{ height: "101vh", backgroundColor: "#000000" }}
+      >
+        {/* FloatingLines Background */}
+        <div className="absolute inset-0 z-0">
+          <FloatingLines
+            linesGradient={[
+              "#1a0000",
+              "#4a0000",
+              "#e62b1e",
+              "#4a0000",
+              "#1a0000",
+            ]}
+            enabledWaves={["middle", "bottom"]}
+            lineCount={[8, 6]}
+            lineDistance={[8, 10]}
+            topWavePosition={{ x: 10.0, y: 0.5, rotate: -0.4 }}
+            middleWavePosition={{ x: 5.0, y: 0.0, rotate: 0.2 }}
+            bottomWavePosition={{ x: 2.0, y: -0.7, rotate: -1 }}
+            animationSpeed={0.5}
+            interactive={true}
+            bendRadius={3.0}
+            bendStrength={-0.3}
+            parallax={true}
+            parallaxStrength={0.15}
+            mixBlendMode="screen"
+          />
+        </div>
 
         <motion.div
           className="hero-content relative z-10"
           style={{ opacity: heroOpacity, scale: heroScale, y: heroY }}
         >
-
           <motion.h1
             className="hero-title"
             initial={{ opacity: 0 }}
@@ -355,7 +391,11 @@ export default function SpeakersPage() {
                 key={i}
                 initial={{ opacity: 0, y: 40 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 + i * 0.02, duration: 0.5, ease: "easeOut" }}
+                transition={{
+                  delay: 0.3 + i * 0.02,
+                  duration: 0.5,
+                  ease: "easeOut",
+                }}
                 className="title-letter"
               >
                 {letter === " " ? "\u00A0" : letter}
@@ -389,7 +429,7 @@ export default function SpeakersPage() {
           viewport={{ once: true }}
           transition={{ duration: 1.2, ease: "easeInOut" }}
           className="w-full h-[2px] bg-red-600 mb-6"
-          style={{ boxShadow: '0 0 10px rgba(230, 43, 30, 0.6)' }}
+          style={{ boxShadow: "0 0 10px rgba(230, 43, 30, 0.6)" }}
         />
       </div>
 
@@ -404,12 +444,6 @@ export default function SpeakersPage() {
           <h2 className="section-title text-5xl">THE LINEUP</h2>
           <div className="section-line" />
         </motion.div>
-
-        <FilterPills
-          categories={categories}
-          activeCategory={activeCategory}
-          onCategoryChange={setActiveCategory}
-        />
 
         <AnimatePresence mode="wait">
           <motion.div
@@ -429,14 +463,6 @@ export default function SpeakersPage() {
             ))}
           </motion.div>
         </AnimatePresence>
-
-        {filteredSpeakers.length === 0 && (
-          <div className="no-results">
-            <Users size={48} />
-            <p>No speakers found</p>
-            <button onClick={() => setActiveCategory("All")}>Show all</button>
-          </div>
-        )}
       </section>
 
       <AnimatePresence mode="wait">
@@ -445,17 +471,8 @@ export default function SpeakersPage() {
         )}
       </AnimatePresence>
 
-      <AnimatePresence>
-        <SearchModal
-          isOpen={searchOpen}
-          onClose={() => setSearchOpen(false)}
-          speakers={speakers}
-          onSelectSpeaker={setActive}
-        />
-      </AnimatePresence>
-
+      <AnimatePresence></AnimatePresence>
       <BackToTop />
-
       <SpeakersStyles />
     </>
   );

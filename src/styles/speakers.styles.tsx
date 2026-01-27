@@ -4,8 +4,11 @@ export const SpeakersStyles = () => (
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      will-change: auto;
     }
+    .card-image {
+      transition: filter 0.4s ease;
+    }
+
     html {
       scroll-behavior: smooth;
     }
@@ -20,14 +23,13 @@ export const SpeakersStyles = () => (
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
     }
-    
+
     /* Performance optimizations */
     * {
       -webkit-tap-highlight-color: transparent;
     }
-    
+
     img {
-      will-change: transform;
     }
 
     /* SKIP LINK */
@@ -48,6 +50,11 @@ export const SpeakersStyles = () => (
     }
 
     /* BACKGROUND */
+    .is-scrolling .particle,
+    .is-scrolling .orb,
+    .is-scrolling .grid-glow {
+      animation-play-state: paused !important;
+    }
     .fixed-background {
       position: fixed;
       inset: 0;
@@ -62,17 +69,9 @@ export const SpeakersStyles = () => (
       inset: 0;
       background-image:
         linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-        linear-gradient(
-          90deg,
-          rgba(255, 255, 255, 0.03) 1px,
-          transparent 1px
-        );
+        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
       background-size: 60px 60px;
-      mask-image: radial-gradient(
-        ellipse at center,
-        black 0%,
-        transparent 70%
-      );
+      mask-image: radial-gradient(ellipse at center, black 0%, transparent 70%);
     }
     .grid-glow {
       position: absolute;
@@ -399,15 +398,15 @@ export const SpeakersStyles = () => (
       max-width: 1400px;
       margin: 0 auto;
     }
-      .speaker-card,
-.modal-content {
-  transform: translateZ(0);
-}
+    .speaker-card,
+    .modal-content {
+      transform: translateZ(0);
+    }
     .speaker-card {
       position: relative;
       background: rgba(255, 255, 255, 0.03);
       border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 1.25rem;
+      border-radius: 0;
       overflow: hidden;
       cursor: pointer;
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -421,12 +420,8 @@ export const SpeakersStyles = () => (
     .card-glow {
       position: absolute;
       inset: -1px;
-      border-radius: 1.25rem;
-      background: linear-gradient(
-        135deg,
-        rgba(230, 43, 30, 0.3),
-        transparent
-      );
+      border-radius: 0;
+      background: linear-gradient(135deg, rgba(230, 43, 30, 0.3), transparent);
       opacity: 0;
       filter: blur(20px);
       transition: opacity 0.3s ease-out;
@@ -477,6 +472,7 @@ export const SpeakersStyles = () => (
       }
     }
     .card-image-container {
+      background: #0b0f16;
       position: relative;
       height: 320px;
       overflow: hidden;
@@ -486,7 +482,7 @@ export const SpeakersStyles = () => (
       height: 100%;
       object-fit: cover;
       content-visibility: auto;
-  contain-intrinsic-size: 500px 320px;
+      contain-intrinsic-size: 500px 320px;
     }
     .image-overlay {
       position: absolute;
@@ -618,168 +614,243 @@ export const SpeakersStyles = () => (
     }
 
     /* MODAL */
-    .modal-overlay {
+    /* CINEMATIC FULLSCREEN MODAL */
+    .modal-overlay-fullscreen {
       position: fixed;
       inset: 0;
-      z-index: 200;
+      z-index: 1000;
+      background: radial-gradient(
+        circle at center,
+        rgba(0, 0, 0, 1) 0%,
+        rgba(0, 0, 0, 1) 35%,
+        rgba(0, 0, 0, 0.9) 60%,
+        rgba(0, 0, 0, 0.4) 85%,
+        rgba(0, 0, 0, 0) 100%
+      );
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 1.5rem;
-      background: rgba(0, 0, 0, 0.8);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      will-change: opacity;
-    }
-    .modal-content {
-      position: relative;
-      width: 100%;
-      max-width: 500px;
-      background: rgba(15, 20, 30, 0.98);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 1.25rem;
-      overflow: hidden;
-      outline: none;
-      will-change: transform, opacity;
-      transform: translateZ(0);
-      backface-visibility: hidden;
-    }
-    .modal-close {
-      position: absolute;
-      top: 1rem;
-      right: 1rem;
-      z-index: 20;
-      width: 36px;
-      height: 36px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: rgba(255, 255, 255, 0.1);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 50%;
-      color: white;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      will-change: transform;
-    }
-    .modal-close:hover {
-      background: rgba(255, 255, 255, 0.2);
-      transform: scale(1.1);
-    }
-    .modal-image-container {
-      position: relative;
-      height: 220px;
       overflow: hidden;
     }
-    .modal-image {
+
+    .modal-container-fullscreen {
+      position: relative;
       width: 100%;
       height: 100%;
-      object-fit: cover;
-    }
-    .modal-image-overlay {
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(
-        180deg,
-        transparent 0%,
-        rgba(15, 20, 30, 0.8) 100%
-      );
-    }
-    .modal-quick-actions {
-      position: absolute;
-      bottom: 1rem;
-      right: 1rem;
+      background: transparent;
       display: flex;
-      gap: 0.5rem;
+      outline: none;
     }
-    .quick-action-btn {
-      width: 36px;
-      height: 36px;
+
+    .modal-close-btn {
+      position: fixed;
+      top: 2rem;
+      right: 2rem;
+      z-index: 1010;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: white;
+      width: 60px;
+      height: 60px;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: rgba(0, 0, 0, 0.5);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: 50%;
-      color: white;
       cursor: pointer;
-      transition: all 0.2s ease;
-      will-change: transform;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
-    .quick-action-btn:hover {
-      transform: scale(1.1);
-      background: rgba(0, 0, 0, 0.7);
+
+    .modal-close-btn:hover {
+      background: rgba(255, 255, 255, 0.15);
+      transform: rotate(90deg) scale(1.1);
+      border-color: rgba(255, 255, 255, 0.3);
     }
-    .quick-action-btn.active {
-      color: #e62b1e;
-    }
-    .modal-info {
-      padding: 1.5rem;
-    }
-    .modal-category {
-      display: inline-block;
-      padding: 0.25rem 0.75rem;
-      background: rgba(230, 43, 30, 0.2);
-      border-radius: 9999px;
-      font-size: 0.7rem;
-      color: #e62b1e;
-      margin-bottom: 0.75rem;
-    }
-    .modal-name {
-      font-size: 1.5rem;
-      font-weight: 700;
-      margin-bottom: 0.25rem;
-    }
-    .modal-role {
-      font-size: 0.875rem;
-      color: #e62b1e;
-      margin-bottom: 1rem;
-    }
-    .modal-topic-box {
-      padding: 1rem;
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 0.75rem;
-      margin-bottom: 1rem;
-    }
-    .modal-topic-box .topic-label {
-      display: block;
-      font-size: 0.65rem;
-      color: rgba(255, 255, 255, 0.5);
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      margin-bottom: 0.25rem;
-    }
-    .modal-topic-box .topic-value {
-      font-weight: 600;
-    }
-    .modal-bio {
-      font-size: 0.875rem;
-      color: rgba(255, 255, 255, 0.7);
-      line-height: 1.6;
-      margin-bottom: 1.5rem;
-    }
-    .modal-social {
+
+    .modal-inner-fullscreen {
       display: flex;
-      gap: 0.75rem;
+      width: 100%;
+      height: 100%;
     }
-    .social-link {
+
+    .modal-image-side {
+      flex: 1;
+      height: 100%;
+      background: transparent;
       display: flex;
       align-items: center;
-      gap: 0.5rem;
-      padding: 0.75rem 1rem;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 0.5rem;
+      justify-content: center;
+      padding: 4rem;
+      position: relative;
+    }
+
+    .modal-image-wrapper {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      max-width: 800px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-full-image {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      filter: drop-shadow(0 0 50px rgba(230, 43, 30, 0.15));
+    }
+
+    .modal-info-side {
+      flex: 1;
+      height: 100%;
+      padding: 6rem 8rem 6rem 4rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      background: transparent;
+      position: relative;
+    }
+
+    .modal-background-x {
+      position: absolute;
+      inset: -20% -10%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      z-index: -1;
+      opacity: 0.25;
+    }
+
+    .modal-background-x svg {
+      width: 100%;
+      height: 100%;
+      fill: none;
+      stroke: #e62b1e;
+      stroke-width: 0.8;
+      stroke-linecap: square;
+      stroke-linejoin: miter;
+    }
+
+    .modal-info-scroll-box {
+      max-width: 600px;
+      width: 100%;
+      position: relative;
+      z-index: 1;
+    }
+
+    .modal-eyebrow {
+      display: block;
+      color: #e62b1e;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.4em;
+      margin-bottom: 1.5rem;
+      text-transform: uppercase;
+    }
+
+    .modal-full-name {
+      font-size: clamp(3rem, 6vw, 3.5rem);
+      font-weight: 900;
+      line-height: 0.95;
+      letter-spacing: -0.04em;
+      color: white;
+      margin-bottom: 1rem;
+      text-transform: uppercase;
+    }
+
+    .modal-full-role {
+      font-size: 1.25rem;
+      color: rgba(255, 255, 255, 0.5);
+      font-weight: 500;
+      margin-bottom: 3rem;
+    }
+
+    .modal-divider {
+      width: 60px;
+      height: 2px;
+      background: #e62b1e;
+      margin-bottom: 3rem;
+    }
+
+    .modal-section-label {
+      display: block;
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.4);
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      margin-bottom: 1.25rem;
+    }
+
+    .modal-full-bio {
+      font-size: 1.15rem;
+      line-height: 1.7;
+      color: rgba(255, 255, 255, 0.85);
+      margin-bottom: 3.5rem;
+      max-width: 500px;
+    }
+
+    .modal-full-social {
+      display: flex;
+      gap: 2rem;
+    }
+
+    .modal-social-link {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
       color: white;
       text-decoration: none;
-      font-size: 0.875rem;
-      transition: all 0.3s;
+      font-size: 1rem;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      opacity: 0.6;
     }
-    .social-link:hover {
-      background: rgba(230, 43, 30, 0.2);
-      border-color: rgba(230, 43, 30, 0.5);
+
+    .modal-social-link:hover {
+      opacity: 1;
+      color: #e62b1e;
+      transform: translateY(-2px);
+    }
+
+    @media (max-width: 1024px) {
+      .modal-info-side {
+        padding: 4rem;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .modal-inner-fullscreen {
+        flex-direction: column;
+        overflow-y: auto;
+      }
+
+      .modal-image-side {
+        flex: none;
+        height: 50vh;
+        padding: 4rem 2rem 2rem;
+      }
+
+      .modal-info-side {
+        flex: none;
+        height: auto;
+        padding: 2rem;
+        justify-content: flex-start;
+      }
+
+      .modal-full-name {
+        font-size: 2.5rem;
+      }
+
+      .modal-close-btn {
+        top: 1rem;
+        right: 1rem;
+        width: 50px;
+        height: 50px;
+      }
     }
 
     /* BACK TO TOP */
@@ -854,7 +925,7 @@ export const SpeakersStyles = () => (
         background: rgba(255, 255, 255, 0.05);
         border-color: rgba(255, 255, 255, 0.1);
       }
-      
+
       .navbar-links {
         display: none;
       }
@@ -873,10 +944,10 @@ export const SpeakersStyles = () => (
       .speakers-grid {
         grid-template-columns: 1fr;
       }
-      
+
       /* Mobile Font Sizes */
       .title-letter {
-        font-size: clamp(2.5rem, 10vw, 4rem);
+        font-size: clamp(2.5rem, 10vw, 3rem);
       }
       .hero-subtitle {
         font-size: 0.9rem;
@@ -896,7 +967,7 @@ export const SpeakersStyles = () => (
       .view-more {
         font-size: 0.75rem;
       }
-      
+
       /* Mobile Hero Section */
       .hero-section {
         height: 60vh;
@@ -905,10 +976,10 @@ export const SpeakersStyles = () => (
         padding: 1rem;
       }
     }
-    
+
     @media (max-width: 480px) {
       .title-letter {
-        font-size: clamp(2rem, 12vw, 3rem);
+        font-size: clamp(1.5rem, 12vw, 2.3rem);
       }
       .hero-subtitle {
         font-size: 0.8rem;
@@ -922,7 +993,7 @@ export const SpeakersStyles = () => (
       .speaker-topic {
         font-size: 0.7rem;
       }
-      
+
       /* Extra small phones */
       .hero-section {
         height: 60vh;

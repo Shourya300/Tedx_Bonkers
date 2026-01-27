@@ -1,9 +1,15 @@
-'use client';
+"use client";
 
-import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import Image from 'next/image';
-import { motion, useMotionValue, useSpring } from 'framer-motion';
-import Silk from '../components/Silk/Silk';
+import React, {
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import Image from "next/image";
+import { motion, useMotionValue, useSpring } from "framer-motion";
+import Silk from "../components/Silk/Silk";
 
 interface Shape {
   id: number;
@@ -12,7 +18,7 @@ interface Shape {
   vx: number;
   vy: number;
   size: number;
-  type: 'square' | 'circle' | 'rectangle' | 'rhombus';
+  type: "square" | "circle" | "rectangle" | "rhombus";
   color: string;
   glow: boolean;
 }
@@ -21,7 +27,7 @@ export default function AboutPage() {
   // ===== Background + cursor stuff (kept) =====
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
-  const [shapes, setShapes] = useState<Shape[]>([]);
+  const shapesRef = useRef<Shape[]>([]);
 
   const springConfig = { damping: 30, stiffness: 200 };
   const smoothX = useSpring(mouseX, springConfig);
@@ -42,12 +48,19 @@ export default function AboutPage() {
   const dropXSpring = useSpring(dropX, { damping: 26, stiffness: 260 });
   const dropYSpring = useSpring(dropY, { damping: 26, stiffness: 260 });
   const dropScaleSpring = useSpring(dropScale, { damping: 26, stiffness: 260 });
-  const dropOpacitySpring = useSpring(dropOpacity, { damping: 26, stiffness: 260 });
+  const dropOpacitySpring = useSpring(dropOpacity, {
+    damping: 26,
+    stiffness: 260,
+  });
 
   const [dropInBox, setDropInBox] = useState(false);
 
-  const clamp = (v: number, min: number, max: number) => Math.max(min, Math.min(max, v));
-  const centerOf = (r: DOMRect) => ({ x: r.left + r.width / 2, y: r.top + r.height / 2 });
+  const clamp = (v: number, min: number, max: number) =>
+    Math.max(min, Math.min(max, v));
+  const centerOf = (r: DOMRect) => ({
+    x: r.left + r.width / 2,
+    y: r.top + r.height / 2,
+  });
 
   const computeDropWindow = () => {
     const spout = tapSpoutRef.current;
@@ -71,6 +84,37 @@ export default function AboutPage() {
     return { start, end, scrollStart, scrollEnd, targetRect };
   };
 
+  useEffect(() => {
+    let rafId: number;
+
+    const animate = () => {
+      const W = window.innerWidth;
+      const H = window.innerHeight;
+
+      const shapes = shapesRef.current;
+
+      for (let i = 0; i < shapes.length; i++) {
+        const s = shapes[i];
+
+        s.x += s.vx;
+        s.y += s.vy;
+
+        if (s.x <= 0 || s.x >= W - s.size) s.vx *= -1;
+        if (s.y <= 0 || s.y >= H - s.size) s.vy *= -1;
+
+        // subtle glow toggle (cheap, no React state)
+        if (Math.random() > 0.995) {
+          s.glow = !s.glow;
+        }
+      }
+
+      rafId = requestAnimationFrame(animate);
+    };
+
+    rafId = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(rafId);
+  }, []);
+
   const updateDrop = () => {
     const a = computeDropWindow();
     if (!a) return;
@@ -78,7 +122,11 @@ export default function AboutPage() {
     const { start, end, scrollStart, scrollEnd, targetRect } = a;
 
     const yDoc = window.scrollY;
-    const t = clamp((yDoc - scrollStart) / Math.max(1, scrollEnd - scrollStart), 0, 1);
+    const t = clamp(
+      (yDoc - scrollStart) / Math.max(1, scrollEnd - scrollStart),
+      0,
+      1,
+    );
 
     // straight vertical fall: locked X
     const x = start.x;
@@ -110,37 +158,53 @@ export default function AboutPage() {
     const ro = new ResizeObserver(() => updateDrop());
     if (logoBoxRef.current) ro.observe(logoBoxRef.current);
     if (heroRef.current) ro.observe(heroRef.current);
-    if (tapSpoutRef.current) ro.observe(tapSpoutRef.current);
-    if (logoTargetRef.current) ro.observe(logoTargetRef.current);
 
     const onResize = () => updateDrop();
-    window.addEventListener('resize', onResize);
+    window.addEventListener("resize", onResize);
 
     return () => {
       ro.disconnect();
-      window.removeEventListener('resize', onResize);
+      window.removeEventListener("resize", onResize);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
-    const onScroll = () => updateDrop();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
+    let ticking = false;
+
+    const onScroll = () => {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          updateDrop();
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+
+    return () => window.removeEventListener("scroll", onScroll);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // ===== Shapes init (reduced to 4) =====
   useEffect(() => {
-    const colors = ['border-red-500/30', 'border-red-600/25', 'border-white/20', 'border-red-400/35'];
-    const centerX = typeof window !== 'undefined' ? window.innerWidth / 2 : 960;
-    const centerY = typeof window !== 'undefined' ? window.innerHeight / 2 : 540;
+    const colors = [
+      "border-red-500/30",
+      "border-red-600/25",
+      "border-white/20",
+      "border-red-400/35",
+    ];
+    const centerX = typeof window !== "undefined" ? window.innerWidth / 2 : 960;
+    const centerY =
+      typeof window !== "undefined" ? window.innerHeight / 2 : 540;
 
     const shapeConfigs = [
-      { type: 'circle' as const, size: 85, speed: 2.0 },
-      { type: 'circle' as const, size: 200, speed: 0.5 },
-      { type: 'square' as const, size: 130, speed: 1.2 },
-      { type: 'rhombus' as const, size: 75, speed: 2.3 },
+      { type: "circle" as const, size: 85, speed: 2.0 },
+      { type: "circle" as const, size: 200, speed: 0.5 },
+      { type: "square" as const, size: 130, speed: 1.2 },
+      { type: "rhombus" as const, size: 75, speed: 2.3 },
     ];
 
     const initialShapes: Shape[] = shapeConfigs.map((config, i) => {
@@ -159,88 +223,53 @@ export default function AboutPage() {
       };
     });
 
-    setShapes(initialShapes);
+    shapesRef.current = initialShapes;
   }, []);
 
   useEffect(() => {
-    if (shapes.length === 0) return;
-    const animationFrame = setInterval(() => {
-      setShapes((prevShapes) => {
-        const W = typeof window !== 'undefined' ? window.innerWidth : 1920;
-        const H = typeof window !== 'undefined' ? window.innerHeight : 1080;
-
-        const newShapes = prevShapes.map((shape) => {
-          let newX = shape.x + shape.vx;
-          let newY = shape.y + shape.vy;
-          let newVx = shape.vx;
-          let newVy = shape.vy;
-
-          if (newX <= 0 || newX >= W - shape.size) {
-            newVx = -newVx;
-            newX = Math.max(0, Math.min(newX, W - shape.size));
-          }
-          if (newY <= 0 || newY >= H - shape.size) {
-            newVy = -newVy;
-            newY = Math.max(0, Math.min(newY, H - shape.size));
-          }
-
-          return { ...shape, x: newX, y: newY, vx: newVx, vy: newVy };
-        });
-
-        for (let i = 0; i < newShapes.length; i++) {
-          for (let j = i + 1; j < newShapes.length; j++) {
-            const dx = newShapes[i].x - newShapes[j].x;
-            const dy = newShapes[i].y - newShapes[j].y;
-            const distance = Math.sqrt(dx * dx + dy * dy);
-            const minDistance = (newShapes[i].size + newShapes[j].size) / 2 + 30;
-
-            if (distance < minDistance) {
-              const angle = Math.atan2(dy, dx);
-              const targetX = newShapes[j].x + Math.cos(angle) * minDistance;
-              const targetY = newShapes[j].y + Math.sin(angle) * minDistance;
-
-              newShapes[i].vx = (targetX - newShapes[j].x) * 0.05;
-              newShapes[i].vy = (targetY - newShapes[j].y) * 0.05;
-              newShapes[j].vx = -newShapes[i].vx;
-              newShapes[j].vy = -newShapes[i].vy;
-            }
-          }
-        }
-
-        return newShapes;
-      });
-    }, 50);
-
-    return () => clearInterval(animationFrame);
-  }, [shapes.length]);
-
-  useEffect(() => {
-    const glowInterval = setInterval(() => {
-      setShapes((prev) => prev.map((shape) => ({ ...shape, glow: Math.random() > 0.7 })));
-    }, 2000);
-    return () => clearInterval(glowInterval);
-  }, []);
-
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      mouseX.set(e.clientX - 150);
-      mouseY.set(e.clientY - 150);
+    const setVH = () => {
+      document.documentElement.style.setProperty(
+        "--vh",
+        `${window.innerHeight * 0.01}px`,
+      );
     };
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, [mouseX, mouseY]);
+
+    setVH();
+    window.addEventListener("resize", setVH);
+    return () => window.removeEventListener("resize", setVH);
+  }, []);
+
+  useEffect(() => {
+    let raf = 0;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      if (raf) return;
+      raf = requestAnimationFrame(() => {
+        mouseX.set(e.clientX);
+        mouseY.set(e.clientY);
+        raf = 0;
+      });
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      cancelAnimationFrame(raf);
+    };
+  }, []);
 
   const containerVariants = useMemo(
     () => ({
       initial: {
-        boxShadow: '0 0 20px rgba(56, 189, 248, 0.35)',
-        borderColor: 'rgba(56, 189, 248, 0.5)',
-        backgroundColor: 'rgba(0, 0, 0, 0.4)',
+        boxShadow: "0 0 20px rgba(56, 189, 248, 0.35)",
+        borderColor: "rgba(56, 189, 248, 0.5)",
+        backgroundColor: "rgba(0, 0, 0, 0.4)",
       },
       hover: {
-        boxShadow: '0 0 40px rgba(235, 0, 40, 0.6), 0 0 20px rgba(56, 189, 248, 0.4)',
-        borderColor: 'rgba(255, 255, 255, 0.9)',
-        backgroundColor: 'rgba(10, 10, 10, 0.6)',
+        boxShadow:
+          "0 0 40px rgba(235, 0, 40, 0.6), 0 0 20px rgba(56, 189, 248, 0.4)",
+        borderColor: "rgba(255, 255, 255, 0.9)",
+        backgroundColor: "rgba(10, 10, 10, 0.6)",
         transition: { duration: 0.3 },
       },
     }),
@@ -251,7 +280,7 @@ export default function AboutPage() {
     <div className="relative min-h-screen w-full bg-black text-white font-sans selection:bg-red-600 overflow-x-hidden">
       {/* Background */}
       <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
-        {shapes.map((shape) => (
+        {shapesRef.current.map((shape) => (
           <motion.div
             key={shape.id}
             className={`absolute ${shape.color} transition-all duration-500`}
@@ -261,20 +290,38 @@ export default function AboutPage() {
               width: shape.size,
               height: shape.size,
               borderWidth: 2,
-              borderRadius: shape.type === 'circle' ? '50%' : shape.type === 'square' ? '8px' : '0',
-              transform: shape.type === 'rhombus' ? 'rotate(45deg)' : 'none',
+              borderRadius:
+                shape.type === "circle"
+                  ? "50%"
+                  : shape.type === "square"
+                    ? "8px"
+                    : "0",
+              transform: shape.type === "rhombus" ? "rotate(45deg)" : "none",
               boxShadow: shape.glow
-                ? `0 0 20px ${shape.color.includes('red') ? 'rgba(239, 68, 68, 0.6)' : 'rgba(255, 255, 255, 0.5)'}`
-                : 'none',
+                ? `0 0 20px ${shape.color.includes("red") ? "rgba(239, 68, 68, 0.6)" : "rgba(255, 255, 255, 0.5)"}`
+                : "none",
               opacity: shape.glow ? 0.8 : 0.5,
             }}
           />
         ))}
 
-        <motion.div style={{ x: smoothX, y: smoothY }} className="absolute h-[180px] w-[180px] rounded-full bg-red-600/20 blur-[80px]" />
         <motion.div
-          style={{ x: useSpring(mouseX, { damping: 40, stiffness: 150 }), y: useSpring(mouseY, { damping: 40, stiffness: 150 }) }}
-          className="absolute h-[120px] w-[120px] rounded-full bg-sky-400/15 blur-[60px]"
+          style={{
+            x: smoothX,
+            y: smoothY,
+            translateX: "-50%",
+            translateY: "-50%",
+          }}
+          className="absolute h-[180px] w-[180px] rounded-full bg-red-600/20 blur-[60px]"
+        />
+        <motion.div
+          style={{
+            x: useSpring(mouseX, { damping: 40, stiffness: 150 }),
+            y: useSpring(mouseY, { damping: 40, stiffness: 150 }),
+            translateX: "-50%",
+            translateY: "-50%",
+          }}
+          className="absolute h-[120px] w-[120px] rounded-full bg-sky-400/15 blur-[40px]"
         />
       </div>
 
@@ -286,45 +333,70 @@ export default function AboutPage() {
           y: dropYSpring,
           scale: dropScaleSpring,
           opacity: dropOpacitySpring,
-          translateX: '-50%',
-          translateY: '-50%',
-          filter: 'drop-shadow(0 0 18px rgba(56, 189, 248, 0.55))',
+          translateX: "-50%",
+          translateY: "-50%",
+          filter: "drop-shadow(0 0 18px rgba(56, 189, 248, 0.55))",
         }}
-      >
-      </motion.div>
+      ></motion.div>
 
       <main className="relative z-10 flex flex-col items-center">
         {/* HERO */}
-        <section ref={heroRef} className="relative h-[101vh] w-full flex items-center justify-center px-6 overflow-hidden">
+        <section
+          ref={heroRef}
+          className="relative w-full flex items-center justify-center px-6 overflow-hidden"
+          style={{
+            height: "calc(var(--vh, 1vh) * 105)",
+          }}
+        >
           {/* Silk Background */}
           <div className="absolute inset-0 z-0 opacity-60">
-            <Silk 
-              speed={3} 
-              scale={1} 
-              color="#1800eb" 
-              noiseIntensity={1.5} 
-              rotation={0} 
+            <Silk
+              speed={3}
+              scale={1}
+              color="#1800eb"
+              noiseIntensity={1.5}
+              rotation={0}
             />
           </div>
-          
+
           {/* Dark overlay for better text contrast */}
           <div className="absolute inset-0 z-[1] bg-gradient-to-b from-black/40 via-black/20 to-black/50" />
-          
+
           <div className="relative z-10 w-full max-w-6xl">
-            <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.9 }} className="relative">
-              <h1 className="relative z-30 select-none text-center leading-none">
-                <span className="heroTitle inline-flex items-end justify-center whitespace-nowrap">
-                  <span className="heroWhite">ABOUT</span>
-
-                                  </span>
-
-              </h1>
+            <motion.div
+              initial={{ opacity: 0, y: 18 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.9 }}
+              className="relative flex flex-col items-center justify-center"
+            >
+              <motion.h1
+                className="hero-title"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.3 }}
+              >
+                {"ABOUT".split("").map((letter, i) => (
+                  <motion.span
+                    key={i}
+                    initial={{ opacity: 0, y: 40 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{
+                      delay: 0.3 + i * 0.02,
+                      duration: 0.5,
+                      ease: "easeOut",
+                    }}
+                    className="font-sans-serif"
+                  >
+                    {letter === " " ? "\u00A0" : letter}
+                  </motion.span>
+                ))}
+              </motion.h1>
 
               <motion.div
-                initial={{ width: 0 }}
-                animate={{ width: '100%' }}
-                transition={{ delay: 0.35, duration: 1, ease: 'easeOut' }}
-                className="mx-auto mt-6 h-1 w-full max-w-xl bg-[#eb0028]"
+                className="hero-line"
+                initial={{ scaleX: 0 }}
+                animate={{ scaleX: 1 }}
+                transition={{ delay: 0.8, duration: 0.7, ease: "easeInOut" }}
               />
             </motion.div>
           </div>
@@ -337,15 +409,15 @@ export default function AboutPage() {
             <div className="relative">
               {/* Silk effect background for the border */}
               <div className="absolute inset-0 overflow-hidden opacity-40">
-                <Silk 
-                  speed={2} 
-                  scale={0.8} 
-                  color="#2300eb" 
-                  noiseIntensity={2} 
-                  rotation={90} 
+                <Silk
+                  speed={2}
+                  scale={0.8}
+                  color="#2300eb"
+                  noiseIntensity={2}
+                  rotation={90}
                 />
               </div>
-              
+
               {/* Animated gradient border */}
               <motion.div
                 initial={{ scaleX: 0 }}
@@ -354,10 +426,11 @@ export default function AboutPage() {
                 transition={{ duration: 1.2, ease: "easeInOut" }}
                 className="relative h-1 bg-gradient-to-r from-transparent via-blue-600 to-transparent"
                 style={{
-                  boxShadow: '0 0 20px rgba(56, 189, 248, 0.6), 0 0 40px rgba(56, 189, 248, 0.3)',
+                  boxShadow:
+                    "0 0 20px rgba(56, 189, 248, 0.6), 0 0 40px rgba(56, 189, 248, 0.3)",
                 }}
               />
-              
+
               {/* Top accent line */}
               <motion.div
                 initial={{ scaleX: 0 }}
@@ -366,10 +439,10 @@ export default function AboutPage() {
                 transition={{ duration: 1, delay: 0.1, ease: "easeInOut" }}
                 className="absolute top-[-4px] left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-blue-400/50 to-transparent"
                 style={{
-                  boxShadow: '0 0 10px rgba(248, 113, 113, 0.4)',
+                  boxShadow: "0 0 10px rgba(248, 113, 113, 0.4)",
                 }}
               />
-              
+
               {/* Bottom accent line */}
               <motion.div
                 initial={{ scaleX: 0 }}
@@ -378,20 +451,20 @@ export default function AboutPage() {
                 transition={{ duration: 1, delay: 0.1, ease: "easeInOut" }}
                 className="absolute bottom-[-4px] left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-red-400/50 to-transparent"
                 style={{
-                  boxShadow: '0 0 10px rgba(248, 113, 113, 0.4)',
+                  boxShadow: "0 0 10px rgba(248, 113, 113, 0.4)",
                 }}
               />
-              
+
               {/* Pulsing glow effect */}
               <motion.div
-                animate={{ 
+                animate={{
                   opacity: [0.3, 0.6, 0.3],
-                  scale: [1, 1.2, 1]
+                  scale: [1, 1.2, 1],
                 }}
-                transition={{ 
+                transition={{
                   duration: 2,
                   repeat: Infinity,
-                  ease: "easeInOut"
+                  ease: "easeInOut",
                 }}
                 className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 bg-red-600/30 rounded-full blur-md"
               />
@@ -401,8 +474,20 @@ export default function AboutPage() {
 
         {/* About TED */}
         <section className="relative z-30 w-full max-w-4xl mx-auto px-8 pb-20">
-          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.5 }} transition={{ duration: 0.6 }} className="text-center mb-8">
-            <motion.h2 initial={{ opacity: 0, letterSpacing: '0.2em' }} whileInView={{ opacity: 1, letterSpacing: '0.6em' }} viewport={{ once: true }} transition={{ delay: 0.2, duration: 0.8 }} className="text-gray-500 uppercase tracking-[0.6em] text-xs font-semibold mb-6 mt-10">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.5 }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-8"
+          >
+            <motion.h2
+              initial={{ opacity: 0, letterSpacing: "0.2em" }}
+              whileInView={{ opacity: 1, letterSpacing: "0.6em" }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2, duration: 0.8 }}
+              className="text-gray-500 uppercase tracking-[0.6em] text-xs font-semibold mb-6 mt-10"
+            >
               ABOUT TED
             </motion.h2>
           </motion.div>
@@ -413,46 +498,125 @@ export default function AboutPage() {
             viewport={{ once: true, amount: 0.3 }}
             transition={{ duration: 0.6, delay: 0.1 }}
             className="p-12 rounded-3xl border border-white/15 backdrop-blur-md cursor-default mx-auto"
-            style={{ boxShadow: '0 0 15px rgba(255, 255, 255, 0.1)', backgroundColor: 'rgba(0, 0, 0, 0.3)' }}
+            style={{
+              boxShadow: "0 0 15px rgba(255, 255, 255, 0.1)",
+              backgroundColor: "rgba(0, 0, 0, 0.3)",
+            }}
           >
-            <motion.p initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ delay: 0.3, duration: 0.8 }} className="text-gray-300 text-lg leading-relaxed text-center">
-              TED is a nonprofit devoted to spreading ideas worth spreading. Started as a conference in 1984, TED has grown into a global community celebrating
-              human curiosity and the power of ideas to change attitudes, lives and ultimately, the world.
+            <motion.p
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.3, duration: 0.8 }}
+              className="text-gray-300 text-lg leading-relaxed text-center"
+            >
+              TED is a nonprofit devoted to spreading ideas worth spreading.
+              Started as a conference in 1984, TED has grown into a global
+              community celebrating human curiosity and the power of ideas to
+              change attitudes, lives and ultimately, the world.
             </motion.p>
           </motion.div>
         </section>
 
         {/* About TEDx */}
         <section className="relative z-30 w-full max-w-4xl mx-auto px-8 pb-20">
-          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.5 }} transition={{ duration: 0.6 }} className="text-center mb-8">
-            <motion.h2 initial={{ opacity: 0, letterSpacing: '0.2em' }} whileInView={{ opacity: 1, letterSpacing: '0.6em' }} viewport={{ once: true }} transition={{ delay: 0.2, duration: 0.8 }} className="text-gray-500 uppercase tracking-[0.6em] text-xs font-semibold mb-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.5 }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-8"
+          >
+            <motion.h2
+              initial={{ opacity: 0, letterSpacing: "0.2em" }}
+              whileInView={{ opacity: 1, letterSpacing: "0.6em" }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2, duration: 0.8 }}
+              className="text-gray-500 uppercase tracking-[0.6em] text-xs font-semibold mb-6"
+            >
               ABOUT TEDxNIITUNIVERSITY
             </motion.h2>
           </motion.div>
 
-          <motion.div variants={containerVariants} initial="initial" whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.3 }} whileHover="hover" transition={{ duration: 0.6 }} className="p-12 rounded-3xl border backdrop-blur-md cursor-default mx-auto opacity-0 translate-y-10">
-            <motion.h4 initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.3, duration: 0.6 }} className="text-3xl font-bold mb-6 text-sky-400 text-center">
+          <motion.div
+            variants={containerVariants}
+            initial="initial"
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.3 }}
+            whileHover="hover"
+            transition={{ duration: 0.6 }}
+            className="p-12 rounded-3xl border backdrop-blur-md cursor-default mx-auto opacity-0 translate-y-10"
+          >
+            <motion.h4
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.3, duration: 0.6 }}
+              className="text-3xl font-bold mb-6 text-sky-400 text-center"
+            >
               Our Mission
             </motion.h4>
-            <motion.p initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ delay: 0.5, duration: 0.8 }} className="text-gray-300 text-lg leading-relaxed text-center">
-              TEDxNIITUniversity is a platform where ideas worth spreading come to life. We bring together innovators, thinkers, and dreamers from diverse
-              backgrounds to share insights that inspire change and spark conversations.
+            <motion.p
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.5, duration: 0.8 }}
+              className="text-gray-300 text-lg leading-relaxed text-center"
+            >
+              TEDxNIITUniversity is a platform where ideas worth spreading come
+              to life. We bring together innovators, thinkers, and dreamers from
+              diverse backgrounds to share insights that inspire change and
+              spark conversations.
             </motion.p>
-            <motion.div initial={{ width: 0 }} whileInView={{ width: '60%' }} viewport={{ once: true }} transition={{ delay: 0.3, duration: 0.8 }} className="h-0.5 bg-gradient-to-r from-transparent via-sky-400 to-transparent mt-8 mx-auto" />
+            <motion.div
+              initial={{ width: 0 }}
+              whileInView={{ width: "60%" }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.3, duration: 0.8 }}
+              className="h-0.5 bg-gradient-to-r from-transparent via-sky-400 to-transparent mt-8 mx-auto"
+            />
           </motion.div>
         </section>
 
         {/* THEME */}
         <section className="relative z-30 w-full max-w-6xl mx-auto px-8 pb-24 md:px-24">
           <div className="flex flex-col md:flex-row gap-12 items-stretch mt-8">
-            <motion.div variants={containerVariants} initial={{ opacity: 0, x: -50 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, amount: 0.3 }} whileHover="hover" transition={{ duration: 0.6, delay: 0.2 }} className="flex-1 p-10 rounded-3xl border backdrop-blur-md cursor-default relative overflow-hidden">
-              <motion.h4 initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.4, duration: 0.6 }} className="text-2xl md:text-3xl font-bold mb-6 bg-gradient-to-r from-sky-300 to-sky-200 bg-clip-text text-transparent">
+            <motion.div
+              variants={containerVariants}
+              initial={{ opacity: 0, x: -50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, amount: 0.3 }}
+              whileHover="hover"
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="flex-1 p-10 rounded-3xl border backdrop-blur-md cursor-default relative overflow-hidden"
+            >
+              <motion.h4
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.4, duration: 0.6 }}
+                className="text-2xl md:text-3xl font-bold mb-6 bg-gradient-to-r from-sky-300 to-sky-200 bg-clip-text text-transparent"
+              >
                 The Vision
               </motion.h4>
-              <motion.p initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ delay: 0.6, duration: 0.8 }} className="text-gray-300 text-lg leading-relaxed mb-6">
-                <span className="text-sky-300 font-semibold">SUBLIS</span> represents the confluence of ideas and innovation—where great minds converge like water molecules finding harmony.
+              <motion.p
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.6, duration: 0.8 }}
+                className="text-gray-300 text-lg leading-relaxed mb-6"
+              >
+                <span className="text-sky-300 font-semibold">SUBLIS</span>{" "}
+                represents the confluence of ideas and innovation—where great
+                minds converge like water molecules finding harmony.
               </motion.p>
-              <motion.div initial={{ width: 0 }} whileInView={{ width: '40%' }} viewport={{ once: true }} transition={{ delay: 0.4, duration: 0.8 }} className="h-1 bg-gradient-to-r from-sky-400 to-transparent" />
+              <motion.div
+                initial={{ width: 0 }}
+                whileInView={{ width: "40%" }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.4, duration: 0.8 }}
+                className="h-1 bg-gradient-to-r from-sky-400 to-transparent"
+              />
             </motion.div>
 
             <motion.div
@@ -465,26 +629,60 @@ export default function AboutPage() {
               transition={{ duration: 0.6, delay: 0.4 }}
               className="flex-1 p-10 rounded-3xl border backdrop-blur-xl cursor-default flex flex-col items-center justify-center group relative overflow-hidden"
               style={{
-                background: 'linear-gradient(135deg, rgba(56, 189, 248, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%)',
-                borderColor: 'rgba(56, 189, 248, 0.6)',
+                background:
+                  "linear-gradient(135deg, rgba(56, 189, 248, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%)",
+                borderColor: "rgba(56, 189, 248, 0.6)",
               }}
             >
-              <span ref={logoTargetRef} className="absolute left-1/2 top-1/2" style={{ width: 10, height: 10, transform: 'translate(-50%, -50%)' }} aria-hidden="true" />
+              <span
+                ref={logoTargetRef}
+                className="absolute left-1/2 top-1/2"
+                style={{
+                  width: 10,
+                  height: 10,
+                  transform: "translate(-50%, -50%)",
+                }}
+                aria-hidden="true"
+              />
 
-              <motion.div initial={false} animate={{ opacity: 1, scale: dropInBox ? 1 : 0.98 }} transition={{ duration: 0.35 }} className="relative z-10 mb-6 mt-8">
+              <motion.div
+                initial={false}
+                animate={{ opacity: 1, scale: dropInBox ? 1 : 0.98 }}
+                transition={{ duration: 0.35 }}
+                className="relative z-10 mb-6 mt-8"
+              >
                 <motion.div
                   initial={false}
-                  animate={{ opacity: dropInBox ? 1 : 1, scale: dropInBox ? 1.8 : 1.62, rotate: 0 }}
-                  transition={{ duration: 0.45, ease: 'easeOut' }}
+                  animate={{
+                    opacity: dropInBox ? 1 : 1,
+                    scale: dropInBox ? 1.8 : 1.62,
+                    rotate: 0,
+                  }}
+                  transition={{ duration: 0.45, ease: "easeOut" }}
                   className="relative w-56 h-56 md:w-60 md:h-60"
                 >
-                  <Image src="/images/Landing_Page/LogoOnly.png" alt="SUBLIS Theme Logo" fill className="object-contain drop-shadow-[0_0_25px_rgba(56,189,248,0.6)]" />
+                  <Image
+                    src="/images/Landing_Page/LogoOnly.png"
+                    alt="SUBLIS Theme Logo"
+                    fill
+                    className="object-contain drop-shadow-[0_0_25px_rgba(56,189,248,0.6)]"
+                  />
                 </motion.div>
 
-                <motion.div animate={{ rotate: 360 }} transition={{ duration: 20, repeat: Infinity, ease: 'linear' }} className="absolute -inset-4 border-4 border-dashed border-sky-300/40 rounded-full" />
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{
+                    duration: 20,
+                    repeat: Infinity,
+                    ease: "linear",
+                  }}
+                  className="absolute -inset-4 border-4 border-dashed border-sky-300/40 rounded-full"
+                />
               </motion.div>
 
-              <p className="text-[11px] uppercase tracking-[0.3em] text-sky-300 font-semibold text-center relative z-10">LOGO</p>
+              <p className="text-[11px] uppercase tracking-[0.3em] text-sky-300 font-semibold text-center relative z-10">
+                LOGO
+              </p>
             </motion.div>
           </div>
         </section>
@@ -492,13 +690,27 @@ export default function AboutPage() {
 
       <style jsx global>{`
         /* headline closer to your reference */
-        .heroTitle {
-          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        .hero-title {
+          font-family:
+            -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+            "Helvetica Neue", Arial, sans-serif;
+          font-size: clamp(3rem, 8vw, 6rem);
           font-weight: 900;
-          letter-spacing: -0.03em;
-          font-size: clamp(56px, 12vw, 120px);
-          line-height: 0.9;
-          filter: drop-shadow(0 0 18px rgba(0, 0, 0, 0.55));
+          letter-spacing: -0.02em;
+          margin-bottom: 1.5rem;
+          background: linear-gradient(to bottom, #ffffff, #e0e0e0);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+          text-align: center;
+        }
+
+        .hero-line {
+          height: 2px;
+          width: 100px;
+          background: #e62b1e;
+          margin: 0 auto;
+          box-shadow: 0 0 20px rgba(230, 43, 30, 0.5);
         }
         .heroWhite {
           color: rgba(255, 255, 255, 0.95);

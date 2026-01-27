@@ -10,7 +10,6 @@ export default function Navbar() {
 
   const links = [
     { name: "Speakers", path: "/speakers" },
-    { name: "Sponsors", path: "/sponsor" },
     { name: "Rewind", path: "/rewind" },
     { name: "Pre Events", path: "/preevents" },
     { name: "About", path: "/about" },
@@ -103,7 +102,7 @@ export default function Navbar() {
 
         {/* Right Side - Button (Desktop Only) */}
         <div className="flex-1 hidden lg:flex justify-end items-center">
-          <MetalButton variant="primary" className="text-sm xl:text-base">
+          <MetalButton variant="purple" className="text-sm xl:text-base">
             <Link href="/register">Get Tickets</Link>
           </MetalButton>
         </div>

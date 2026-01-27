@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
-import { Sparkles } from "lucide-react";
+import Image from "next/image";
 
 type Speaker = {
   id: number;
@@ -23,47 +23,7 @@ interface SpeakerCardProps {
 
 /* ================== HOOKS ================== */
 
-const SCRAMBLE_CHARS = "!@#$%^&*()_+-=[]{}|;:,.<>?";
-const isMobile =
-  typeof window !== "undefined" && window.innerWidth < 768;
-
-function useTextScramble(text: string, trigger: boolean): string {
-  const [displayText, setDisplayText] = useState(text);
-
-useEffect(() => {
-  if (!trigger) {
-    setDisplayText(text);
-    return;
-  }
-
-  let iteration = 0;
-  let raf: number;
-
-  const run = () => {
-    setDisplayText(
-      text
-        .split("")
-        .map((char, index) => {
-          if (index < iteration) return text[index];
-          if (char === " ") return " ";
-          return SCRAMBLE_CHARS[Math.floor(Math.random() * SCRAMBLE_CHARS.length)];
-        })
-        .join("")
-    );
-
-    iteration += 0.5;
-    if (iteration < text.length) {
-      raf = requestAnimationFrame(run);
-    }
-  };
-
-  raf = requestAnimationFrame(run);
-  return () => cancelAnimationFrame(raf);
-}, [text, trigger]);
-
-
-  return displayText;
-}
+const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
 
 function use3DEffect(ref: React.RefObject<HTMLDivElement | null>) {
   const x = useMotionValue(0);
@@ -138,28 +98,27 @@ function useGlare(ref: React.RefObject<HTMLDivElement | null>) {
 
 export function SpeakerCard({ speaker, onClick, index }: SpeakerCardProps) {
   const ref = useRef<HTMLDivElement>(null);
-const { rotateX, rotateY } = isMobile
-  ? { rotateX: 0, rotateY: 0 }
-  : use3DEffect(ref);
+  const imgRef = useRef<HTMLImageElement | null>(null);
 
-if (!isMobile) {
-  useGlare(ref);
-}
+  const { rotateX, rotateY } = isMobile
+    ? { rotateX: 0, rotateY: 0 }
+    : use3DEffect(ref);
+
+  if (!isMobile) {
+    useGlare(ref);
+  }
 
   const [isHovered, setIsHovered] = useState(false);
-  const scrambledName = useTextScramble(speaker.name, isHovered);
 
   return (
     <motion.div
       ref={ref}
       onClick={onClick}
-onMouseEnter={() => !isMobile && setIsHovered(true)}
-onMouseLeave={() => !isMobile && setIsHovered(false)}
-
+      onMouseEnter={() => !isMobile && setIsHovered(true)}
+      onMouseLeave={() => !isMobile && setIsHovered(false)}
       whileInView={{ opacity: 1, y: 0 }}
-initial={{ opacity: 0, y: 60 }}
-viewport={{ once: true, margin: "-100px" }}
-
+      initial={{ opacity: 0, y: 60 }}
+      viewport={{ once: true, margin: "-100px" }}
       transition={{ duration: 0.5, delay: index * 0.05, ease: "easeOut" }}
       style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
       className="speaker-card"
@@ -178,19 +137,19 @@ viewport={{ once: true, margin: "-100px" }}
 
       <div className="card-image-container">
         <div className="image-overlay" />
-        <motion.img
-  src={speaker.image}
-  alt={speaker.name}
-  width={400}
-  height={500}
-  loading={index < 6 ? "eager" : "lazy"}
-  decoding="async"
-  fetchPriority={index < 4 ? "high" : "auto"}
-  className="card-image"
-/>
+        <Image
+          ref={imgRef}
+          src={speaker.image}
+          alt={speaker.name}
+          fill
+          sizes="(max-width: 768px) 100vw, 33vw"
+          priority={index < 4}
+          className="card-image"
+          style={{ objectFit: "cover" }}
+        />
 
         <div className="holographic-overlay" />
-        <div className="category-badge">{speaker.category}</div>
+        <div className="">{speaker.category}</div>
       </div>
 
       <div className="card-content">
@@ -199,10 +158,9 @@ viewport={{ once: true, margin: "-100px" }}
           <span className="speaker-tag">SPEAKER</span>
         </div>
 
-        <h3 className="speaker-name">{scrambledName}</h3>
+        <h3 className="speaker-name">{speaker.name}</h3>
 
         <div className="topic-container">
-          <Sparkles size={14} className="topic-icon" />
           <p className="speaker-topic">{speaker.topic}</p>
         </div>
 

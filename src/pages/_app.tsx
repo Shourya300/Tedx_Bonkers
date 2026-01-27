@@ -1,5 +1,6 @@
 import { ThemeProvider } from "next-themes";
 import "@/styles/globals.css";
+import "@/components/DomeGallery/DomeGallery.css";
 
 import Navbar from "@/components/Navbar/Navbar";
 import CustomCursor from "@/components/ui/CustomCursor";
