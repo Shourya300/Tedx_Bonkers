@@ -11,30 +11,30 @@ const CURSOR_STYLES = {
     borderRadius: "9999px",
     backgroundColor: "rgba(255,255,255,1)",
     border: "2px solid rgba(255,255,255,0)",
-    boxShadow: "0 0 16px 6px rgba(255,255,255,0.7)", // white glow
-    duration: 0,
+    boxShadow: "none",
+    duration: 0.15,
   },
   underline: {
     borderRadius: "0px",
     backgroundColor: "rgba(255,255,255,1)",
     border: "none",
-    boxShadow: "0 0 10px 3px rgba(255,255,255,0.6)", // white glow
-    duration: 0,
+    boxShadow: "none",
+    duration: 0.15,
   },
   interactive: {
     borderRadius: "999px",
     backgroundColor: "rgba(255,255,255,0.9)",
     border: "none",
-    boxShadow: "0 0 16px 6px rgba(255,255,255,0.7)", // white glow
-    duration: 0,
+    boxShadow: "none",
+    duration: 0.15,
   },
 };
 
 const CURSOR_SIZES = {
-  default: { width: 8, height: 8, duration: 0 },
-  text: { width: 3, height: 16, duration: 0 },
-  card: { width: 24, height: 24, duration: 0 },
-  underline: { width: 0, height: 2, duration: 0 }, // width calculated dynamically
+  default: { width: 16, height: 16, duration: 0.25 },
+  text: { width: 6, height: 28, duration: 0.25 },
+  card: { width: 40, height: 40, duration: 0.3 },
+  underline: { width: 0, height: 2, duration: 0.25 }, // width calculated dynamically
 };
 
 export default function CustomCursor() {
@@ -114,31 +114,22 @@ export default function CustomCursor() {
         targetY = rect.bottom;
       }
 
-      gsap.to(cursor, {
-        x: targetX,
-        y: targetY,
-        width: size.width,
-        height: size.height,
-        duration: 0,
-        ease: "none",
-        overwrite: "auto",
-      });
-    },
-    [setCursorMode],
-  );
+    gsap.to(cursor, {
+      x: targetX,
+      y: targetY,
+      duration: 0.02,
+      ease: "linear",
+      overwrite: "auto",
+    });
 
-  useEffect(() => {
-    // Reset idle state on mount to prevent stale state from previous page
-    scrollSync.isLensIdle = false;
-    setIsHidden(false);
-
-    // Initial style application
-    if (cursorRef.current) {
-      gsap.set(cursorRef.current, {
-        ...CURSOR_STYLES.default,
-      });
-    }
-  }, []);
+    gsap.to(cursor, {
+      width: size.width,
+      height: size.height,
+      duration: size.duration,
+      ease: "power3.out",
+      overwrite: "auto",
+    });
+  }, [setCursorMode]);
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);

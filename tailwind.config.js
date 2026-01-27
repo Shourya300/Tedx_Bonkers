@@ -42,8 +42,16 @@ module.exports = {
   			sm: 'calc(var(--radius) - 4px)'
   		},
   		colors: {
+  			navy: '#132440',
+  			"ted-red": "#eb0028",
+  			"text-color": "var(--text-color)",
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
+  			ted: {
+  				red: "var(--ted-red)",
+  				"dark-red": "var(--ted-dark-red)",
+  				"official-red": "var(--ted-official-red)",
+  			},
   			card: {
   				DEFAULT: 'hsl(var(--card))',
   				foreground: 'hsl(var(--card-foreground))'
