@@ -22,6 +22,8 @@ export default function EventTimeline() {
           className="object-contain"
         />
       </div>
+      <Footer />
     </>
   );
+import Footer from "@/components/Footer/Footer";
 }

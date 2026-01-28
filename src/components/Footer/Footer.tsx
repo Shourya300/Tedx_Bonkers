@@ -9,20 +9,21 @@ import Image from "next/image";
 
 const Footer = () => {
   return (
-    <footer className="relative bg-gradient-to-br from-[#222222] to-[#181818] backdrop-blur-lg border border-white/10 p-8 shadow-lg text-white">
-      <div className="container mx-auto space-y-12">
+    <footer className="relative bg-gradient-to-br from-[#222222] to-[#181818] backdrop-blur-lg border border-white/10 p-2 shadow-lg text-white">
+      <div className="container mx-auto space-y-2">
         {/* Top Section */}
-        <div className="flex flex-wrap justify-between items-start space-y-8 md:space-y-0">
+        <div className="flex flex-wrap justify-between items-start space-y-2 md:space-y-0">
           {/* Logo */}
-          <div className="flex flex-col items-start w-full md:w-auto">
+          <div className="flex flex-col items-center w-full md:w-auto relative justify-center" style={{ minHeight: 0 }}>
             <Image
-              src="/images/logo-rights.png"
+              src="/images/logo-white.png"
               alt="TEDx Logo"
-              width={290}
-              height={290}
+              width={260}
+              height={260}
+              style={{ maxHeight: 64, width: "auto" }}
             />
-            <p className="mt-4 text-sm text-white/80">
-              Ideas Worth Spreading. Join the movement.
+            <p className="mt-1 text-xs text-white/80 text-center">
+              Ideas Worth Spreading.
             </p>
           </div>
 
@@ -32,15 +33,9 @@ const Footer = () => {
             <nav className="flex flex-col space-y-2">
               <Link
                 href="/speakers"
-                className="hover:underline hover:text-red-500"
+                className="hover:underline hover:text-red-500 py-1 text-base"
               >
                 Speakers
-              </Link>
-              <Link
-                href="/sponsor"
-                className="hover:underline hover:text-red-500"
-              >
-                Sponsors
               </Link>
               <Link
                 href="/rewind"
@@ -59,6 +54,12 @@ const Footer = () => {
                 className="hover:underline hover:text-red-500"
               >
                 About
+              </Link>
+              <Link
+                href="/register"
+                className="hover:underline hover:text-red-500"
+              >
+                Tickets
               </Link>
             </nav>
           </div>
@@ -82,7 +83,7 @@ const Footer = () => {
                   href="tel:+1234567890"
                   className="hover:underline hover:text-red-500"
                 >
-                  +91 93155 08567
+                  +91 98993 95178
                 </a>
               </p>
               <p>
@@ -97,7 +98,7 @@ const Footer = () => {
         <hr className="border-t border-white/20" />
 
         {/* Socials */}
-        <div className="flex justify-center space-x-6">
+        <div className="flex justify-center space-x-4 mt-2">
           <a
             href="https://www.facebook.com/tedxniituniversity/"
             aria-label="Facebook"
@@ -134,7 +135,7 @@ const Footer = () => {
       </div>
 
       {/* Vertical Year */}
-      <div className="absolute top-1/2 right-4 transform -translate-y-1/2 rotate-90 text-lg font-bold text-white/50 hidden md:block">
+      <div className="absolute top-1/2 right-2 transform -translate-y-1/2 rotate-90 text-xs font-bold text-white/40 hidden md:block">
         © 2025
       </div>
     </footer>

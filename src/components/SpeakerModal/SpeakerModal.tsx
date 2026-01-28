@@ -105,30 +105,6 @@ export function SpeakerModal({ speaker, onClose }: SpeakerModalProps) {
                   <h4 className="modal-section-label">Biography</h4>
                   <p className="modal-full-bio">{speaker.bio}</p>
                 </div>
-
-                <div className="modal-social-section">
-                  <h4 className="modal-section-label">Connect</h4>
-                  <div className="modal-full-social">
-                    <a
-                      href={speaker.linkedin}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="modal-social-link"
-                    >
-                      <Linkedin size={20} />
-                      <span>LinkedIn</span>
-                    </a>
-                    <a
-                      href={speaker.twitter}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="modal-social-link"
-                    >
-                      <Twitter size={20} />
-                      <span>Twitter</span>
-                    </a>
-                  </div>
-                </div>
               </motion.div>
             </div>
           </div>

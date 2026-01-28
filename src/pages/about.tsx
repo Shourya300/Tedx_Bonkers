@@ -10,6 +10,7 @@ import React, {
 import Image from "next/image";
 import { motion, useMotionValue, useSpring } from "framer-motion";
 import Silk from "../components/Silk/Silk";
+import Footer from "@/components/Footer/Footer";
 
 interface Shape {
   id: number;
@@ -278,33 +279,17 @@ export default function AboutPage() {
 
   return (
     <div className="relative min-h-screen w-full bg-black text-white font-sans selection:bg-red-600 overflow-x-hidden">
-      {/* Background */}
-      <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
-        {shapesRef.current.map((shape) => (
-          <motion.div
-            key={shape.id}
-            className={`absolute ${shape.color} transition-all duration-500`}
-            style={{
-              left: shape.x,
-              top: shape.y,
-              width: shape.size,
-              height: shape.size,
-              borderWidth: 2,
-              borderRadius:
-                shape.type === "circle"
-                  ? "50%"
-                  : shape.type === "square"
-                    ? "8px"
-                    : "0",
-              transform: shape.type === "rhombus" ? "rotate(45deg)" : "none",
-              boxShadow: shape.glow
-                ? `0 0 20px ${shape.color.includes("red") ? "rgba(239, 68, 68, 0.6)" : "rgba(255, 255, 255, 0.5)"}`
-                : "none",
-              opacity: shape.glow ? 0.8 : 0.5,
-            }}
-          />
-        ))}
-
+      {/* Gradient Background Layer */}
+      <div
+        className="pointer-events-none fixed inset-0 z-0 overflow-hidden"
+        style={{
+          background:
+            `radial-gradient(circle at 100% 100%, rgba(30,64,175,0.65) 0%, rgba(30,64,175,0.10) 12%, rgba(0,0,0,0) 22%),
+             radial-gradient(circle at 0% 0%, rgba(136,19,55,0.48) 0%, rgba(136,19,55,0.08) 12%, rgba(0,0,0,0) 22%),
+             #000`,
+          zIndex: 0,
+        }}
+      >
         <motion.div
           style={{
             x: smoothX,
@@ -606,9 +591,16 @@ export default function AboutPage() {
                 transition={{ delay: 0.6, duration: 0.8 }}
                 className="text-gray-300 text-lg leading-relaxed mb-6"
               >
-                <span className="text-sky-300 font-semibold">SUBLIS</span>{" "}
-                represents the confluence of ideas and innovation—where great
-                minds converge like water molecules finding harmony.
+                Rooted in the theme
+                <span className="text-sky-300 font-semibold">
+                  {" "}
+                  SUBLIS - What moves beneath, Moves us all
+                </span>{" "}
+                the event explores the unseen forces that shape our thoughts,
+                actions, and communities. Through powerful ideas and shared
+                experiences, it brings what lies beneath the surface into
+                conversation. A platform where hidden movements inspire visible
+                change.
               </motion.p>
               <motion.div
                 initial={{ width: 0 }}
@@ -687,6 +679,8 @@ export default function AboutPage() {
           </div>
         </section>
       </main>
+
+      <Footer />
 
       <style jsx global>{`
         /* headline closer to your reference */

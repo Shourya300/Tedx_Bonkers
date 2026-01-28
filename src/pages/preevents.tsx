@@ -9,6 +9,7 @@ import {
 import { ChevronDown } from "lucide-react";
 import Hyperspeed from "@/components/HyperSpeed/Hyperspeed";
 import Image from "next/image";
+import Footer from "@/components/Footer/Footer";
 
 interface Event {
   id: number;
@@ -344,15 +345,15 @@ const TedxRippleWebsite = () => {
                     {activeEvent.title}
                   </h2>
 
-                  <p className="text-base md:text-2xl text-gray-200 leading-relaxed mb-6 md:mb-8">
+                  <p className="text-base md:text-2xl text-gray-200 leading-relaxed mb-10 md:mb-14">
                     {activeEvent.description}
                   </p>
 
-                  <div className="flex flex-row justify-center gap-6 md:gap-10 mt-2 md:mt-4 flex-wrap">
+                  <div className="flex flex-row justify-center gap-5 md:gap-8 mt-2 md:mt-4 flex-wrap">
                     {activeEvent.images.map((imgSrc, index) => (
                       <div
                         key={index}
-                        className="relative w-[40vw] md:w-[370px] h-[150px] md:h-[250px] rounded-xl overflow-hidden shadow-2xl hover:scale-105 transition-transform duration-300 cursor-pointer border border-white/20"
+                        className="relative w-[36vw] md:w-[280px] h-[120px] md:h-[180px] rounded-xl overflow-hidden shadow-2xl hover:scale-105 transition-transform duration-300 cursor-pointer border border-white/20"
                         onClick={(e) => {
                           e.stopPropagation();
                           setSelectedImageIndex(index);
@@ -362,7 +363,7 @@ const TedxRippleWebsite = () => {
                           src={imgSrc}
                           alt={`Event image ${index + 1}`}
                           fill
-                          sizes="(max-width: 768px) 40vw, 370px"
+                          sizes="(max-width: 768px) 36vw, 280px"
                           className="object-cover"
                           priority={index === 0}
                         />
@@ -375,49 +376,49 @@ const TedxRippleWebsite = () => {
           )}
         </AnimatePresence>
 
-        {/* Hover Dock Navigation */}
-        <div
-          className="fixed bottom-6 md:bottom-8 left-1/2 -translate-x-1/2 z-50 pointer-events-auto max-w-[95vw] md:max-w-max"
-          style={{ fontFamily: "Google Sans Flex, sans-serif" }}
+{/* Hover Dock Navigation – anchored to background */}
+<div
+  className="absolute bottom-6 md:bottom-10 left-1/2 -translate-x-1/2 z-40 pointer-events-auto max-w-[95vw] md:max-w-max"
+  style={{ fontFamily: "Google Sans Flex, sans-serif" }}
+>
+  <div className="flex flex-row items-center gap-2 p-2 bg-neutral-900/60 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl overflow-x-auto custom-scrollbar">
+    {events.map((event) => {
+      const isActive = activeEvent?.id === event.id;
+      return (
+        <button
+          key={event.id}
+          onClick={() => {
+            lastInteractionRef.current = Date.now();
+            setActiveEvent(event);
+
+            if ((window as any).$ && rippleBgRef.current) {
+              const rect = rippleBgRef.current.getBoundingClientRect();
+              const centerX = rect.width / 2;
+              const centerY = rect.height / 2;
+
+              requestAnimationFrame(() => {
+                (window as any)
+                  .$(rippleBgRef.current)
+                  .ripples("drop", centerX, centerY, 60, 0.1);
+              });
+            }
+          }}
+          className={`
+            relative px-4 py-2 md:px-6 md:py-3 rounded-xl text-xs md:text-sm font-medium tracking-wide transition-all duration-300 whitespace-nowrap flex-shrink-0
+            ${
+              isActive
+                ? "bg-white text-black shadow-lg scale-105"
+                : "text-white/70 hover:text-white hover:bg-white/10"
+            }
+          `}
         >
-          <div className="flex flex-row items-center gap-2 p-2 bg-neutral-900/60 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl overflow-x-auto custom-scrollbar">
-            {events.map((event) => {
-              const isActive = activeEvent?.id === event.id;
-              return (
-                <button
-                  key={event.id}
-                  onClick={() => {
-                    lastInteractionRef.current = Date.now(); // Reset idle timer to fade fog
-                    setActiveEvent(event);
+          {event.title}
+        </button>
+      );
+    })}
+  </div>
+</div>
 
-                    // Trigger ripple at center of background
-                    if ((window as any).$ && rippleBgRef.current) {
-                      const rect = rippleBgRef.current.getBoundingClientRect();
-                      const centerX = rect.width / 2;
-                      const centerY = rect.height / 2;
-
-                      requestAnimationFrame(() => {
-                        (window as any)
-                          .$(rippleBgRef.current)
-                          .ripples("drop", centerX, centerY, 60, 0.1);
-                      });
-                    }
-                  }}
-                  className={`
-                  relative px-4 py-2 md:px-6 md:py-3 rounded-xl text-xs md:text-sm font-medium tracking-wide transition-all duration-300 whitespace-nowrap flex-shrink-0
-                  ${
-                    isActive
-                      ? "bg-white text-black shadow-lg scale-105"
-                      : "text-white/70 hover:text-white hover:bg-white/10"
-                  }
-                `}
-                >
-                  {event.title}
-                </button>
-              );
-            })}
-          </div>
-        </div>
 
         <style>{`
                 .click-reveal-bg {
@@ -676,6 +677,7 @@ const TedxRippleWebsite = () => {
                     letter-spacing: 0.1em;
                 }
             `}</style>
+      <Footer />
     </>
   );
 };

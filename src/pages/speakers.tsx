@@ -474,6 +474,8 @@ export default function SpeakersPage() {
       <AnimatePresence></AnimatePresence>
       <BackToTop />
       <SpeakersStyles />
+      <Footer />
     </>
   );
 }
+import Footer from "@/components/Footer/Footer";

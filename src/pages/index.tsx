@@ -386,11 +386,11 @@ export default function Home() {
               </h2>
               <div className="w-36 h-[1px] bg-[#D3D3D3] shadow-[0_0_10px_rgba(230,230,230,230)]" />
               <p className="text-center text-base md:text-[1.6rem] leading-[1.7] max-w-[28.75rem] mx-auto font-medium font-sans tracking-[0.02em] text-[#EAEAEA] mt-4 px-4 md:px-0">
-                Ideas shape the future—and our speakers are the voices leading
-                that change. Meet innovators, thinkers, creators, and
-                storytellers from diverse fields who will take the stage to
-                share powerful ideas worth spreading. Each talk is crafted to
-                spark curiosity, challenge perspectives, and inspire action.
+                From bold ideas to lived experiences, our speakers embody
+                curiosity, resilience, and innovation. Their stories invite you
+                to question, reflect, and see the world through a new lens.
+                Together, they bring perspectives that spark dialogue, challenge
+                assumptions, and leave a lasting impact beyond the stage.
               </p>
               <div className="mt-2">
                 <Link href="/speakers" passHref legacyBehavior>
@@ -413,11 +413,10 @@ export default function Home() {
               </h2>
               <div className="w-48 h-[1px] bg-[#D3D3D3] shadow-[0_0_10px_rgba(230,230,230,230)]" />
               <p className="text-center text-base md:text-[1.6rem] leading-[1.7] max-w-[28.75rem] mx-auto font-medium font-sans tracking-[0.02em] text-[#EAEAEA] mt-4 px-4 md:px-0">
-                Before the main TEDx experience, we bring the community together
-                through engaging pre-events. From workshops and panel
-                discussions to interactive meetups, these sessions are designed
-                to ignite conversations, foster collaboration, and build
-                momentum leading up to the main event.
+                A series of thoughtfully curated moments that built the momentum
+                toward the main stage. From reveals and conversations to
+                celebration and connection, each pre-event shaped the journey.
+                Together, these five chapters led us to the event itself.
               </p>
               <div className="mt-2">
                 <Link href="/preevents" passHref legacyBehavior>
@@ -439,10 +438,11 @@ export default function Home() {
               </h2>
               <div className="w-24 h-[1px] bg-[#D3D3D3] shadow-[0_0_10px_rgba(230,230,230,230)]" />
               <p className="text-center text-base md:text-[1.6rem] leading-[1.7] max-w-[28.75rem] mx-auto font-medium font-sans tracking-[0.02em] text-[#EAEAEA] mt-4 px-4 md:px-0">
-                Rewind is a podcast that explores the intersection of technology
-                and society. From discussions on the latest trends to in-depth
-                analysis of emerging technologies, Rewind offers a unique
-                perspective on the future of our world.
+                A journey through the moments and ideas that defined our past
+                editions. As we mark our 9th year, it reflects the legacy built
+                over time and the stories that continue to inspire. Each chapter
+                reminds us how far we’ve come and sets the tone for what lies
+                ahead.
               </p>
               <div className="mt-2">
                 <Link href="/rewind" passHref legacyBehavior>
@@ -484,16 +484,16 @@ export default function Home() {
           </div>
         </section>
 
-
         <section className="min-h-screen flex items-end md:items-center pointer-events-auto px-6 md:px-12 py-8 md:py-0">
           <div className="max-w-xl mx-auto md:ml-auto md:mr-0 text-center mb-24 md:mb-0">
             <div className="flex flex-col items-center gap-4">
               <div className="w-32 h-[1px] bg-[#D3D3D3] shadow-[0_0_10px_rgba(230,230,230,230)]" />
               <p className="text-center text-base md:text-[1.6rem] leading-[1.7] max-w-[30rem] mx-auto font-medium font-sans tracking-[0.02em] text-[#EAEAEA] mt-4 px-4 md:px-0">
-                Our logo represents the spirit of innovation and connection that
-                defines TEDxNIITUniversity. It embodies the convergence of
-                ideas, technology, and human creativity—symbolizing how diverse
-                perspectives come together to create something extraordinary.
+                The logo embodies Sublis through a fluid droplet that reveals
+                motion within, symbolizing forces often unnoticed yet deeply
+                influential. The wheel inside reflects continuous movement,
+                ideas in flow, reminding us that what moves beneath ultimately
+                moves us all.
               </p>
             </div>
           </div>
