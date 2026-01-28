@@ -137,11 +137,6 @@ const TedxRippleWebsite = () => {
     //     ]
     // },
   ];
-  useEffect(() => {
-    if (!activeEvent) {
-      setActiveEvent(events[0]);
-    }
-  }, []);
 
   useEffect(() => {
     const setVH = () => {
@@ -287,20 +282,47 @@ const TedxRippleWebsite = () => {
               });
             }
 
-            const nextIndex = (clickCount + 1) % events.length;
-            setActiveEvent(events[nextIndex]);
+            // If no active event, start with the first one
+            if (!activeEvent) {
+              setActiveEvent(events[0]);
+              requestAnimationFrame(() => {
+                preloadImages(events[0].images);
+              });
+              setClickCount(0);
+            } else {
+              // Otherwise cycle through events
+              const nextIndex = (clickCount + 1) % events.length;
+              setActiveEvent(events[nextIndex]);
 
-            requestAnimationFrame(() => {
-              preloadImages(events[nextIndex].images);
-            });
-            setClickCount((c) => c + 1);
+              requestAnimationFrame(() => {
+                preloadImages(events[nextIndex].images);
+              });
+              setClickCount((c) => c + 1);
+            }
           }}
         >
           {RippleLayer}
         </div>
 
         <AnimatePresence initial={false} mode="sync">
-          {activeEvent && (
+          {!activeEvent ? (
+            <div className="absolute inset-0 flex items-center justify-center z-40 pointer-events-none">
+              <motion.div
+                key="click-to-reveal"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ duration: 0.6, ease: "easeOut" }}
+              >
+                <h2
+                  className="text-4xl md:text-7xl font-bold text-white tracking-wider"
+                  style={{ fontFamily: "Google Sans Flex, sans-serif" }}
+                >
+                  CLICK TO REVEAL
+                </h2>
+              </motion.div>
+            </div>
+          ) : (
             <div className="absolute inset-0 flex items-center justify-center z-40 pointer-events-none">
               <motion.div
                 key={activeEvent.id}
@@ -367,6 +389,19 @@ const TedxRippleWebsite = () => {
                   onClick={() => {
                     lastInteractionRef.current = Date.now(); // Reset idle timer to fade fog
                     setActiveEvent(event);
+
+                    // Trigger ripple at center of background
+                    if ((window as any).$ && rippleBgRef.current) {
+                      const rect = rippleBgRef.current.getBoundingClientRect();
+                      const centerX = rect.width / 2;
+                      const centerY = rect.height / 2;
+
+                      requestAnimationFrame(() => {
+                        (window as any)
+                          .$(rippleBgRef.current)
+                          .ripples("drop", centerX, centerY, 60, 0.1);
+                      });
+                    }
                   }}
                   className={`
                   relative px-4 py-2 md:px-6 md:py-3 rounded-xl text-xs md:text-sm font-medium tracking-wide transition-all duration-300 whitespace-nowrap flex-shrink-0
@@ -467,27 +502,6 @@ const TedxRippleWebsite = () => {
             style={{ animationDuration: "0.3s" }}
             onClick={() => setSelectedImageIndex(null)}
           >
-            {/* Close Button */}
-            <button
-              className="absolute top-6 right-6 text-white/50 hover:text-white transition-colors"
-              onClick={() => setSelectedImageIndex(null)}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="48"
-                height="48"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <line x1="18" y1="6" x2="6" y2="18"></line>
-                <line x1="6" y1="6" x2="18" y2="18"></line>
-              </svg>
-            </button>
-
             {/* Navigation - Prev */}
             <button
               className={`absolute left-4 md:left-12 p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-all ${selectedImageIndex === 0 ? "opacity-0 pointer-events-none" : "opacity-100"}`}

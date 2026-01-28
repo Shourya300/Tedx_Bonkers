@@ -1,3 +1,4 @@
+"use client";
 import { useEffect, useRef } from "react";
 import {
   Scene,
@@ -380,109 +381,37 @@ export default function FloatingLines({
 
     const setSize = () => {
       const el = containerRef.current;
+      if (!el || !renderer.domElement) return;
+
       const width = el.clientWidth || 1;
       const height = el.clientHeight || 1;
 
       renderer.setSize(width, height, false);
 
-      const canvasWidth = renderer.domElement.width;
-      const canvasHeight = renderer.domElement.height;
-      uniforms.iResolution.value.set(canvasWidth, canvasHeight, 1);
+      uniforms.iResolution.value.set(
+        renderer.domElement.width,
+        renderer.domElement.height,
+        1,
+      );
     };
 
     setSize();
-
-    const ro =
-      typeof ResizeObserver !== "undefined"
-        ? new ResizeObserver(setSize)
-        : null;
-
-    if (ro && containerRef.current) {
-      ro.observe(containerRef.current);
-    }
-
-    const handlePointerMove = (event) => {
-      const rect = renderer.domElement.getBoundingClientRect();
-      const x = event.clientX - rect.left;
-      const y = event.clientY - rect.top;
-      const dpr = renderer.getPixelRatio();
-
-      targetMouseRef.current.set(x * dpr, (rect.height - y) * dpr);
-      targetInfluenceRef.current = 1.0;
-
-      if (parallax) {
-        const centerX = rect.width / 2;
-        const centerY = rect.height / 2;
-        const offsetX = (x - centerX) / rect.width;
-        const offsetY = -(y - centerY) / rect.height;
-        targetParallaxRef.current.set(
-          offsetX * parallaxStrength,
-          offsetY * parallaxStrength,
-        );
-      }
-    };
-
-    const handlePointerLeave = () => {
-      targetInfluenceRef.current = 0.0;
-    };
-
-    if (interactive) {
-      renderer.domElement.addEventListener("pointermove", handlePointerMove);
-      renderer.domElement.addEventListener("pointerleave", handlePointerLeave);
-    }
-
-    let raf = 0;
-    const renderLoop = () => {
-      uniforms.iTime.value = clock.getElapsedTime();
-
-      if (interactive) {
-        currentMouseRef.current.lerp(targetMouseRef.current, mouseDamping);
-        uniforms.iMouse.value.copy(currentMouseRef.current);
-
-        currentInfluenceRef.current +=
-          (targetInfluenceRef.current - currentInfluenceRef.current) *
-          mouseDamping;
-        uniforms.bendInfluence.value = currentInfluenceRef.current;
-      }
-
-      if (parallax) {
-        currentParallaxRef.current.lerp(
-          targetParallaxRef.current,
-          mouseDamping,
-        );
-        uniforms.parallaxOffset.value.copy(currentParallaxRef.current);
-      }
-
-      renderer.render(scene, camera);
-      raf = requestAnimationFrame(renderLoop);
-    };
-    renderLoop();
+    renderer.render(scene, camera);
 
     return () => {
-      cancelAnimationFrame(raf);
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-      if (ro && containerRef.current) {
-        ro.disconnect();
-      }
 
-      if (interactive) {
-        renderer.domElement.removeEventListener(
-          "pointermove",
-          handlePointerMove,
-        );
-        renderer.domElement.removeEventListener(
-          "pointerleave",
-          handlePointerLeave,
-        );
-      }
+      
 
       geometry.dispose();
       material.dispose();
       renderer.dispose();
+
       if (renderer.domElement.parentElement) {
         renderer.domElement.parentElement.removeChild(renderer.domElement);
       }
     };
+
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     linesGradient,
