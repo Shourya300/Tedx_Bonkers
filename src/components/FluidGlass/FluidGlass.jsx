@@ -33,12 +33,23 @@ export default function FluidGlass({
         top: 0,
         left: 0,
         width: "100%",
-        height: "100%",
+        height: "100dvh", // Use dynamic viewport height for mobile compatibility
+        minHeight: "100vh", // Fallback for older browsers
         pointerEvents: "none",
         zIndex: 5,
       }}
     >
-      <Canvas camera={{ position: [0, 0, 20], fov: 15 }} gl={{ alpha: true }}>
+      <Canvas
+        dpr={
+          typeof window !== "undefined" && window.innerWidth < 768 ? 1 : [1, 2]
+        }
+        camera={{ position: [0, 0, 20], fov: 15 }}
+        gl={{
+          alpha: true,
+          antialias: false,
+          powerPreference: "high-performance",
+        }}
+      >
         <ambientLight intensity={0.5} />
         <directionalLight position={[10, 10, 5]} intensity={1.5} />
         <Environment preset="city" />
@@ -57,22 +68,29 @@ const ModeWrapper = memo(function ModeWrapper({
   modeProps = {},
   ...props
 }) {
+  const [isMobile, setIsMobile] = useState(false);
   const ref = useRef();
   const { nodes } = useGLTF(glb);
-  const buffer = useFBO();
+  const buffer = useFBO({
+    resolution: isMobile ? 512 : 1024,
+  });
+
   const { viewport: vp } = useThree();
   const [scene] = useState(() => new THREE.Scene());
   const geoWidthRef = useRef(1);
   const scrollProgressRef = useRef(0);
   const logoRef = useRef();
-  const [isMobile, setIsMobile] = useState(false);
-  const chromaticAberrationRef = useRef(0.15);
+  const chromaticAberrationRef = useRef(0.5);
+  const materialRef = useRef();
+  const lensProgressRef = useRef(0);
 
   // Idle detection for initial state only
   const lastPointerMoveTime = useRef(Date.now());
   const idleTime = useRef(0);
+  const lastThrottledPointerUpdateRef = useRef(0);
+  const POINTER_THROTTLE_MS = 16; // ~60fps throttling
 
-  const logoTexture = useTexture("/images/Landing_Page/TEDx LOGO (NO BG).png");
+  const logoTexture = useTexture("/images/Landing_Page/AuraLogo.png");
 
   // Detect mobile devices
   useEffect(() => {
@@ -98,16 +116,25 @@ const ModeWrapper = memo(function ModeWrapper({
     }
   }, [nodes, geometryKey]);
 
-  // Track pointer movement
+  // Track pointer movement with throttling
   useEffect(() => {
     const handlePointerMove = () => {
-      lastPointerMoveTime.current = Date.now();
-      idleTime.current = 0;
+      const now = Date.now();
+      if (now - lastThrottledPointerUpdateRef.current >= POINTER_THROTTLE_MS) {
+        lastPointerMoveTime.current = now;
+        idleTime.current = 0;
+        lastThrottledPointerUpdateRef.current = now;
+      }
     };
 
     if (typeof window !== "undefined") {
-      window.addEventListener("pointermove", handlePointerMove);
-      return () => window.removeEventListener("pointermove", handlePointerMove);
+      window.addEventListener("pointermove", handlePointerMove, {
+        passive: true,
+      });
+      return () => {
+        window.removeEventListener("pointermove", handlePointerMove);
+        scrollSync.isLensIdle = false; // Reset on unmount
+      };
     }
   }, []);
 
@@ -118,11 +145,22 @@ const ModeWrapper = memo(function ModeWrapper({
     // GSAP in index.tsx is the single source of truth
     const scrollProgress = scrollSync.rawProgress;
 
-    // PHASE 1: Lens growth
-    const lensProgress = Math.min(scrollProgress / PHASE_START, 1);
+    // PHASE 1: Lens growth - mobile takes longer to ensure full screen coverage
+    const phaseStart = isMobile ? 0.65 : 0.45;
+    const lensProgress = Math.min(scrollProgress / phaseStart, 1);
 
-    // PHASE 2: Content movement (synced via scrollSync)
-    const contentProgress = scrollSync.progress;
+    lensProgressRef.current = lensProgress;
+
+    // PHASE 2: Content movement (ONLY after lens is done)
+    // start logo movement when lens is ~45% grown
+    const LOGO_EARLY_START = 0.45;
+
+    const contentProgress =
+      lensProgress < LOGO_EARLY_START
+        ? 0
+        : (lensProgress - LOGO_EARLY_START) / (1 - LOGO_EARLY_START);
+
+    const clampedContentProgress = THREE.MathUtils.clamp(contentProgress, 0, 1);
 
     // Check if user is idle ONLY before scrolling starts
     const timeSinceLastMove = Date.now() - lastPointerMoveTime.current;
@@ -141,36 +179,41 @@ const ModeWrapper = memo(function ModeWrapper({
 
     if (scrollProgress === 0 && isIdle) {
       // Before any scrolling, move randomly in small area at center to hint at hidden content
-      const randomRadius = isMobile ? 0.3 : 0.19;
+      const randomRadius = isMobile ? 0.4 : 0.35;
       const randomSpeed = 0.6;
       destX =
         Math.sin(idleTime.current * randomSpeed) *
         randomRadius *
-        (isMobile ? 0.5 : 1);
+        (isMobile ? 0.3 : 1);
       destY =
         Math.cos(idleTime.current * randomSpeed * 0.7) *
         randomRadius *
-        (isMobile ? 0.8 : 0.5);
-    } else if (lensProgress < 1) {
-      // During lens growth, follow pointer
-      destX = ((pointer.x * v.width) / 2) * (1 - lensProgress);
-      destY = ((pointer.y * v.height) / 2) * (1 - lensProgress);
+        (isMobile ? 0.4 : 0.5);
+    } else if (scrollProgress === 0) {
+      // Before scrolling starts, follow pointer
+      const pointerX = (pointer.x * v.width) / 2;
+      const pointerY = (pointer.y * v.height) / 2;
+
+      destX = pointerX * 0.85;
+      destY = pointerY * 0.85;
     } else {
-      // After lens fully grown, stay centered
+      // Once scrolling starts, move to center and grow from there
       destX = 0;
       destY = 0;
     }
 
-    easing.damp3(ref.current.position, [destX, destY, 15], 0.15, delta);
+    // Continue easing with slightly increased damping for smoother motion
+    easing.damp3(ref.current.position, [destX, destY, 15], 0.12, delta);
 
     /* ---------- LENS SCALE ---------- */
-
     const baseScale = Math.min(
-      0.15,
-      (v.width * 1.2) / (geoWidthRef.current || 1)
+      0.13,
+      (v.width * 0.8) / (geoWidthRef.current || 1),
     );
 
-    const maxScale = (v.width * 3.0) / (geoWidthRef.current || 1);
+    const maxViewportSize = Math.max(v.width, v.height);
+
+    const maxScale = (maxViewportSize * 2.5) / (geoWidthRef.current || 1);
 
     const targetScale = THREE.MathUtils.lerp(baseScale, maxScale, lensProgress);
 
@@ -182,72 +225,77 @@ const ModeWrapper = memo(function ModeWrapper({
 
     /* ---------- LOGO MOVE (AFTER LENS FULL) ---------- */
 
-    // Logo reaches destination in the first 50% of content scroll, then stays fixed
-    const LOGO_PHASE_DURATION = 0.5;
-    const logoShiftProgress = THREE.MathUtils.clamp(
-      contentProgress / LOGO_PHASE_DURATION,
-      0,
-      1
-    );
+    const LOGO_PHASE_DURATION = isMobile ? 0.5 : 0.3;
+    const logoShiftProgress = THREE.MathUtils.clamp(contentProgress, 0, 1);
 
-    // Chromatic aberration reduces during logo movement phase
-    const aberrationProgress = THREE.MathUtils.clamp(
-      contentProgress / LOGO_PHASE_DURATION,
+    // Chromatic aberration reduces as user scrolls down from the very beginning
+    const aberrationProgress = THREE.MathUtils.smoothstep(
+      scrollProgress,
       0,
-      1
+      0.3,
     );
 
     const targetChromaticAberration = THREE.MathUtils.lerp(
-      0.4, // strong distortion at start
-      0.001, // crystal clear
-      aberrationProgress
+      0.6, // blurry at start
+      0.0005, // crystal clear
+      aberrationProgress,
     );
 
     easing.damp(
       chromaticAberrationRef,
       "current",
       targetChromaticAberration,
-      0.6,
-      delta
-    );
-    easing.damp(
-      chromaticAberrationRef,
-      "current",
-      targetChromaticAberration,
-      0.5,
-      delta
+      0.4,
+      delta,
     );
 
-    // Target position - use actual viewport at logo's z position
+    // 🔑 force material uniform update every frame
+    if (materialRef.current) {
+      materialRef.current.chromaticAberration = chromaticAberrationRef.current;
+    }
+
     const logoViewport = viewport.getCurrentViewport(camera, [0, 0, -59.5]);
 
     if (logoRef.current) {
-      if (isMobile) {
-        // On mobile, move logo up slightly
-        const targetLogoY = THREE.MathUtils.lerp(
-          -3,
-          logoViewport.height * 0.15,
-          logoShiftProgress
-        );
-        logoRef.current.position.x = 0;
-        logoRef.current.position.y = targetLogoY;
-      } else {
-        // On desktop, move logo left
-        const targetLogoX = THREE.MathUtils.lerp(
-          0,
-          -logoViewport.width * 0.25,
-          logoShiftProgress
-        );
-        logoRef.current.position.x = targetLogoX;
-        logoRef.current.position.y = -1;
+      if (logoRef.current) {
+        if (isMobile) {
+          // MOBILE: logo moves UP only
+          const logoStart = 0.78;
+          const logoEnd = 0.92;
+
+          const logoUpProgress = THREE.MathUtils.clamp(
+            (scrollProgress - logoStart) / (logoEnd - logoStart),
+            0,
+            1,
+          );
+
+          const targetLogoY = THREE.MathUtils.lerp(0, 3.5, logoUpProgress);
+
+          easing.damp(logoRef.current.position, "y", targetLogoY, 0.25, delta);
+          easing.damp(logoRef.current.position, "x", 0, 0.25, delta);
+        } else {
+          // DESKTOP: lock Y to center, animate X only
+          logoRef.current.position.y = -0.5;
+
+          const targetLogoX = THREE.MathUtils.lerp(
+            0,
+            -logoViewport.width * 0.18,
+            logoShiftProgress,
+          );
+
+          easing.damp(logoRef.current.position, "x", targetLogoX, 0.3, delta);
+        }
       }
     }
 
-    /* ---------- FBO RENDER ---------- */
+    const shouldRenderBuffer = lensProgress < 1 || scrollProgress < 0.9;
 
-    gl.setRenderTarget(buffer);
-    gl.render(scene, camera);
-    gl.setRenderTarget(null);
+    if (shouldRenderBuffer) {
+      gl.setRenderTarget(buffer);
+      gl.render(scene, camera);
+      gl.setRenderTarget(null);
+    }
+
     gl.setClearColor(0x000000, 0);
   });
 
@@ -267,18 +315,22 @@ const ModeWrapper = memo(function ModeWrapper({
     <>
       {createPortal(
         <>
-          <BackgroundPlane isMobile={isMobile} />
+          <BackgroundPlane
+            isMobile={isMobile}
+            lensProgress={lensProgressRef.current}
+          />
           <mesh
             ref={logoRef}
-            position={[0, isMobile ? -3 : -3, -59.5]}
-            scale={isMobile ? 1 : 1.5}
+            position={[0, isMobile ? 0 : -3, -59.5]}
+            scale={isMobile ? 1.4 : 1.5}
+            renderOrder={2}
           >
-            <planeGeometry args={isMobile ? [10, 10] : [13, 13]} />
+            <planeGeometry args={isMobile ? [15, 10] : [21, 15]} />
             <meshBasicMaterial map={logoTexture} transparent />
           </mesh>
           {children}
         </>,
-        scene
+        scene,
       )}
       <mesh scale={[vp.width, vp.height, 1]}>
         <planeGeometry />
@@ -297,16 +349,16 @@ const ModeWrapper = memo(function ModeWrapper({
         {...props}
       >
         <MeshTransmissionMaterial
+          ref={materialRef}
           buffer={buffer.texture}
-          ior={ior ?? 1.1}
-          thickness={thickness ?? 0.7}
-          anisotropy={anisotropy ?? 0.1}
-          chromaticAberration={
-            chromaticAberration ?? chromaticAberrationRef.current
-          }
+          ior={ior ?? 1.05}
+          thickness={isMobile ? 0.4 : 0.7}
+          anisotropy={isMobile ? 0 : 0.1}
+          chromaticAberration={chromaticAberrationRef.current}
           transmission={1}
           roughness={0}
           attenuationDistance={0.8}
+          samples={isMobile ? 4 : 8}
           {...extraMat}
         />
       </mesh>

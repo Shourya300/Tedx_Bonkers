@@ -29,7 +29,7 @@
     "**/*.tsx",
     "src/components/AnimatedBackground/AnimatedBackground.js",
     "src/components/ThreeScene/threescene.js"
-  ],
+, "src/components/ComputerScene/Computers.js"  ],
   "exclude": [
     "node_modules"
   ]
