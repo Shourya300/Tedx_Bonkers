@@ -248,8 +248,8 @@ export default function Home() {
               if (scrollProgress >= logoSectionStartScrollProgress) {
                 const logoSectionProgress = Math.min(
                   (scrollProgress - logoSectionStartScrollProgress) /
-                  (logoSectionEndScrollProgress -
-                    logoSectionStartScrollProgress),
+                    (logoSectionEndScrollProgress -
+                      logoSectionStartScrollProgress),
                   1,
                 );
 

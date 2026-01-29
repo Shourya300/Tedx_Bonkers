@@ -232,7 +232,7 @@ const ModeWrapper = memo(function ModeWrapper({
     const aberrationProgress = THREE.MathUtils.smoothstep(
       scrollProgress,
       0,
-      0.6,
+      0.3,
     );
 
     const targetChromaticAberration = THREE.MathUtils.lerp(

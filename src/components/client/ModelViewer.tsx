@@ -23,9 +23,8 @@ export default function ModelViewer({ url }: { url: string }) {
             <h1
               style={{ 
                 fontFamily: "logoFont",
-                
               }}
-              className="my-0 text-[#9DEEFF] text-[70px] md:text-[200px] font-bold opacity-100 leading-none"
+              className="my-0 text-[#9DEEFF] font-bold opacity-100 leading-none text-[clamp(3.5rem,14vw,12.5rem)]"
             >
               SUBLIS
             </h1>
@@ -36,9 +35,9 @@ export default function ModelViewer({ url }: { url: string }) {
                 marginTop: "-1rem",
                 lineHeight: "1",
               }}
-              className="text-[#111111] text-[20px] md:text-[40px] my-0 leading-none"
+              className="text-[#111111] my-0 leading-none text-[clamp(1rem,4vw,2.5rem)]"
             >
-              
+              {/* Add subtitle text here if needed */}
             </p>
           </div>
         </div>

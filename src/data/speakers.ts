@@ -117,7 +117,7 @@ export const speakers: Speaker[] = [
   {
     id: 10,
     name: "Shefali Chopra",
-    role: "Empathy",
+    role: "Empathetic Storyteller",
     topic: "",
     category: "",
     bio: "Shefali Chopra is a TEDx speaker, writer, and mentor dedicated to conscious living. Known by her storytelling persona Ramta Ram, she uses narrative to inspire personal growth, reduce anxiety, and build deep human connection. With a global academic background across India, the Middle East, and Europe, she has become a voice for environmental awareness, mental well-being, and social responsibility. An organ donor and mentor to aspiring speakers and educators, she continues to inspire hope, empathy, and responsible living toward society and the planet.",
