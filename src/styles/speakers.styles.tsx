@@ -947,7 +947,7 @@ export const SpeakersStyles = () => (
 
       /* Mobile Font Sizes */
       .title-letter {
-        font-size: clamp(2.5rem, 10vw, 3rem);
+        font-size: clamp(3.2rem, 13vw, 4.2rem);
       }
       .hero-subtitle {
         font-size: 0.9rem;
@@ -979,7 +979,7 @@ export const SpeakersStyles = () => (
 
     @media (max-width: 480px) {
       .title-letter {
-        font-size: clamp(1.5rem, 12vw, 2.3rem);
+        font-size: clamp(2.2rem, 16vw, 3.2rem);
       }
       .hero-subtitle {
         font-size: 0.8rem;

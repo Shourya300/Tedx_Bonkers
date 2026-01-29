@@ -381,12 +381,13 @@ export default function SpeakersPage() {
           style={{ opacity: heroOpacity, scale: heroScale, y: heroY }}
         >
           <motion.h1
-            className="hero-title"
+            className="hero-title responsive-hero-title"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3 }}
           >
-            {"Meet Our Speakers".split("").map((letter, i) => (
+            {/* On mobile, break after 'Meet Our' */}
+            <span className="block md:inline">{[...'Meet Our '].map((letter, i) => (
               <motion.span
                 key={i}
                 initial={{ opacity: 0, y: 40 }}
@@ -400,7 +401,22 @@ export default function SpeakersPage() {
               >
                 {letter === " " ? "\u00A0" : letter}
               </motion.span>
-            ))}
+            ))}</span>
+            <span className="block md:inline">{[...'Speakers'].map((letter, i) => (
+              <motion.span
+                key={i + 9}
+                initial={{ opacity: 0, y: 40 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{
+                  delay: 0.3 + (i + 9) * 0.02,
+                  duration: 0.5,
+                  ease: "easeOut",
+                }}
+                className="title-letter"
+              >
+                {letter === " " ? "\u00A0" : letter}
+              </motion.span>
+            ))}</span>
           </motion.h1>
 
           <motion.p
@@ -474,6 +490,26 @@ export default function SpeakersPage() {
       <AnimatePresence></AnimatePresence>
       <BackToTop />
       <SpeakersStyles />
+      <style jsx global>{`
+        .responsive-hero-title {
+          font-size: 2.5rem;
+        }
+        @media (max-width: 640px) {
+          .responsive-hero-title {
+            font-size: 2.8rem;
+            line-height: 1.1;
+            text-align: center;
+          }
+          .responsive-hero-title span.block {
+            display: block;
+          }
+        }
+        @media (max-width: 420px) {
+          .responsive-hero-title {
+            font-size: 2.1rem;
+          }
+        }
+      `}</style>
       <Footer />
     </>
   );
