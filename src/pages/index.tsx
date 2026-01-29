@@ -1,5 +1,5 @@
 "use client";
-import { MetalButton } from "@/components/metal-button";
+import { MetalButton } from "@/components/ui/metal-button";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { useRef, useEffect, useLayoutEffect, useState } from "react";
@@ -248,8 +248,8 @@ export default function Home() {
               if (scrollProgress >= logoSectionStartScrollProgress) {
                 const logoSectionProgress = Math.min(
                   (scrollProgress - logoSectionStartScrollProgress) /
-                    (logoSectionEndScrollProgress -
-                      logoSectionStartScrollProgress),
+                  (logoSectionEndScrollProgress -
+                    logoSectionStartScrollProgress),
                   1,
                 );
 

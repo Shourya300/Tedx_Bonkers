@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { MetalButton } from "../metal-button";
+import { MetalButton } from "@/components/ui/metal-button";
 import { useState, useRef, useEffect } from "react";
 import gsap from "gsap";
 
@@ -115,19 +115,16 @@ export default function Navbar() {
         aria-label="Toggle menu"
       >
         <span
-          className={`w-6 h-0.5 bg-white transition-all duration-300 ${
-            isMenuOpen ? "rotate-45 translate-y-2" : ""
-          }`}
+          className={`w-6 h-0.5 bg-white transition-all duration-300 ${isMenuOpen ? "rotate-45 translate-y-2" : ""
+            }`}
         ></span>
         <span
-          className={`w-6 h-0.5 bg-white transition-all duration-300 ${
-            isMenuOpen ? "opacity-0" : ""
-          }`}
+          className={`w-6 h-0.5 bg-white transition-all duration-300 ${isMenuOpen ? "opacity-0" : ""
+            }`}
         ></span>
         <span
-          className={`w-6 h-0.5 bg-white transition-all duration-300 ${
-            isMenuOpen ? "-rotate-45 -translate-y-2" : ""
-          }`}
+          className={`w-6 h-0.5 bg-white transition-all duration-300 ${isMenuOpen ? "-rotate-45 -translate-y-2" : ""
+            }`}
         ></span>
       </button>
 

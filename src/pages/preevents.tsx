@@ -55,7 +55,7 @@ const TedxRippleWebsite = () => {
         ref={rippleBgRef}
         className="absolute inset-0 z-20 pointer-events-auto bg-image-responsive"
         style={{
-          backgroundImage: "url('/images/test/tpe.png')",
+          backgroundImage: "url('/preevents/tpe.png')",
           backgroundSize: "cover",
           backgroundPosition: "center",
           backgroundRepeat: "no-repeat",

@@ -3,34 +3,24 @@ import { useGesture } from "@use-gesture/react";
 import Image from "next/image";
 
 const DEFAULT_IMAGES = [
-  {
-    src: "/images/DomeGallery/DSC02023.JPG",
-    alt: "Abstract art",
-  },
-  {
-    src: "/images/DomeGallery/IMG_2119.jpg",
-    alt: "Modern sculpture",
-  },
-  {
-    src: "/images/DomeGallery/DSC02141.JPG",
-    alt: "Digital artwork",
-  },
-  {
-    src: "/images/DomeGallery/DSC02064.JPG",
-    alt: "Contemporary art",
-  },
-  {
-    src: "/images/rewindhero.jpeg",
-    alt: "Geometric pattern",
-  },
-  {
-    src: "/gallery/2024/pic10.JPG",
-    alt: "Textured surface",
-  },
-  {
-    src: "/gallery/2024/pic12.JPG",
-    alt: "Social media image",
-  },
+  { src: "/images/DomeGallery/DSC02023.JPG", alt: "Gallery Image" },
+  { src: "/images/DomeGallery/DSC02064.JPG", alt: "Gallery Image" },
+  { src: "/images/DomeGallery/DSC02141.JPG", alt: "Gallery Image" },
+  { src: "/images/DomeGallery/IMG_2119.jpg", alt: "Gallery Image" },
+  { src: "/images/DomeGallery/pic.JPG", alt: "Gallery Image" },
+  { src: "/images/DomeGallery/pic2.JPG", alt: "Gallery Image" },
+  { src: "/images/DomeGallery/pic3.JPG", alt: "Gallery Image" },
+  { src: "/images/DomeGallery/pic4.JPG", alt: "Gallery Image" },
+  { src: "/images/DomeGallery/pic5.JPG", alt: "Gallery Image" },
+  { src: "/images/DomeGallery/pic6.JPG", alt: "Gallery Image" },
+  { src: "/images/DomeGallery/pic7.JPG", alt: "Gallery Image" },
+  { src: "/images/DomeGallery/pic8.JPG", alt: "Gallery Image" },
+  { src: "/images/DomeGallery/pic9.JPG", alt: "Gallery Image" },
+  { src: "/images/DomeGallery/pic10.JPG", alt: "Gallery Image" },
+  { src: "/images/DomeGallery/pic11.JPG", alt: "Gallery Image" },
+  { src: "/images/DomeGallery/pic12.JPG", alt: "Gallery Image" },
+  { src: "/images/DomeGallery/pic13.JPG", alt: "Gallery Image" },
+  { src: "/images/DomeGallery/rewindhero.jpeg", alt: "Gallery Image" },
 ];
 
 const DEFAULTS = {
