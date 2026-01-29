@@ -1,3 +1,4 @@
+
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
 
 @import "./SpeakerModal.responsive.css";
@@ -20,7 +21,17 @@
  * - CSS classes: Use dvh directly for fixed/sticky containers
  *
  * Browser Support: Chrome 108+, Safari 15.4+, Firefox 101+
+
+ 
  */
+
+ @font-face {
+  font-family: 'logoFontLight';
+  src: url('/fonts/TitlingGothicFBWide-Light-AF65ddb13640c00 (1).otf') format('opentype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
 
 @font-face {
   font-family: 'logoFont';

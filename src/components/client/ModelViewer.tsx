@@ -24,20 +24,21 @@ export default function ModelViewer({ url }: { url: string }) {
               style={{ 
                 fontFamily: "logoFont",
               }}
-              className="my-0 text-[#9DEEFF] font-bold opacity-100 leading-none text-[clamp(3.5rem,14vw,12.5rem)]"
+              className="my-0 text-[#9DEEFF] font-bold opacity-100 leading-none text-[clamp(4rem,14vw,12.5rem)]"
             >
               SUBLIS
             </h1>
             <p
-              style={{ 
-                fontFamily: "logoFont",
-                wordSpacing: "0.9rem",
-                marginTop: "-1rem",
-                lineHeight: "1",
+              style={{
+                fontFamily: "logoFontLight",
+                wordSpacing: "clamp(0.3rem, 1.5vw, 1.9rem)",
+                transform: "translateY(clamp(-0.2rem, -1vw, -1.1rem))",
+                lineHeight: "1.1",
+                letterSpacing: "0.03em"
               }}
-              className="text-[#111111] my-0 leading-none text-[clamp(1rem,4vw,2.5rem)]"
+              className="text-[#111111] my-0 leading-none text-[clamp(0.7rem,3vw,2rem)] whitespace-nowrap"
             >
-              {/* Add subtitle text here if needed */}
+              WHAT MOVES BENEATH MOVES US ALL
             </p>
           </div>
         </div>

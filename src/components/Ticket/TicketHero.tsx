@@ -1,4 +1,4 @@
-import ShinyText from "./ShinyText";
+  import ShinyText from "./ShinyText";
 import FaultyTerminal from "./FaultyTerminal";
 
 const TicketHero = () => {
@@ -43,7 +43,7 @@ const TicketHero = () => {
               yoyo={false}
               pauseOnHover={false}
               disabled={false}
-              className="font-bold text-9xl pointer-events-auto"
+              className="font-bold text-8xl md:text-9xl pointer-events-auto"
             />
             <h2 className="text-[#b5b5b5] text-3xl">NOW</h2>
           </div>

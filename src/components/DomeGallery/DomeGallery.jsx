@@ -138,6 +138,7 @@ export default function DomeGallery({
   const openingRef = useRef(false);
   const openStartedAtRef = useRef(0);
   const lastDragEndAt = useRef(0);
+  const lastInteractionRef = useRef(performance.now());
 
   const scrollLockedRef = useRef(false);
   const lockScroll = useCallback(() => {
@@ -304,8 +305,10 @@ export default function DomeGallery({
     {
       onDragStart: ({ event }) => {
         if (focusedElRef.current) return;
+        lastInteractionRef.current = performance.now(); // ← ADD
         stopInertia();
         const evt = event;
+
         draggingRef.current = true;
         movedRef.current = false;
         startRotRef.current = { ...rotationRef.current };
@@ -347,6 +350,8 @@ export default function DomeGallery({
           applyTransform(nextX, nextY);
         }
         if (last) {
+          lastInteractionRef.current = performance.now(); // ← ADD
+
           draggingRef.current = false;
           let [vMagX, vMagY] = velocity;
           const [dirX, dirY] = direction;
@@ -370,6 +375,43 @@ export default function DomeGallery({
     },
     { target: mainRef, eventOptions: { passive: true } },
   );
+
+  useEffect(() => {
+    let rafId;
+
+    const AUTO_ROTATE_SPEED = 0.05; // degrees per frame
+    const AUTO_ROTATE_DELAY = 2000; // ms after interaction
+
+    const tick = () => {
+      const now = performance.now();
+
+      const isDragging = draggingRef.current;
+      const isInertiaRunning = inertiaRAF.current !== null;
+      const isOpening =
+        rootRef.current?.getAttribute("data-enlarging") === "true";
+
+      const idle = now - lastInteractionRef.current > AUTO_ROTATE_DELAY;
+
+      if (!isDragging && !isInertiaRunning && !isOpening && idle) {
+        const nextY = wrapAngleSigned(
+          rotationRef.current.y + AUTO_ROTATE_SPEED,
+        );
+
+        rotationRef.current = {
+          x: rotationRef.current.x,
+          y: nextY,
+        };
+
+        applyTransform(rotationRef.current.x, nextY);
+      }
+
+      rafId = requestAnimationFrame(tick);
+    };
+
+    rafId = requestAnimationFrame(tick);
+
+    return () => cancelAnimationFrame(rafId);
+  }, []);
 
   useEffect(() => {
     const scrim = scrimRef.current;
@@ -480,6 +522,8 @@ export default function DomeGallery({
   const openItemFromElement = useCallback(
     (el) => {
       if (openingRef.current) return;
+      lastInteractionRef.current = performance.now(); // ← ADD
+
       openingRef.current = true;
       openStartedAtRef.current = performance.now();
       lockScroll();
