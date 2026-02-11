@@ -148,7 +148,11 @@ export function SpeakerCard({ speaker, onClick, index }: SpeakerCardProps) {
           style={{
             objectFit: "cover",
             ...(speaker.name === "Rainy Varshney"
-              ? { objectPosition: "center 90%" }
+              ? { objectPosition: "center 90%" } : speaker.name === "Vinit Goenka"
+              ? { objectPosition: "center 5%" } : speaker.name === "Keith Gomes"
+              ? { objectPosition: "center 5%" } : speaker.name === "Major Mohd Ali Shah"
+              ? { objectPosition: "center 5%" } : speaker.name === "Mehak Dhingra"
+              ? { objectPosition: "center 15%" }
               : {}),
           }}
         />
