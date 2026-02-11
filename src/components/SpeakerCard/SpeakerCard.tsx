@@ -126,7 +126,7 @@ export function SpeakerCard({ speaker, onClick, index }: SpeakerCardProps) {
       role="button"
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
+          e.preventDefault  ();
           onClick();
         }
       }}
@@ -158,7 +158,6 @@ export function SpeakerCard({ speaker, onClick, index }: SpeakerCardProps) {
         />
 
         <div className="holographic-overlay" />
-        <div className="">{speaker.category}</div>
       </div>
 
       <div className="card-content">
