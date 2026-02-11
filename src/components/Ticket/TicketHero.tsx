@@ -1,35 +1,35 @@
-"use client"
+"use client";
 import ShinyText from "./ShinyText";
-// import FaultyTerminal from "./FaultyTerminal";
+import FaultyTerminal from "./FaultyTerminal";
 
 const TicketHero = () => {
-
   return (
     <div className="rounded-md">
       <section>
         <div className="hero h-screen flex items-center justify-center relative overflow-hidden">
           <div className="absolute inset-0 z-0">
             <div className="absolute inset-0 z-0">
-  {/* <FaultyTerminal
-  
-                scale={2.3}
-                gridMul={[2, 1]}
-                digitSize={1.2}
-                timeScale={0.6}
-                pause={false}
-                scanlineIntensity={0.5}
-                glitchAmount={1}
-                flickerAmount={1}
-                noiseAmp={1}
-                chromaticAberration={0}
-                dither={0}
-                curvature={0.2}
-                tint="#eb0028"
-                mouseReact={true}
-                mouseStrength={0.5}
-                pageLoadAnimation
-                brightness={0.8}
-              /> */}
+              <div className="absolute inset-0 z-0 hidden md:block">
+                <FaultyTerminal
+                  scale={2.3}
+                  gridMul={[2, 1]}
+                  digitSize={1.2}
+                  timeScale={0.6}
+                  pause={false}
+                  scanlineIntensity={0.5}
+                  glitchAmount={1}
+                  flickerAmount={1}
+                  noiseAmp={1}
+                  chromaticAberration={0}
+                  dither={0}
+                  curvature={0.2}
+                  tint="#eb0028"
+                  mouseReact={true}
+                  mouseStrength={0.5}
+                  pageLoadAnimation
+                  brightness={0.8}
+                />
+              </div>
             </div>
           </div>
           <div className="text-center text-xl md:text-2xl lg:text-3xl font-thin relative z-10 pointer-events-none select-none">

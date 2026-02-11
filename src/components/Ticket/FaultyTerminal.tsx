@@ -279,11 +279,7 @@ export default function FaultyTerminal({
   tint = "#ffffff",
   mouseReact = true,
   mouseStrength = 0.2,
-  dpr = typeof window !== "undefined"
-    ? window.innerWidth < 768
-      ? 1
-      : Math.min(window.devicePixelRatio || 1, 2)
-    : 1,
+  dpr = typeof window !== "undefined" && window.innerWidth < 768 ? 0.8 : 1,
   pageLoadAnimation = true,
   brightness = 1,
   className,
@@ -342,16 +338,18 @@ export default function FaultyTerminal({
             gl.canvas.width / gl.canvas.height,
           ),
         },
-        uLowQuality: { value: window.innerWidth < 768 ? 1 : 0 },
+        uLowQuality: { value: 1 },
+
         uScale: { value: scale },
 
         uGridMul: {
-          value: new Float32Array(
-            window.innerWidth < 768
-              ? [gridMul[0] * 0.7, gridMul[1] * 0.7]
-              : gridMul,
-          ),
-        },
+  value: new Float32Array(
+    window.innerWidth < 768
+      ? [1.2, 0.8]
+      : [1.6, 1.0]
+  ),
+},
+
 
         uDigitSize: { value: digitSize },
         uScanlineIntensity: { value: scanlineIntensity },
@@ -397,51 +395,51 @@ export default function FaultyTerminal({
     resize();
 
     const update = (t: number) => {
-  rafRef.current = requestAnimationFrame(update);
+      rafRef.current = requestAnimationFrame(update);
 
-  const isMobile = window.innerWidth < 768;
-  const fps = isMobile ? 30 : 60;
-  const frameInterval = 1000 / fps;
+      const isMobile = window.innerWidth < 768;
+      const fps = isMobile ? 24 : 40;
+      const frameInterval = 1000 / fps;
 
-  if (t - lastFrameRef.current < frameInterval) return;
-  lastFrameRef.current = t;
+      if (t - lastFrameRef.current < frameInterval) return;
+      lastFrameRef.current = t;
 
-  if (pageLoadAnimation && loadAnimationStartRef.current === 0) {
-    loadAnimationStartRef.current = t;
-  }
+      if (pageLoadAnimation && loadAnimationStartRef.current === 0) {
+        loadAnimationStartRef.current = t;
+      }
 
-  if (!pause) {
-    const elapsed = (t * 0.001 + timeOffsetRef.current) * timeScale;
-    program.uniforms.iTime.value = elapsed;
-    frozenTimeRef.current = elapsed;
-  } else {
-    program.uniforms.iTime.value = frozenTimeRef.current;
-  }
+      if (!pause) {
+        const elapsed = (t * 0.001 + timeOffsetRef.current) * timeScale;
+        program.uniforms.iTime.value = elapsed;
+        frozenTimeRef.current = elapsed;
+      } else {
+        program.uniforms.iTime.value = frozenTimeRef.current;
+      }
 
-  if (pageLoadAnimation && loadAnimationStartRef.current > 0) {
-    const animationDuration = 2000;
-    const animationElapsed = t - loadAnimationStartRef.current;
-    program.uniforms.uPageLoadProgress.value = Math.min(
-      animationElapsed / animationDuration,
-      1
-    );
-  }
+      if (pageLoadAnimation && loadAnimationStartRef.current > 0) {
+        const animationDuration = 2000;
+        const animationElapsed = t - loadAnimationStartRef.current;
+        program.uniforms.uPageLoadProgress.value = Math.min(
+          animationElapsed / animationDuration,
+          1,
+        );
+      }
 
-  if (mouseReact && window.innerWidth >= 768) {
-    const dampingFactor = 0.08;
-    const smoothMouse = smoothMouseRef.current;
-    const mouse = mouseRef.current;
+      if (mouseReact && window.innerWidth >= 768) {
+        const dampingFactor = 0.08;
+        const smoothMouse = smoothMouseRef.current;
+        const mouse = mouseRef.current;
 
-    smoothMouse.x += (mouse.x - smoothMouse.x) * dampingFactor;
-    smoothMouse.y += (mouse.y - smoothMouse.y) * dampingFactor;
+        smoothMouse.x += (mouse.x - smoothMouse.x) * dampingFactor;
+        smoothMouse.y += (mouse.y - smoothMouse.y) * dampingFactor;
 
-    const mouseUniform = program.uniforms.uMouse.value as Float32Array;
-    mouseUniform[0] = smoothMouse.x;
-    mouseUniform[1] = smoothMouse.y;
-  }
+        const mouseUniform = program.uniforms.uMouse.value as Float32Array;
+        mouseUniform[0] = smoothMouse.x;
+        mouseUniform[1] = smoothMouse.y;
+      }
 
-  renderer.render({ scene: mesh });
-};
+      renderer.render({ scene: mesh });
+    };
 
     rafRef.current = requestAnimationFrame(update);
     ctn.appendChild(gl.canvas);
