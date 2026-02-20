@@ -763,16 +763,15 @@ export default function AboutPage() {
                   index === 8 ? "lg:col-start-2" : ""
                 } mb-4 sm:mb-0`}
               >
-                {/* Image Container - Removed Border and Box, Circular Shape */}
+                {/* Image Container*/}
                 <div className="relative w-full max-w-[280px] sm:max-w-[340px] md:max-w-[460px] aspect-square rounded-full overflow-hidden transition-all duration-700">
                   {/* Photo Background (The Spiral) */}
                   <div className="absolute inset-0 z-0 opacity-80 group-hover:opacity-100 transition-opacity duration-700">
                     <div className="absolute inset-0 photo-spiral-bg scale-105 group-hover:scale-125 transition-transform duration-[2s] ease-out" />
-                    {/* Subtle dark gradient for depth */}
                     <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/40" />
                   </div>
 
-                  {/* Member Photo - Massive zoom/size increase */}
+                  {/*Core pic*/}
                   <div className="absolute inset-0 z-10 flex items-center justify-center">
                     <div className="absolute inset-0 z-10">
                       <Image
@@ -792,7 +791,7 @@ export default function AboutPage() {
 
                 {/* Name & Role Floating below */}
                 <div className="mt-8 text-center px-4">
-                  <h3 className="text-white font-black text-lg md:text-2xl tracking-tighter uppercase group-hover:text-red-600 transition-all duration-300">
+                  <h3 className="text-white font-black text-base md:text-2xl tracking-tighter uppercase group-hover:text-red-600 transition-all duration-300">
                     {member.name}
                   </h3>
                   <div className="flex items-center justify-center gap-3 mt-3">
