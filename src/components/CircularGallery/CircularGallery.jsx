@@ -557,8 +557,10 @@ class App {
   update() {
     // Auto-scroll if not interacting
     if (!this.isDown) {
-      // Adjust this value for speed (positive: right, negative: left)
-      this.scroll.target += 0.1; // You can tweak this value for desired speed
+      // Use screen width to determine device
+      const isMobile = this.screen && this.screen.width < 768;
+      const autoSpeed = isMobile ? 0.05 : 0.1;
+      this.scroll.target += autoSpeed;
     }
     this.scroll.current = lerp(
       this.scroll.current,

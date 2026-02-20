@@ -159,11 +159,42 @@ type PopupData = {
 };
 
 export default function SponsorsPage() {
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const heroRef = useRef<HTMLElement>(null);
   const sponsorsGridRef = useRef<HTMLElement>(null);
   const [popup, setPopup] = useState<PopupData | null>(null);
   const [isExpanded, setIsExpanded] = useState(false);
   const [showAllPrevious, setShowAllPrevious] = useState(false);
+
+  useEffect(() => {
+  const isMobile = window.innerWidth < 768;
+  if (!isMobile) return;
+
+  const handleScroll = () => {
+    const cards = document.querySelectorAll(".sponsor-card");
+    let closestIndex = 0;
+    let closestDistance = Infinity;
+
+    cards.forEach((card, index) => {
+      const rect = card.getBoundingClientRect();
+      const cardCenter = rect.top + rect.height / 2;
+      const screenCenter = window.innerHeight / 2;
+      const distance = Math.abs(screenCenter - cardCenter);
+
+      if (distance < closestDistance) {
+        closestDistance = distance;
+        closestIndex = index;
+      }
+    });
+
+    setActiveIndex(closestIndex);
+  };
+
+  handleScroll();
+  window.addEventListener("scroll", handleScroll);
+
+  return () => window.removeEventListener("scroll", handleScroll);
+}, []);
 
   useEffect(() => {
     if (popup || showAllPrevious) {
@@ -361,13 +392,22 @@ export default function SponsorsPage() {
                   viewport={{ once: true }}
                   transition={{ delay: i * 0.05 }}
                   whileHover={{ scale: 1.05 }}
-                  className="group flex flex-col items-center gap-3 cursor-pointer"
+                  className="group sponsor-card flex flex-col items-center gap-3 cursor-pointer"
                 >
                   <div className="w-full aspect-[4/3] rounded-3xl bg-white/[0.03] border border-white/5 hover:border-white/20 transition-all overflow-hidden flex items-center justify-center p-8 relative">
                     <img
                       src={sponsor.image}
                       alt={sponsor.name}
-                      className="w-full h-full object-contain filter grayscale brightness-125 group-hover:grayscale-0 transition-all duration-700"
+                      className={`
+  w-full h-full object-contain transition-all duration-700
+  ${
+    typeof window !== "undefined" && window.innerWidth < 768
+      ? activeIndex === i
+        ? "grayscale-0 brightness-110"
+        : "grayscale brightness-125"
+      : "filter grayscale brightness-125 group-hover:grayscale-0"
+  }
+`}
                     />
                     {/* Localized dark area for text legibility */}
                     <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
