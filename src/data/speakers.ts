@@ -113,17 +113,17 @@ export const speakers: Speaker[] = [
     linkedin: "https://linkedin.com",
     twitter: "https://twitter.com",
   },
-  // {
-  //   id: 12,
-  //   name: "Manas",
-  //   role: "Tech Ethicist",
-  //   topic: "",
-  //   category: "",
-  //   bio: "Manas advises tech giants on ethical AI development.",
-  //   image: "/speakers/manas.png",
-  //   linkedin: "https://linkedin.com",
-  //   twitter: "https://twitter.com",
-  // },
+    {
+    id: 12,
+    name: "Neha Sakka",
+    role: "Engineer & Energy Policy Professional",
+    topic: "",
+    category: "Innovation",
+    bio: "Neha Sakka represents a new generation of engineers advancing India’s clean energy transition. Working within Rajasthan’s power distribution system, she contributes to strengthening infrastructure while promoting sustainable energy solutions. She has supported the development of EV charging facilities and leads awareness initiatives on cleaner mobility. Through her speaking engagements, she connects technical expertise with public understanding, helping shape conversations around renewable energy and future mobility.",
+    image: "/speakers/neha.png",
+    linkedin: "https://linkedin.com",
+    twitter: "https://twitter.com",
+  },
 ];
 
 export const categories = [

@@ -487,7 +487,7 @@ export default function SponsorsPage() {
                       <img
                         src={popup.image}
                         alt={popup.name}
-                        className="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-700"
+                        className="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-500"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
                     </motion.div>
