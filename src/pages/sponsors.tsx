@@ -17,7 +17,7 @@ const sponsors = [
     href: "https://www.bluechiphs.com/",
   },
   {
-    image: "/sponsors/gdx.png",
+    image: "/sponsors/GDX.png",
     name: "GDX",
     partnerType: "Security Partner",
     href: "https://www.gdxgroup.in/",
