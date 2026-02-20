@@ -13,6 +13,7 @@ export default function Navbar() {
     { name: "Rewind", path: "/rewind" },
     { name: "Pre Events", path: "/preevents" },
     { name: "About", path: "/about" },
+    { name: "Sponsors ", path: "/sponsors" },
   ];
 
   useEffect(() => {
