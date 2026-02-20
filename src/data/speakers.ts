@@ -13,18 +13,6 @@ export type Speaker = {
 
 export const speakers: Speaker[] = [
   {
-    id: 1,
-    name: "Mehak Dhingra",
-    role: "Professional Model",
-    topic: "",
-    category: "Arts",
-    bio: "Mehak Dhingra is a rising force in Indian pageantry and fashion, crowned Miss Teen India 2022 and later earning titles at Miss Charm India 2025 and Miss Universe India 2025 Runner-Up. Beyond the spotlight, she champions animal welfare and children’s education. With confidence, grace, and global ambition, she inspires young minds to dream boldly and redefine modern Indian representation on international stages.",
-    image: "/speakers/mehak.png",
-    linkedin: "https://linkedin.com",
-    twitter: "https://twitter.com",
-    featured: true,
-  },
-  {
     id: 2,
     name: "Keith Gomes",
     role: "Director",
@@ -78,17 +66,6 @@ export const speakers: Speaker[] = [
     category: "Arts",
     bio: "Sindhu Sridhar is a fashion visionary and founder of SINS Studio, redefining sustainable luxury in India. A graduate of the London College of Fashion, she pioneers up-cycled, made-to-order couture that revives heritage textiles and craftsmanship. Recognized for innovative design concepts, Sindhu bridges tradition with modern sustainability, shaping a future where fashion is both ethical and elegant.",
     image: "/speakers/sindhu.png",
-    linkedin: "https://linkedin.com",
-    twitter: "https://twitter.com",
-  },
-  {
-    id: 7,
-    name: "Alokananda Roy",
-    role: "Social Reformer",
-    topic: "",
-    category: "Society",
-    bio: "Alokananda Roy is a classical dancer, former Miss India finalist, and founder of Touch World NGO. She pioneered “culture therapy,” using dance and music to rehabilitate prisoners and marginalized communities. Her transformative work through art has gained global recognition, proving creativity’s power to heal, restore dignity, and rebuild lives through expression, empathy, and human connection.",
-    image: "/speakers/alkanada.png",
     linkedin: "https://linkedin.com",
     twitter: "https://twitter.com",
   },
