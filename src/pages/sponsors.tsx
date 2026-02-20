@@ -244,7 +244,7 @@ export default function SponsorsPage() {
         {/* Floating scroll-down arrow */}
         <motion.button
           onClick={scrollToSponsors}
-          className="absolute bottom-8 ml-[25%] mb-[15%] md:ml-[45%] -translate-x-1/2 z-10 flex flex-col items-center gap-2 text-white/60 hover:text-white transition-colors group w-full max-w-[200px]"
+          className="absolute bottom-8 ml-[25%] mb-[15%] md:mb-[0%] md:ml-[45%] -translate-x-1/2 z-10 flex flex-col items-center gap-2 text-white/60 hover:text-white transition-colors group w-full max-w-[200px]"
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1, duration: 0.6 }}
