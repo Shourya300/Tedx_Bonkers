@@ -9,6 +9,25 @@ import {
 } from "ogl";
 import { useEffect, useRef } from "react";
 
+// TypeScript type for props
+/**
+ * @typedef {Object} GalleryItem
+ * @property {string} image
+ * @property {string} text
+ * @property {string} [type]
+ */
+
+/**
+ * @typedef {Object} CircularGalleryProps
+ * @property {GalleryItem[]} items
+ * @property {number} [bend]
+ * @property {string} [textColor]
+ * @property {number} [borderRadius]
+ * @property {string} [font]
+ * @property {number} [scrollSpeed]
+ * @property {number} [scrollEase]
+ */
+
 function debounce(func, wait) {
   let timeout;
   return function (...args) {
@@ -586,6 +605,9 @@ class App {
   }
 }
 
+/**
+ * @param {CircularGalleryProps} props
+ */
 export default function CircularGallery({
   items = [],
   bend = 3,
