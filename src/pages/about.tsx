@@ -764,7 +764,7 @@ export default function AboutPage() {
                 } mb-4 sm:mb-0`}
               >
                 {/* Image Container*/}
-                <div className="relative w-full max-w-[280px] sm:max-w-[340px] md:max-w-[460px] aspect-square rounded-full overflow-hidden transition-all duration-700">
+                <div className="relative w-[50vw] sm:w-full max-w-[460px] aspect-square rounded-full overflow-hidden transition-all duration-700">
                   {/* Photo Background (The Spiral) */}
                   <div className="absolute inset-0 z-0 opacity-80 group-hover:opacity-100 transition-opacity duration-700">
                     <div className="absolute inset-0 photo-spiral-bg scale-105 group-hover:scale-125 transition-transform duration-[2s] ease-out" />
@@ -794,7 +794,7 @@ export default function AboutPage() {
                   <h3 className="text-white font-black text-base md:text-2xl tracking-tighter uppercase group-hover:text-red-600 transition-all duration-300">
                     {member.name}
                   </h3>
-                  <div className="flex items-center justify-center gap-3 mt-3">
+                  <div className="flex items-center justify-center gap-1 md:gap-3 mt-3">
                     <div className=" bg-red-600/50" />
                     <p className="text-red-500 font-bold text-[8px] md:text-2xs tracking-[0.2em] uppercase">
                       {member.role}
