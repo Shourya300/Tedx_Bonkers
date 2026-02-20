@@ -12,8 +12,8 @@ export default function Navbar() {
     { name: "Speakers", path: "/speakers" },
     { name: "Rewind", path: "/rewind" },
     { name: "Pre Events", path: "/preevents" },
-    { name: "About", path: "/about" },
     { name: "Sponsors ", path: "/sponsors" },
+    { name: "About", path: "/about" },
   ];
 
   useEffect(() => {
