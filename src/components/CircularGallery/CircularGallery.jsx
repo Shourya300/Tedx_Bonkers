@@ -555,6 +555,11 @@ class App {
     }
   }
   update() {
+    // Auto-scroll if not interacting
+    if (!this.isDown) {
+      // Adjust this value for speed (positive: right, negative: left)
+      this.scroll.target += 0.1; // You can tweak this value for desired speed
+    }
     this.scroll.current = lerp(
       this.scroll.current,
       this.scroll.target,
