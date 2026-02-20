@@ -461,6 +461,30 @@ export default function Home() {
           <div className="max-w-xl mx-auto md:ml-auto md:mr-0 text-center">
             <div className="flex flex-col items-center gap-4">
               <h2 className="text-4xl md:text-7xl font-bold text-white text-glow">
+                Sponsors
+              </h2>
+              <div className="w-24 h-[1px] bg-[#D3D3D3] shadow-[0_0_10px_rgba(230,230,230,230)]" />
+              <p className="text-center text-base md:text-[1.6rem] leading-[1.7] max-w-[30rem] mx-auto font-sans font-medium tracking-[0.02em] text-[#EAEAEA] mt-4 px-4 md:px-0">
+                Our sponsors are the driving force behind the experiences we create. <br />
+At TEDxNIIT University, we collaborate with visionary brands and organizations who believe in the power of ideas, innovation, and meaningful dialogue.
+              </p>
+              <div className="mt-2">
+                <Link href="/sponsors" passHref legacyBehavior>
+                  <a tabIndex={0}>
+                    <MetalButton variant="purple" className="text-sm">
+                      Learn More
+                    </MetalButton>
+                  </a>
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="min-h-screen flex items-center pointer-events-auto px-6 md:px-12 py-8 md:py-0">
+          <div className="max-w-xl mx-auto md:ml-auto md:mr-0 text-center">
+            <div className="flex flex-col items-center gap-4">
+              <h2 className="text-4xl md:text-7xl font-bold text-white text-glow">
                 About
               </h2>
               <div className="w-24 h-[1px] bg-[#D3D3D3] shadow-[0_0_10px_rgba(230,230,230,230)]" />

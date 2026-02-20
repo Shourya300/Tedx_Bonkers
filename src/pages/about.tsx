@@ -12,6 +12,55 @@ import { motion, useMotionValue, useSpring } from "framer-motion";
 import Silk from "../components/Silk/Silk";
 import Footer from "@/components/Footer/Footer";
 
+const CORE_MEMBERS = [
+  {
+    name: "Anushkaa Manishi",
+    image: "/core/anushkaa.png",
+    role: "Organizer & Licensee",
+  },
+  { name: "Arjun R. Kamath", image: "/core/arjun.png", role: "Co-Organizer" },
+  {
+    name: "Ashutosh Purkaysth",
+    image: "/core/ashu.png",
+    role: "Sponsorship Core",
+  },
+  {
+    name: "Akshat Godika",
+    image: "/core/baja.png",
+    role: "Creative Core",
+  },
+  {
+    name: "Nishant Saxena",
+    image: "/core/goya.png",
+    role: "Editorial Curation Core",
+  },
+  {
+    name: "Jerush Ajvin",
+    image: "/core/jerush.png",
+    role: "Capture & Post Production Core",
+  },
+  {
+    name: "Prisha Kashyap",
+    image: "/core/prishaaaa.png",
+    role: "Marketing & Social Media Core",
+  },
+  {
+    name: "Shourya Srivastava",
+    image: "/core/techy.png",
+    role: "Tech Core",
+  },
+  {
+    name: "Vikram Kondoju",
+    image: "/core/viky.png",
+    role: "Production Core",
+  },
+  {
+    name: "Vishodhan Charry",
+    image: "/core/vishodhan.png",
+    role: "Design Core",
+  },
+];
+
 interface Shape {
   id: number;
   x: number;
@@ -283,8 +332,7 @@ export default function AboutPage() {
       <div
         className="pointer-events-none fixed inset-0 z-0 overflow-hidden"
         style={{
-          background:
-            `radial-gradient(circle at 100% 100%, rgba(30,64,175,0.65) 0%, rgba(30,64,175,0.10) 12%, rgba(0,0,0,0) 22%),
+          background: `radial-gradient(circle at 100% 100%, rgba(30,64,175,0.65) 0%, rgba(30,64,175,0.10) 12%, rgba(0,0,0,0) 22%),
              radial-gradient(circle at 0% 0%, rgba(136,19,55,0.48) 0%, rgba(136,19,55,0.08) 12%, rgba(0,0,0,0) 22%),
              #000`,
           zIndex: 0,
@@ -678,6 +726,89 @@ export default function AboutPage() {
             </motion.div>
           </div>
         </section>
+
+        {/* CORE MEMBERS SECTION */}
+        <section className="relative z-30 w-full max-w-7xl mx-auto px-8 pb-32">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <motion.h2
+              initial={{ opacity: 0, letterSpacing: "0.2em" }}
+              whileInView={{ opacity: 1, letterSpacing: "0.6em" }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2, duration: 0.8 }}
+              className="text-gray-500 uppercase tracking-[0.6em] text-xs font-semibold mb-6 mt-10"
+            >
+              OUR TEAM
+            </motion.h2>
+            <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent mb-4">
+              Core Members
+            </h2>
+            <div className="w-24 h-1 bg-gradient-to-r from-transparent via-red-600 to-transparent mx-auto rounded-full shadow-[0_0_15px_rgba(230,43,30,0.6)]" />
+          </motion.div>
+
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-12 md:gap-x-8 md:gap-y-20 px-2 sm:px-8">
+            {CORE_MEMBERS.map((member, index) => (
+              <motion.div
+                key={member.name}
+                initial={{ opacity: 0, y: 40 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.2 }}
+                transition={{ delay: index * 0.1, duration: 0.7 }}
+                whileHover={{ y: 0 }}
+                className={`group relative flex flex-col items-center ${
+                  index === 8 ? "lg:col-start-2" : ""
+                } mb-4 sm:mb-0`}
+              >
+                {/* Image Container - Removed Border and Box, Circular Shape */}
+                <div className="relative w-full max-w-[280px] sm:max-w-[340px] md:max-w-[460px] aspect-square rounded-full overflow-hidden transition-all duration-700">
+                  {/* Photo Background (The Spiral) */}
+                  <div className="absolute inset-0 z-0 opacity-80 group-hover:opacity-100 transition-opacity duration-700">
+                    <div className="absolute inset-0 photo-spiral-bg scale-105 group-hover:scale-125 transition-transform duration-[2s] ease-out" />
+                    {/* Subtle dark gradient for depth */}
+                    <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/40" />
+                  </div>
+
+                  {/* Member Photo - Massive zoom/size increase */}
+                  <div className="absolute inset-0 z-10 flex items-center justify-center">
+                    <div className="absolute inset-0 z-10">
+                      <Image
+                        src={member.image}
+                        alt={member.name}
+                        fill
+                        className="object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
+                        sizes="(max-width: 768px) 500px, 950px"
+                        priority={index < 3}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Interactive Glow */}
+                  <div className="absolute inset-0 z-[5] opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-[radial-gradient(circle_at_center,_rgba(230,43,30,0.15)_0%,_transparent_70%)]" />
+                </div>
+
+                {/* Name & Role Floating below */}
+                <div className="mt-8 text-center px-4">
+                  <h3 className="text-white font-black text-lg md:text-2xl tracking-tighter uppercase group-hover:text-red-600 transition-all duration-300">
+                    {member.name}
+                  </h3>
+                  <div className="flex items-center justify-center gap-3 mt-3">
+                    <div className=" bg-red-600/50" />
+                    <p className="text-red-500 font-bold text-[8px] md:text-2xs tracking-[0.2em] uppercase">
+                      {member.role}
+                    </p>
+                    <div className=" bg-red-600/50" />
+                  </div>
+                  {/* Animated underline */}
+                  <div className="w-0 group-hover:w-full h-[2px] bg-red-600 mx-auto mt-4 transition-all duration-500 shadow-[0_0_15px_rgba(230,43,30,0.5)]" />
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </section>
       </main>
 
       <Footer />
@@ -750,6 +881,20 @@ export default function AboutPage() {
           width: 10px;
           height: 10px;
           transform: translate(-50%, -50%);
+        }
+
+        .photo-spiral-bg {
+          background:
+            url("/images/spiral_bg.png") center/cover no-repeat,
+            repeating-conic-gradient(
+              from 0deg,
+              #000 0deg 15deg,
+              #450a0a 15deg 30deg
+            );
+          width: 100%;
+          height: 100%;
+          filter: contrast(120%) brightness(80%);
+          mask-image: radial-gradient(circle, black, transparent 80%);
         }
       `}</style>
     </div>
