@@ -11,6 +11,7 @@ export default function Navbar() {
   const links = [
     { name: "Speakers", path: "/speakers" },
     { name: "Rewind", path: "/rewind" },
+    { name: "Timeline", path: "/timeline" },
     { name: "Pre Events", path: "/preevents" },
     { name: "Sponsors ", path: "/sponsors" },
     { name: "About", path: "/about" },
@@ -116,16 +117,19 @@ export default function Navbar() {
         aria-label="Toggle menu"
       >
         <span
-          className={`w-6 h-0.5 bg-white transition-all duration-300 ${isMenuOpen ? "rotate-45 translate-y-2" : ""
-            }`}
+          className={`w-6 h-0.5 bg-white transition-all duration-300 ${
+            isMenuOpen ? "rotate-45 translate-y-2" : ""
+          }`}
         ></span>
         <span
-          className={`w-6 h-0.5 bg-white transition-all duration-300 ${isMenuOpen ? "opacity-0" : ""
-            }`}
+          className={`w-6 h-0.5 bg-white transition-all duration-300 ${
+            isMenuOpen ? "opacity-0" : ""
+          }`}
         ></span>
         <span
-          className={`w-6 h-0.5 bg-white transition-all duration-300 ${isMenuOpen ? "-rotate-45 -translate-y-2" : ""
-            }`}
+          className={`w-6 h-0.5 bg-white transition-all duration-300 ${
+            isMenuOpen ? "-rotate-45 -translate-y-2" : ""
+          }`}
         ></span>
       </button>
 
