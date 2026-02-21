@@ -115,7 +115,7 @@ export const speakers: Speaker[] = [
   },
     {
     id: 12,
-    name: "Neha Sakka",
+    name: "Er. Neha Sakka",
     role: "Engineer & Energy Policy Professional",
     topic: "",
     category: "Innovation",
