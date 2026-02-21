@@ -151,7 +151,7 @@ export function SpeakerCard({ speaker, onClick, index }: SpeakerCardProps) {
               ? { objectPosition: "center 90%" } : speaker.name === "Vinit Goenka"
               ? { objectPosition: "center 5%" } : speaker.name === "Keith Gomes"
               ? { objectPosition: "center 5%" } : speaker.name === "Major Mohd Ali Shah"
-              ? { objectPosition: "center 3%" } : speaker.name === "Neha Sakka"
+              ? { objectPosition: "center 3%" } : speaker.name === "Er. Neha Sakka"
               ? { objectPosition: "center 15%" }
               : {}),
           }}
