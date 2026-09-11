@@ -55,7 +55,7 @@ const CORE_MEMBERS = [
     role: "Production Core",
   },
   {
-    name: "Vishodan Charry",
+    name: "Vishodan Chary",
     image: "/core/vishodhan.png",
     role: "Design Core",
   },
